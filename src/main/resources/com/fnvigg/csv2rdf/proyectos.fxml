@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.ProyectosController">
+   <children>
+      <TitledPane animated="false" prefHeight="400.0" prefWidth="600.0" text="Proyectos">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <ListView fx:id="listProyects" layoutX="24.0" layoutY="36.0" prefHeight="265.0" prefWidth="261.0" />
+                  <Button fx:id="loadBtn" layoutX="61.0" layoutY="314.0" mnemonicParsing="false" text="Cargar" />
+                  <Button fx:id="deleteBtn" layoutX="197.0" layoutY="314.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="51.0" text="Borrar" />
+                  <Button fx:id="registerNewBtn" layoutX="390.0" layoutY="234.0" mnemonicParsing="false" text="Registrar" />
+                  <Separator layoutX="296.0" layoutY="-31.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="4.0" />
+                  <Label layoutX="107.0" layoutY="14.0" text="Lista de proyectos" />
+                  <Label layoutX="403.0" layoutY="14.0" text="Nuevo proyecto" />
+                  <TextField fx:id="dataProyectFld" layoutX="422.0" layoutY="61.0" />
+                  <Label fx:id="dataLbl" layoutX="306.0" layoutY="65.0" text="Ingeniero de Datos" />
+                  <Label fx:id="ontologicalLbl" layoutX="306.0" layoutY="127.0" text="Ingeniero Ontológico" />
+                  <TextField fx:id="ontologicProyectFld" layoutX="422.0" layoutY="123.0" />
+                  <Label fx:id="nameLbl" layoutX="306.0" layoutY="189.0" text="Nombre de proyecto" />
+                  <TextField fx:id="nameProyectFld" layoutX="422.0" layoutY="185.0" />
+                  <Label layoutX="408.0" layoutY="293.0" text="Label" visible="false" />
+               </children></AnchorPane>
+        </content>
+      </TitledPane>
+   </children>
+</AnchorPane>
