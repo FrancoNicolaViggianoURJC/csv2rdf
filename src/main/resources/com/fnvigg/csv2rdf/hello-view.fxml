@@ -26,7 +26,7 @@
                         <Font name="Inter Regular" size="27.0" />
                     </font>
                 </Label>
-                <Label layoutX="26.0" layoutY="272.0" prefHeight="68.0" prefWidth="252.0" text="CSV@RDF Helptool es una aplicacion de &#10;escritorio diseñada para brindar apoyo a los&#10;usuarios del proceso metodológico CSV@RDF." textFill="WHITE" />
+                <Label layoutX="26.0" layoutY="272.0" prefHeight="68.0" prefWidth="252.0" text="CSV@RDF Helptool es una aplicación de &#10;escritorio diseñada para brindar apoyo a los&#10;usuarios del proceso metodológico CSV@RDF." textFill="WHITE" />
             </children>
         </AnchorPane>
         <AnchorPane prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: white;">
