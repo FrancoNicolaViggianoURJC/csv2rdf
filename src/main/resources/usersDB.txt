@@ -1,2 +1,4 @@
 aaa,bbb,Ingeniero de datos
 ccc,ddd,Ingeniero Ontológico
+Franco,1234,Ingeniero Ontológico
+Valentina,1234,Ingeniero de datos

@@ -49,6 +49,17 @@ public class ProyectosController implements Initializable {
             throw new RuntimeException(e);
         }
 
+        //Llenar y bloquear el rol asociado
+        String rol = AtributosSesion.getRol();
+        String nombre = AtributosSesion.getUser();
+        if(rol.equals("Ingeniero de datos")){
+            dataProyectFld.setDisable(true);
+            dataProyectFld.setText(nombre);
+
+        } else if (rol.equals("Ingeniero Ontológico")) {
+            ontologicProyectFld.setDisable(true);
+            ontologicProyectFld.setText(nombre);
+        }
     }
 
     @FXML
@@ -94,8 +105,6 @@ public class ProyectosController implements Initializable {
             actualizarLista();
             lblDatos.setVisible(false);
             lblOntologico.setVisible(false);
-        }else{
-
         }
     }
 
@@ -133,8 +142,19 @@ public class ProyectosController implements Initializable {
             String linea = br.readLine();
             String ingDato, ingOnt;
             String[] tokens = linea.split(",");
-            ingDato = tokens[0];
-            ingOnt = tokens[1];
+            ingDato = tokens[1];
+            ingOnt = tokens[0];
+
+            //OJO, si el usuario de la sesion no coincide con ninguno de los dos, no debe dejar interactuar con el proyecto
+            String userSesion = AtributosSesion.getUser();
+            if(userSesion.equals(tokens[0]) || userSesion.equals(tokens[1])){
+                //No coincide con ningun miembro del proyecto
+                deleteBtn.setDisable(false);
+                loadBtn.setDisable(false);
+            }else{
+                deleteBtn.setDisable(true);
+                loadBtn.setDisable(true);
+            }
 
             lblDatos.setText(ingDato);
             lblOntologico.setText(ingOnt);

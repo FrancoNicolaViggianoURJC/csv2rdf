@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloController {
+    //Controller para la pantalla de bienvenida
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -26,19 +27,23 @@ public class HelloController {
     public Label prueba;
     public PasswordField passFld;
     public Label errLbl;
-    //Controller para la pantalla de bienvenida
     private Gestor_usuarios users = new Gestor_usuarios();
 
     @FXML
     protected void loginBtnButtonClick(ActionEvent event) throws IOException {
         String user = userFld.getText();
         String pass = passFld.getText();
+        AtributosSesion.setUser(user);
+
         boolean validado = false;
         //Crear la java class gestor_usuarios pasandole como argumento el user y el pass
         validado = users.validar_Usuario(user, pass);
-        //if validado ... transicionar a la siguiente
-        //else repeat
+
+        //if validado ...
         if (validado){
+            //Asignamos los roles a la sesion
+            String rol = users.obtenerRoles(user);
+            AtributosSesion.setRol(rol);
             errLbl.setVisible(false);
             //transicionar a pantalla inicial de proyectos
             transicionar(event);

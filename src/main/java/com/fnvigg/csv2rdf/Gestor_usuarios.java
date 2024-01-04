@@ -38,6 +38,7 @@ public class Gestor_usuarios {
             BufferedWriter bufferedWriter = new BufferedWriter(escritor);
             bufferedWriter.write(" ");
             bufferedWriter.close();
+            escritor.close();
             System.out.println("Archivo creado exitosamente.");
 
         } catch (IOException e) {
@@ -57,6 +58,8 @@ public class Gestor_usuarios {
                 //procesar linea
                 String[] partes = linea.split(String.valueOf(","));
                 if(partes[0].equals(user) && partes[1].equals(pass)){
+                    bufferedLector.close();
+                    lectorArchivo.close();
                     return true;
                 }
             }
@@ -79,6 +82,7 @@ public class Gestor_usuarios {
             BufferedWriter bufferedWriter = new BufferedWriter(escritor);
             bufferedWriter.write(user + "," + pass + "," + rol + '\n');
             bufferedWriter.close();
+            escritor.close();
             System.out.println("Usuario escrito exitosamente.");
             return true;
         } catch (IOException e) {
@@ -87,4 +91,27 @@ public class Gestor_usuarios {
         }
     }
 
+    public String obtenerRoles(String user) {
+        try {
+            //Creacion del objeto para escribir con el archivo
+            File archivo = new File("src/main/resources/usersDB.txt");
+            FileReader lector = new FileReader(archivo);
+            BufferedReader br = new BufferedReader(lector);
+            String linea = br.readLine();
+            while(linea !=null){
+                String[] partes = linea.split(String.valueOf(","));
+                if(partes[0].equals(user)){
+                    br.close();
+                    lector.close();
+                    return partes[2];
+                }else{
+                    linea = br.readLine();
+                }
+            }
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

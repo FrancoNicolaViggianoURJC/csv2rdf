@@ -12,6 +12,7 @@ import java.util.List;
 
 public class Gestor_proyectos {
 
+    private AtributosSesion config;
     public Gestor_proyectos() {
     }
 
@@ -63,7 +64,7 @@ public class Gestor_proyectos {
             FileWriter fr = new FileWriter(config, true);
             BufferedWriter br = new BufferedWriter(fr);
             br.write(nombreOntologico + "," + nombreDato);
-
+            System.out.println(AtributosSesion.getUser());
             br.close();
             fr.close();
         } catch (IOException e) {
