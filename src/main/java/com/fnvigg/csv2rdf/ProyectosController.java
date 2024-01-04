@@ -82,6 +82,23 @@ public class ProyectosController implements Initializable {
         return false;
     }
 
+    @FXML
+    private boolean mostrarAlertaNombre(ActionEvent event){
+        Alert alertaNombre = new Alert(Alert.AlertType.INFORMATION);
+        alertaNombre.setTitle("Atencion");
+        alertaNombre.setContentText("Ya existe un proyecto con ese nombre");
+        Optional<ButtonType> resultado = alertaNombre.showAndWait();
+        return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaCampos(ActionEvent event){
+        Alert alertaNombre = new Alert(Alert.AlertType.INFORMATION);
+        alertaNombre.setTitle("Atencion");
+        alertaNombre.setContentText("Faltan datos por introducir");
+        Optional<ButtonType> resultado = alertaNombre.showAndWait();
+        return false;
+    }
     private void actualizarLista(){
         try {
             List<String> listaProyectos = proyectos.getProyectos();
@@ -113,23 +130,29 @@ public class ProyectosController implements Initializable {
         String nombreProyecto = nameProyectFld.getText();
         String nombreOntologico = ontologicProyectFld.getText();
         String nombreDato = dataProyectFld.getText();
-        boolean nombreDisponible = true;
-        for (Object proyecto : listProyects.getItems()){
-            String proyectoString = (String) proyecto;
-            if(nombreProyecto.equals(proyectoString)){
-                nombreDisponible = false;
-                break;
+        if(nombreProyecto.equals("") || nombreDato.equals("") || nombreOntologico.equals("")){
+            mostrarAlertaCampos(event);
+        }else{
+            boolean nombreDisponible = true;
+            for (Object proyecto : listProyects.getItems()){
+                String proyectoString = (String) proyecto;
+                if(nombreProyecto.equals(proyectoString)){
+                    nombreDisponible = false;
+                    break;
+                }
+            }
+            if(nombreDisponible) {
+                proyectos.crearProyecto(nombreProyecto, nombreDato, nombreOntologico);
+                actualizarLista();
+                nameProyectFld.setText("");
+                ontologicProyectFld.setText("");
+                dataProyectFld.setText("");
+            }else{
+                //mostrar mensaje error...
+                mostrarAlertaNombre(event);
             }
         }
-        if(nombreDisponible) {
-            proyectos.crearProyecto(nombreProyecto, nombreDato, nombreOntologico);
-            actualizarLista();
-            nameProyectFld.setText("");
-            ontologicProyectFld.setText("");
-            dataProyectFld.setText("");
-        }else{
-            //mostrar mensaje error...
-        }
+
     }
 
     public void onClickDatosProyecto(MouseEvent mouseEvent) {
