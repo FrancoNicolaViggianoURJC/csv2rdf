@@ -49,6 +49,33 @@ public class CimController implements Initializable {
         archivosIndicados = new LinkedList<String>();
         nombresArchivos = new LinkedList<String>();
         //accordion.getPanes().add()
+
+        //Rellenar el listview de archivos en la init por si ya hubiera de antes
+        String proyecto = AtributosSesion.getNombreProyecto();
+        String ruta = System.getProperty("user.dir");
+        File ficheroDestino = new File( "src/main/resources/Proyectos/" + proyecto + "/");
+
+        //Filtro para no obtener el archivo de configuracion
+        FilenameFilter filter = new FilenameFilter() {
+
+            public boolean accept(File f, String name)
+            {
+                return !name.contentEquals("config.txt");
+            }
+        };
+        File[] ficheros = ficheroDestino.listFiles(filter);
+
+        //Inicializacion linkedlists
+        for(File f : ficheros){
+            archivosIndicados.add(f.getAbsolutePath());
+            nombresArchivos.add(f.getName());
+        }
+
+        //Popular lista
+        ObservableList<String> listaObservable = FXCollections.observableArrayList();
+        listaObservable.addAll(nombresArchivos);
+        listViewArchivos.setItems(listaObservable);
+
     }
 
     @FXML
