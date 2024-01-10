@@ -34,6 +34,7 @@ public class CimController implements Initializable {
     public Button btnRestablecerCampo;
     public Button btnQuitarCampo;
     public TitledPane panel1;
+    public Button btnQuitarArchivo;
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -42,39 +43,17 @@ public class CimController implements Initializable {
     private LinkedList<String> archivosIndicados;
     //Nombres archivos
     private LinkedList<String> nombresArchivos;
+    private String nombreProyecto;
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
         accordion.setExpandedPane(panel1);
         archivosIndicados = new LinkedList<String>();
         nombresArchivos = new LinkedList<String>();
-        //accordion.getPanes().add()
 
-        //Rellenar el listview de archivos en la init por si ya hubiera de antes
-        String proyecto = AtributosSesion.getNombreProyecto();
-        String ruta = System.getProperty("user.dir");
-        File ficheroDestino = new File( "src/main/resources/Proyectos/" + proyecto + "/");
-
-        //Filtro para no obtener el archivo de configuracion
-        FilenameFilter filter = new FilenameFilter() {
-
-            public boolean accept(File f, String name)
-            {
-                return !name.contentEquals("config.txt");
-            }
-        };
-        File[] ficheros = ficheroDestino.listFiles(filter);
-
-        //Inicializacion linkedlists
-        for(File f : ficheros){
-            archivosIndicados.add(f.getAbsolutePath());
-            nombresArchivos.add(f.getName());
-        }
-
-        //Popular lista
-        ObservableList<String> listaObservable = FXCollections.observableArrayList();
-        listaObservable.addAll(nombresArchivos);
-        listViewArchivos.setItems(listaObservable);
+        //Actualizarcion listview e inicializacion de linkedlists
+        nombreProyecto = AtributosSesion.getNombreProyecto();
+        actualizarListview(nombreProyecto);
 
     }
 
@@ -90,7 +69,59 @@ public class CimController implements Initializable {
         return false;
     }
 
-    public void indicarArchivos(ActionEvent event) {
+    @FXML
+    private boolean mostrarConfirmacion(ActionEvent event){
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle("Confirmacion de acción");
+        alerta.setContentText("¿Estas seguro de querer borrar el archivo?");
+        Optional<ButtonType> resultado = alerta.showAndWait();
+
+        if(resultado.isEmpty()){
+            System.out.println("Cerrada");
+            return false;
+        }else if(resultado.get() == ButtonType.OK){
+            System.out.println("Borrar archivo");
+            return true;
+        }else if(resultado.get() == ButtonType.CANCEL){
+            System.out.println("Cancelado");
+            return false;
+        }
+        return false;
+    }
+
+    /*------------------------------------------------------------
+    |                   LISTVIEW ARCHIVOS                        |
+    ------------------------------------------------------------*/
+
+    private void actualizarListview(String proyecto) {
+        //Rellenar el listview de archivos en la init por si ya hubiera de antes
+        String ruta = System.getProperty("user.dir");
+        File ficheroDestino = new File( ruta + "/src/main/resources/Proyectos/" + proyecto + "/");
+
+        //Filtro para no obtener el archivo de configuracion
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File f, String name)
+            {
+                return !name.contentEquals("config.txt");
+            }
+        };
+
+        File[] ficheros = ficheroDestino.listFiles(filter);
+
+        //Inicializacion linkedlists
+        for(File f : ficheros){
+            archivosIndicados.add(f.getAbsolutePath());
+            nombresArchivos.add(f.getName());
+        }
+
+        //Popular lista
+        ObservableList<String> listaObservable = FXCollections.observableArrayList();
+        listaObservable.addAll(nombresArchivos);
+        listViewArchivos.setItems(listaObservable);
+
+    }
+
+    public void btnIndicarArchivosAction(ActionEvent event) {
         //Funcion para abrir el explorador de archivos
         File ficheroSeleccionado = fileChooser.showOpenDialog(stage);
         //Obtenemos el nombre de proyecto
@@ -128,27 +159,46 @@ public class CimController implements Initializable {
         }
     }
 
-    public void campoIndicado(MouseEvent mouseEvent) {
-    }
-
     public void archivoIndicado(MouseEvent mouseEvent) {
         //Las rutas de los archivos vienen indicadas en el linkedlist de la clase
         //Los indices deberian coincidir en todo momento, comprobar esto
         int indice = listViewArchivos.getSelectionModel().getSelectedIndex();
         String path = archivosIndicados.get(indice);
-        try {
-            Reader input = new FileReader(path);
-            Iterable<CSVRecord> campos = CSVFormat.EXCEL.parse(input);
-            for(CSVRecord campo : campos){
-                String[] columnas = campo.values();
-                actualizarListviewCampos(columnas);
-                break;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String[] campos = proyectos.obtenerCampos(path);
+        actualizarListviewCampos(campos);
     }
 
+    public void btnQuitarArchivoAction(ActionEvent event) {
+        int indice = listViewArchivos.getSelectionModel().getSelectedIndex();
+        String path = archivosIndicados.get(indice);
+        File archivo = new File(path);
+        boolean accion = mostrarConfirmacion(event);
+        if(accion){
+            boolean resultado = archivo.delete();
+            if(resultado){
+                System.out.println("Archivo eliminado");
+                //Actualizacion indices
+                archivosIndicados.remove(indice);
+                nombresArchivos.remove(indice);
+
+                //Actualizacion indice archivos
+                ObservableList<String> listaObservable = FXCollections.observableArrayList();
+                listaObservable.addAll(nombresArchivos);
+                //Popular el listview
+                listViewArchivos.setItems(listaObservable);
+
+                //Actualizacion indice campos
+                listViewCampos.setItems(FXCollections.observableArrayList());
+            }else{
+                System.out.println("Error al eliminar el archivo");
+            }
+        }
+
+    }
+
+    /*------------------------------------------------------------
+    |                   LISTVIEW CAMPOS                           |
+     ------------------------------------------------------------*/
     private void actualizarListviewCampos(String[] campos) {
         //Actualiza el list view derecho
         ObservableList<String> listaObservable = FXCollections.observableArrayList();
@@ -156,13 +206,16 @@ public class CimController implements Initializable {
         //Añadimos la lista observable al listview
         listViewCampos.setItems(listaObservable);
     }
-
-    public void btnReestablecerCampoAction(ActionEvent event) {
-    }
-
     public void btnQuitarCampoAction(ActionEvent event) {
         //Coger indice de la listview
         //Quitar header del archivo y sus respectivos valores
+        //Al leerse las cabeceras en orden, el indice de la listview corresponde a la posicion en el csv
+        int indiceCampo = listViewCampos.getSelectionModel().getSelectedIndex();
+        int indiceArchivo = listViewArchivos.getSelectionModel().getSelectedIndex();
 
+        String ruta = archivosIndicados.get(indiceArchivo);
+        proyectos.removerCampo(ruta, indiceCampo);
+        actualizarListviewCampos(proyectos.obtenerCampos(ruta));
     }
+
 }

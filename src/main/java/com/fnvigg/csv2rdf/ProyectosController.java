@@ -3,6 +3,7 @@ package com.fnvigg.csv2rdf;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -114,10 +115,24 @@ public class ProyectosController implements Initializable {
         }
     }
     public void onClickCargarProyecto(ActionEvent event) {
+        String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
+        String fase = proyectos.obtenerFase(nombreProyecto);
+
+        if(fase.equals("PIM")){
+            cargarEscena("fasePim.fxml", event);
+        }else if(fase.equals("PSM")){
+            cargarEscena("fasePsm.fxml", event);
+        }else if(fase.equals("DSL")){
+            cargarEscena("faseDsl.fxml", event);
+        }else{
+            cargarEscena("faseCim.fxml", event);
+        }
+
+    }
+
+    private void cargarEscena(String s, ActionEvent event) {
         try {
-            String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
-            AtributosSesion.setNombreProyecto(nombreProyecto);
-            root = FXMLLoader.load(getClass().getResource("faseCim.fxml"));
+            root = FXMLLoader.load(getClass().getResource(s));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);
@@ -125,7 +140,6 @@ public class ProyectosController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void onClickBorrarProyecto(ActionEvent event) {
@@ -139,13 +153,15 @@ public class ProyectosController implements Initializable {
     }
 
     public void onClickRegistrarProyecto(ActionEvent event) {
-
+        //Obtencion de los campos
         String nombreProyecto = nameProyectFld.getText();
         String nombreOntologico = ontologicProyectFld.getText();
         String nombreDato = dataProyectFld.getText();
+        //Comprobacion que ninguno esté vacio
         if(nombreProyecto.equals("") || nombreDato.equals("") || nombreOntologico.equals("")){
             mostrarAlertaCampos(event);
         }else{
+            //Comprobacion nombre disponible
             boolean nombreDisponible = true;
             for (Object proyecto : listProyects.getItems()){
                 String proyectoString = (String) proyecto;
@@ -154,6 +170,8 @@ public class ProyectosController implements Initializable {
                     break;
                 }
             }
+
+            //Creacion del proyecto
             if(nombreDisponible) {
                 proyectos.crearProyecto(nombreProyecto, nombreDato, nombreOntologico);
                 actualizarLista();
@@ -171,38 +189,23 @@ public class ProyectosController implements Initializable {
     public void onClickDatosProyecto(MouseEvent mouseEvent) {
         //Recoger los nombres del ing datos, ontologico y cambiar las properties de las label de abajo
         String proyecto = (String) listProyects.getSelectionModel().getSelectedItem();
-        File fichero = new File("src/main/resources/Proyectos/" + proyecto + "/config.txt");
-        try {
-            FileReader fr = new FileReader(fichero);
-            BufferedReader br = new BufferedReader(fr);
-            String linea = br.readLine();
-            String ingDato, ingOnt;
-            String[] tokens = linea.split(",");
-            ingDato = tokens[1];
-            ingOnt = tokens[0];
+        String[] ingenieros = proyectos.obtenerPropiedades(proyecto);
+        String ingDatos = ingenieros[0];
+        String ingOntologico = ingenieros[1];
+        String userSesion = AtributosSesion.getUser();
 
-            //OJO, si el usuario de la sesion no coincide con ninguno de los dos, no debe dejar interactuar con el proyecto
-            String userSesion = AtributosSesion.getUser();
-            if(userSesion.equals(tokens[0]) || userSesion.equals(tokens[1])){
-                //No coincide con ningun miembro del proyecto
-                deleteBtn.setDisable(false);
-                loadBtn.setDisable(false);
-            }else{
-                deleteBtn.setDisable(true);
-                loadBtn.setDisable(true);
-            }
-
-            lblDatos.setText(ingDato);
-            lblOntologico.setText(ingOnt);
-            lblDatos.setVisible(true);
-            lblOntologico.setVisible(true);
-
-            fr.close();
-            br.close();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(userSesion.equals(ingDatos) || userSesion.equals(ingOntologico)){
+            //No coincide con ningun miembro del proyecto
+            deleteBtn.setDisable(false);
+            loadBtn.setDisable(false);
+        }else{
+            deleteBtn.setDisable(true);
+            loadBtn.setDisable(true);
         }
 
+        lblDatos.setText(ingDatos);
+        lblOntologico.setText(ingOntologico);
+        lblDatos.setVisible(true);
+        lblOntologico.setVisible(true);
     }
 }

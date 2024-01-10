@@ -6,6 +6,7 @@ public class AtributosSesion {
     private static String rol;
     private static String nombreProyecto;
 
+    private static String ultimaPantalla;
     public static void setUser(String user){
         AtributosSesion.user = user;
     }
@@ -28,5 +29,13 @@ public class AtributosSesion {
 
     public static void setNombreProyecto(String nombreProyecto) {
         AtributosSesion.nombreProyecto = nombreProyecto;
+    }
+
+    public static String getUltimaPantalla() {
+        return ultimaPantalla;
+    }
+
+    public static void setUltimaPantalla(String ultimaPantalla) {
+        AtributosSesion.ultimaPantalla = ultimaPantalla;
     }
 }
