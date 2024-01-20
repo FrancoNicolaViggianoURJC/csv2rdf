@@ -3,8 +3,11 @@ package com.fnvigg.csv2rdf;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +20,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -53,6 +57,8 @@ public class CimController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources){
         accordion.setExpandedPane(panel1);
+
+        //--------------- Panel 1 --------------------------------
         archivosIndicados = new LinkedList<String>();
         nombresArchivos = new LinkedList<String>();
 
@@ -60,17 +66,27 @@ public class CimController implements Initializable {
         nombreProyecto = AtributosSesion.getNombreProyecto();
         actualizarListview(nombreProyecto);
 
-        //Actualizacion esquema
+        //--------------- Panel 2 --------------------------------
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
         //Creamos el fichero de destino
         String ruta = System.getProperty("user.dir");
-        File f = new File("src/main/resources/Proyectos/" + proyecto + "/esquema.png");
+        File f = new File(ruta + "src/main/resources/Proyectos/" + proyecto + "/esquema.png");
         if(f.exists() && !f.isDirectory()) {
             // do something
             Image img = new Image(f.getAbsolutePath());
             imageEsquema.setImage(img);
         }
+
+        //--------------- Panel 3 --------------------------------
+        ArrayList lista = new ArrayList<>();
+        try {
+            lista = proyectos.obtenerRequerimientos(proyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ObservableList listaRequerimientos = FXCollections.observableArrayList(lista);
+        listviewRequerimientos.setItems(listaRequerimientos);
     }
 
     @FXML
@@ -129,6 +145,25 @@ public class CimController implements Initializable {
         return false;
     }
 
+    @FXML
+    private boolean mostrarAlertaRequerimiento(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Requerimientos de datos");
+        String contenido = "El campo está vacio.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaRequerimientoLista(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Requerimientos de datos");
+        String contenido = "El elemento seleccionado no es válido.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
     /*------------------------------------------------------------
     |                   LISTVIEW ARCHIVOS                        |
     ------------------------------------------------------------*/
@@ -138,11 +173,11 @@ public class CimController implements Initializable {
         String ruta = System.getProperty("user.dir");
         File ficheroDestino = new File( ruta + "/src/main/resources/Proyectos/" + proyecto + "/");
 
-        //Filtro para no obtener el archivo de configuracion
+        //Filtro para no obtener los archivos de configuracion
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File f, String name)
             {
-                return (!name.contentEquals("config.txt") && !name.contentEquals("esquema.png"));
+                return (!name.contentEquals("config.txt") && !name.contentEquals("esquema.png") && !name.contentEquals("requerimientos.txt"));
             }
         };
 
@@ -309,13 +344,58 @@ public class CimController implements Initializable {
     }
 
     public void btnEliminarRequerimientoAction(ActionEvent event) {
-        
+        int indice = listviewRequerimientos.getSelectionModel().getSelectedIndex();
+
+        if(indice == -1){
+            //Mostrar alerta (La lista esta vacia)
+            mostrarAlertaRequerimientoLista(event);
+        }else{
+            //Ya que la observableList no se puede modificar, hay que convertirla a arraylist, modificar, y luego revertir el tipo
+            ArrayList<String> listLL = new ArrayList<>(listviewRequerimientos.getItems());
+            listLL.remove(indice);
+            ObservableList lista = FXCollections.observableArrayList(listLL);
+            listviewRequerimientos.setItems(lista);
+
+            //Borrar la linea igual al indice seleccionado
+            String proyecto = AtributosSesion.getNombreProyecto();
+            try {
+                proyectos.borrarRequerimiento(indice, proyecto);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-
     public void btnAñadirRequerimientoAction(ActionEvent event) {
+        String requerimiento = inputFieldRequerimientos.getText();
+        String proyecto = AtributosSesion.getNombreProyecto();
+        if(requerimiento.isEmpty()){
+            //mostrar alerta
+            mostrarAlertaRequerimiento(event);
+        }else{
+            //Obtener la lista, añadirle el string, y actualizarla.
+            ObservableList lista = listviewRequerimientos.getItems();
+            lista.add(requerimiento);
+            listviewRequerimientos.setItems(lista);
+            inputFieldRequerimientos.setText("");
 
+            try {
+                //Actualizamos el archivo de requerimientos
+                proyectos.addRequerimiento(requerimiento, proyecto);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void btnSiguienteFaseAction(ActionEvent event) {
+        try {
+            root = FXMLLoader.load(getClass().getResource("fasePim.fxml"));
+            stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

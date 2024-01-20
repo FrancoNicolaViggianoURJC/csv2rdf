@@ -1,5 +1,6 @@
 package com.fnvigg.csv2rdf;
 
+import javafx.scene.image.Image;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -7,6 +8,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -188,5 +190,80 @@ public class Gestor_proyectos {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void addRequerimiento(String requerimiento, String proyecto) throws IOException {
+        //Obtener ruta
+        String ruta = System.getProperty("user.dir");
+        File f = new File(ruta + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos.txt");
+        //Abrirlo en modo append
+        FileWriter fw = new FileWriter(f, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(requerimiento + '\n');
+
+        bw.close();
+        fw.close();
+    }
+
+    public void borrarRequerimiento(int indice, String proyecto) throws IOException {
+        //Comprobar si existe el archivo
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos.txt";
+        String rutaAux = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos_a.txt";
+        File f = new File(ruta);
+        File f_aux = new File(rutaAux);
+        //Comprobar si existe
+        if(f.exists() && !f.isDirectory()){
+            //Borrar la linea == indice
+            FileReader fr = new FileReader(f);
+            FileWriter fw = new FileWriter(f_aux);
+
+            BufferedReader reader = new BufferedReader(fr);
+            BufferedWriter writer = new BufferedWriter(fw);
+
+            //Hay que leer linea por linea el archivo, y replicar todas menos la que coincide con el indice
+            int contador = 0;
+            String linea = reader.readLine();
+            while(linea != null){
+                if(contador != indice){
+                    writer.write(linea + '\n');
+                }else{
+                    //No hacer nada, es la linea a borrar
+                }
+                linea = reader.readLine();
+                contador += 1;
+            }
+
+            reader.close();
+            writer.close();
+            fr.close();
+            fw.close();
+
+            //Borrar el archivo original, y renombrar el auxiliar al original
+            f.delete();
+            f_aux.renameTo(f);
+        }else{
+            return;
+        }
+    }
+
+    public ArrayList obtenerRequerimientos(String proyecto) throws IOException {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos.txt";
+        File f = new File(ruta);
+        ArrayList<String> lista = new ArrayList<>();
+        //Comprobar si existe
+        if(f.exists() && !f.isDirectory()){
+            FileReader fr = new FileReader(f);
+            BufferedReader br = new BufferedReader(fr);
+
+            String linea = br.readLine();
+
+            while(linea != null){
+                lista.add(linea);
+                linea = br.readLine();
+            }
+            fr.close();
+            br.close();
+        }
+        return lista;
     }
 }
