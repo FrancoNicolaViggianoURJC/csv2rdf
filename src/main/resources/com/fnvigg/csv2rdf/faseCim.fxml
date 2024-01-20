@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.CimController">
@@ -22,14 +24,39 @@
                      </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="untitled 2">
+          <TitledPane animated="false" text="Esquema gráfico">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="17.0" layoutY="14.0" prefHeight="63.0" prefWidth="565.0" text="El esquema gráfico representa la distribución de los archivos fuentes, sus campos y las relaciones entre&#10;distintos ficheros. La función de este elemento, es describir a un buen nivel de detalle el dominio de los&#10;datos, para servir de referencia en futuras fases." />
+                        <ImageView fx:id="imageEsquema" fitHeight="209.0" fitWidth="559.0" layoutX="14.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../esquemaDefault.png" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="btnCargarEsquema" layoutX="266.0" layoutY="293.0" mnemonicParsing="false" onAction="#btnCargarEsquemaAction" text="Cargar" />
+                     </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="untitled 3">
+          <TitledPane animated="false" text="Requerimientos de los datos">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="12.0" layoutY="14.0" prefHeight="56.0" prefWidth="574.0" text="A través del análisis del dominio de los datos y el esquema gráfico, se elaboran los requerimientos de&#10;datos por medio de descripciones de los mismos. Estas descripciones deben ser lo suficientemente com-&#10;prensibles para obtener requerimientos coherentes, correctos y completos." />
+                        <ImageView fx:id="imageHelp" fitHeight="45.0" fitWidth="46.0" layoutX="523.0" layoutY="70.0" onMouseClicked="#imageHelpAction" opacity="0.81" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../ayuda.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <ListView fx:id="listviewRequerimientos" layoutX="14.0" layoutY="70.0" prefHeight="165.0" prefWidth="487.0" />
+                        <TextField fx:id="inputFieldRequerimientos" layoutX="14.0" layoutY="248.0" prefHeight="25.0" prefWidth="487.0" />
+                        <Button fx:id="btnEliminarRequerimiento" layoutX="516.0" layoutY="150.0" mnemonicParsing="false" onAction="#btnEliminarRequerimientoAction" text="Eliminar" />
+                        <Button fx:id="btnAñadirRequerimiento" layoutX="520.0" layoutY="248.0" mnemonicParsing="false" onAction="#btnAñadirRequerimientoAction" text="Añadir" />
+                        <Button fx:id="btnSiguienteFase" layoutX="494.0" layoutY="285.0" mnemonicParsing="false" onAction="#btnSiguienteFaseAction" text="Siguiente fase" />
+                     </children></AnchorPane>
             </content>
           </TitledPane>
         </panes>
