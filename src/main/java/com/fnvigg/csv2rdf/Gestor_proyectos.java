@@ -89,10 +89,54 @@ public class Gestor_proyectos {
                 tokens = linea.split(",");
                 fase = tokens[2];
             }
+
+            br.close();
+            lector.close();
         }catch (IOException e){
             e.printStackTrace();
         }
         return fase;
+    }
+
+    public void setFase(String nombreProyecto, String fase){
+        String ruta = System.getProperty("user.dir");
+        try {
+            File config = new File(ruta + "/src/main/resources/Proyectos/" + nombreProyecto + "/config.txt");
+            File config_aux = new File(ruta + "/src/main/resources/Proyectos/" + nombreProyecto + "/config_aux.txt");
+
+            FileReader lector = new FileReader(config);
+            BufferedReader br = new BufferedReader(lector);
+            FileWriter fw = new FileWriter(config_aux);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            String linea = br.readLine();
+            String[] tokens = {};
+            if (linea != null) {
+                tokens = linea.split(",");
+                tokens[2] = fase;
+            }
+
+            int aux = 1;
+            for (String token : tokens){
+                if(aux != tokens.length){
+                bw.write(token+",");
+                }else{
+                    bw.write(token);
+                }
+                aux += 1;
+            }
+
+            bw.close();
+            fw.close();
+            br.close();
+            lector.close();
+
+            config.delete();
+            config_aux.renameTo(config);
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public String[] obtenerPropiedades(String proyecto) {

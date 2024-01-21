@@ -13,6 +13,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        stage.setResizable(false);
         stage.getIcons().add(new Image("/rdf graph.png"));
         stage.setTitle("CSV@RDF Helptool");
         stage.setScene(scene);
