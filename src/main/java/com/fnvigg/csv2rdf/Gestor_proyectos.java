@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -309,5 +310,23 @@ public class Gestor_proyectos {
             br.close();
         }
         return lista;
+    }
+
+    public void guardarMDO(File ficheroSeleccionado, String nombreProyecto) {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/MDO.png";
+        File ficheroDestino = new File(ruta);
+
+        //Crear las copias de archivos para no trabajar sobre los originales
+        FileChannel sourceChannel = null;
+        FileChannel destChannel = null;
+        try {
+            sourceChannel = new FileInputStream(ficheroSeleccionado).getChannel();
+            destChannel = new FileOutputStream(ficheroDestino).getChannel();
+            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+            sourceChannel.close();
+            destChannel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
