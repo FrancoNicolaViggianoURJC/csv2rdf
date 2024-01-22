@@ -22,12 +22,26 @@
                      </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="untitled 2">
+          <TitledPane animated="false" text="Set de reglas">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="14.0" text="A continuación se presenta el set de reglas:" />
+                        <Button fx:id="btnClases" layoutX="33.0" layoutY="37.0" mnemonicParsing="false" onAction="#btnClasesAction" prefHeight="25.0" prefWidth="85.0" text="Clases" />
+                        <Button fx:id="btnAsociaciones" layoutX="146.0" layoutY="37.0" mnemonicParsing="false" onAction="#btnAsociacionesAction" text="Asociaciones" />
+                        <Button fx:id="btnAtributos" layoutX="256.0" layoutY="37.0" mnemonicParsing="false" onAction="#btnAtributosAction" prefHeight="25.0" prefWidth="85.0" text="Atributos" />
+                        <Button fx:id="btnRutas" layoutX="475.0" layoutY="37.0" mnemonicParsing="false" onAction="#btnRutasAction" prefHeight="25.0" prefWidth="85.0" text="Rutas" />
+                        <Label fx:id="lblTexto" layoutX="22.0" layoutY="66.0" prefHeight="69.0" prefWidth="553.0" text="- Las clases y sus nombres se obtendran de los contenedores representados en el esquema gráfico." />
+                        <ImageView fx:id="imageAyuda" fitHeight="276.0" fitWidth="583.0" layoutX="7.0" layoutY="138.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../clases.png" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="btnEnumerados" layoutX="364.0" layoutY="37.0" mnemonicParsing="false" onAction="#btnEnumeradosAction" prefHeight="25.0" prefWidth="85.0" text="Enumerados" />
+                     </children></AnchorPane>
             </content>
           </TitledPane>
-          <TitledPane animated="false" text="untitled 3">
+          <TitledPane animated="false" text="Modelo de dominio objetivo">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>

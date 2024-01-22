@@ -8,7 +8,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -19,6 +22,8 @@ public class PimController implements Initializable {
 
     public Button btnVolver;
     public Accordion accordion;
+    public Label lblTexto;
+    public ImageView imageAyuda;
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -36,6 +41,7 @@ public class PimController implements Initializable {
 
     }
 
+    // 1 Panel
     public void btnVolverAction(ActionEvent event) {
         try {
             root = FXMLLoader.load(getClass().getResource("faseCim.fxml"));
@@ -47,4 +53,61 @@ public class PimController implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
+    // 2 Panel
+    public void btnClasesAction(ActionEvent event) {
+        String texto = "- Las clases y sus nombres se obtendrán de los contenedores representados en el esquema gráfico.";
+        String ruta = System.getProperty("user.dir");
+        Image img = new Image(ruta + "/src/main/resources/clases.png");
+
+        lblTexto.setText(texto);
+        imageAyuda.setImage(img);
+    }
+
+    public void btnAsociacionesAction(ActionEvent event) {
+        String texto = "- Las asociaciones entre clases se derivarán de las relaciones entre contenedores representados en\n" +
+                "   el esquema gráfico y la información recolectada en los requerimientos de los datos.\n" +
+                "- Cualquier relación en el esquema gráfico implicará la inclusión de un atributo en la clase referenciada\n" +
+                "   cuyo tipo de dato será el nombre de la clase referenciada en el modelo de dominio objetivo.";
+        String ruta = System.getProperty("user.dir");
+        Image img = new Image(ruta + "/src/main/resources/asociaciones.png");
+
+        lblTexto.setText(texto);
+        imageAyuda.setImage(img);
+    }
+
+    public void btnAtributosAction(ActionEvent event) {
+        String texto = "- Los atributos de las clases se obtendrán a partir del análisis de los valores en su dominio de datos.\n" +
+                "    Los atributos de una clase pueden ser definidos usando datatypes básicos como string, char, integer, float, boolean or date.";
+        String ruta = System.getProperty("user.dir");
+        Image img = new Image(ruta + "/src/main/resources/atributos.png");
+
+        lblTexto.setText(texto);
+        imageAyuda.setImage(img);
+    }
+
+    public void btnEnumeradosAction(ActionEvent event) {
+        String texto = "- Los atributos con un valor numérico usado para representar valores (1- ocio, 2- trabajo, 3-otros) se\n" +
+                "   definirán usando el tipo enum. Los valores tendrán que ser anotados en el esquema por medio de\n" +
+                "   comentarios.";
+        String ruta = System.getProperty("user.dir");
+        Image img = new Image(ruta + "/src/main/resources/enumerados.png");
+
+        lblTexto.setText(texto);
+        imageAyuda.setImage(img);
+    }
+    public void btnRutasAction(ActionEvent event) {
+        String texto = "- Se van a definir también rutas para aquellos atributos que sean de interés, pero que su contenedor\n" +
+                "   no sea de interés. Estas rutas se definen por comentarios de la siguiente manera: el atributo de inte-\n" +
+                "   rés, en la misma caja, un atributo clave que se refiera a otro contenedor que será conectado por una\n" +
+                "   linea";
+        String ruta = System.getProperty("user.dir");
+        Image img = new Image(ruta + "/src/main/resources/ruta.png");
+
+        lblTexto.setText(texto);
+        imageAyuda.setImage(img);
+    }
+
+    //3 Panel
+
 }
