@@ -178,7 +178,7 @@ public class CimController implements Initializable {
             public boolean accept(File f, String name)
             {
                 return (!name.contentEquals("config.txt") && !name.contentEquals("esquema.png") && !name.contentEquals("requerimientos.txt")
-                 && !name.contentEquals("MDO.png"));
+                 && !name.contentEquals("MDO.png") && !name.contentEquals("esquemaOnt.png"));
             }
         };
 

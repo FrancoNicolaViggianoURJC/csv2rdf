@@ -329,4 +329,22 @@ public class Gestor_proyectos {
             throw new RuntimeException(e);
         }
     }
+
+    public void guardarEsquemaOnt(File ficheroSeleccionado, String nombreProyecto) {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/esquemaOnt.png";
+        File ficheroDestino = new File(ruta);
+
+        //Crear las copias de archivos para no trabajar sobre los originales
+        FileChannel sourceChannel = null;
+        FileChannel destChannel = null;
+        try {
+            sourceChannel = new FileInputStream(ficheroSeleccionado).getChannel();
+            destChannel = new FileOutputStream(ficheroDestino).getChannel();
+            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+            sourceChannel.close();
+            destChannel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
