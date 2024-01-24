@@ -1,20 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
 <AnchorPane prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.PsmController">
    <children>
-      <Accordion prefHeight="500.0" prefWidth="600.0">
+      <Accordion fx:id="accordion" prefHeight="500.0" prefWidth="600.0">
         <panes>
           <TitledPane animated="false" text="Introducción">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="33.0" prefHeight="61.0" prefWidth="565.0" text="En esta fase, se obtendrá el esquema ontológico y el sistema proporcionará la ontologia asociada. Para&#10;ello, el usuario deberá seguir una serie de reglas para transformar el modelo MDO obtenido.&#10;&#10;" textAlignment="CENTER" />
+                        <ImageView fx:id="imageEsquemaEjemplo" fitHeight="316.0" fitWidth="569.0" layoutX="15.0" layoutY="101.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../esquemaOnt.png" />
+                           </image></ImageView>
+                        <Button layoutX="15.0" layoutY="8.0" mnemonicParsing="false" onAction="#btnFaseAnteriorAction" text="Fase anterior" />
+                     </children></AnchorPane>
             </content>
           </TitledPane>
           <TitledPane animated="false" text="Reglas de transformación">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="14.0" text="A continuación, se presenta el conjunto de reglas para cada elemento:" />
+                        <Button layoutX="31.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnClasesOnt" text="Clases" />
+                        <Button layoutX="120.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnAtributosAction" text="Atributos" />
+                        <Button layoutX="223.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnAtributosPropiosAction" text="Atributos propios" />
+                        <Button layoutX="364.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnEnumeradosAction" text="Enumerados" />
+                        <Button layoutX="469.0" layoutY="40.0" mnemonicParsing="false" onAction="#btnColeccionesAction" text="Colecciones" />
+                        <ImageView fx:id="imageAyudasOnt" fitHeight="281.0" fitWidth="569.0" layoutX="46.0" layoutY="134.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../clasesOnt.png" />
+                           </image>
+                        </ImageView>
+                        <Label fx:id="labelAyudaOnt" alignment="CENTER" layoutX="14.0" layoutY="76.0" prefHeight="58.0" prefWidth="569.0" text="Un atributo UML definido por un tipo colección ordenada sera transformado en una OWL Object &#10;Property cuyo dominio será la correspondiente clase OWL y cuyo rango será la clase RDF Seq." textAlignment="CENTER" textOverrun="CLIP" />
+                     </children></AnchorPane>
             </content>
           </TitledPane>
           <TitledPane animated="false" text="Esquema ontológico">
