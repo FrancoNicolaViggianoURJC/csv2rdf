@@ -1,5 +1,7 @@
 package com.fnvigg.csv2rdf;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -8,18 +10,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -29,11 +31,15 @@ public class PsmController implements Initializable {
     public ImageView imageAyudasOnt;
     public Label labelAyudaOnt;
     public ImageView imageEsquema;
+    public ListView listviewClases;
+    public ListView listviewAtributos;
     private Stage stage;
     private Scene scene;
     private Parent root;
     private String nombreProyecto = AtributosSesion.getNombreProyecto();
     private Gestor_proyectos proyectos = new Gestor_proyectos();
+    private ArrayList<String> clasesUML = new ArrayList<>();
+    private ArrayList<String> atributosUML = new ArrayList<>();
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         nombreProyecto = AtributosSesion.getNombreProyecto();
@@ -61,6 +67,14 @@ public class PsmController implements Initializable {
             imageEsquema.setImage(img);
         }
 
+        //Cargar listview de clases
+        ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        f = new File(ruta);
+        if(f.exists() && !f.isDirectory()){
+            clasesUML = proyectos.obtenerClases(f);
+            ObservableList oll = FXCollections.observableArrayList(clasesUML);
+            listviewClases.setItems(oll);
+        }
     }
 
     @FXML
@@ -72,7 +86,35 @@ public class PsmController implements Initializable {
         Optional<ButtonType> resultado = alerta.showAndWait();
         return false;
     }
+    @FXML
+    private boolean mostrarAlertaBlank(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Esquema ontológico");
+        String contenido = "El campo no debe estar en blanco.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+    @FXML
+    private boolean mostrarAlertaDuplicado(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Esquema ontológico");
+        String contenido = "La clase no debe ser idéntica a otra.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
 
+    @FXML
+    private boolean mostrarAlertaSeleccion(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Esquema ontológico");
+        String contenido = "Debe seleccionar una clase a borrar.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+    //Pestaña introduccion
     public void btnFaseAnteriorAction(ActionEvent event) {
         try {
             root = FXMLLoader.load(getClass().getResource("fasePim.fxml"));
@@ -85,6 +127,7 @@ public class PsmController implements Initializable {
         }
     }
 
+    //Pestaña set de reglas
     public void btnClasesOnt(ActionEvent event) {
         //Cargamos el texto y la imagen correspondiente
         String frase = "Una clase UML se transformará en una clase OWL.";
@@ -164,6 +207,7 @@ public class PsmController implements Initializable {
         }
     }
 
+    //Pestaña cargar esquema
     public void btnCargarEsquemaAction(ActionEvent event) {
         FileChooser fc = new FileChooser();
         File ficheroSeleccionado = fc.showOpenDialog(stage);
@@ -181,5 +225,132 @@ public class PsmController implements Initializable {
                 mostrarAlertaImagen(event);
             }
         }
+    }
+
+    //Pestaña introducir datos
+
+    //Actualizar el listview izquierdo a partir de la clase derecha
+    public void listviewClasesAction(MouseEvent mouseEvent) {
+        int index = listviewClases.getSelectionModel().getSelectedIndex();
+        if(index != -1){
+            String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
+            if(!clase.isBlank()){
+                //Iterar el archivo de atributos buscando los que tenga esta clase
+                try {
+                    LinkedList<String> atributos = proyectos.obtenerAtributos(clase, nombreProyecto);
+                    ObservableList oll = FXCollections.observableArrayList(atributos);
+                    listviewAtributos.setItems(oll);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    public void añadirTipoBasico(ActionEvent event) {
+    }
+
+    public void añadirTipoClase(ActionEvent event) {
+    }
+
+    public void añadirEnumerado(ActionEvent event) {
+    }
+
+    public void añadirColeccion(ActionEvent event) {
+    }
+
+    public void añadirColeccionOrd(ActionEvent event) {
+    }
+
+    public void btnEliminarAtributo(ActionEvent event) {
+        String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
+        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+
+        //Una vez obtenido el indice, hay que obtener la lista de atributos de cada clase
+        LinkedList<String> atributos = new LinkedList<>();
+        try {
+            atributos = proyectos.obtenerAtributos(clase, nombreProyecto);
+            atributos.remove(index);
+            proyectos.guardarAtributos(clase, nombreProyecto, atributos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void btnEliminarClaseAction(ActionEvent event) {
+        int index = listviewClases.getSelectionModel().getSelectedIndex();
+        if(index == -1){
+            //Mostrar alerta seleccion
+            mostrarAlertaSeleccion(event);
+        }else{
+            //Eliminamos el objeto de la lista
+            clasesUML.remove(index);
+
+            //Eliminamos el objeto de la listview
+            ArrayList<String> listLL = new ArrayList<>(listviewClases.getItems());
+            listLL.remove(index);
+            ObservableList obsList = FXCollections.observableArrayList(listLL);
+            listviewClases.setItems(obsList);
+
+            //Actualizamos la lista de clases
+            try {
+                proyectos.guardarClases(clasesUML, nombreProyecto);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            //Limpiamos el listview de atributos, al no haber ninguna clase seleccionada
+            ArrayList<String> blankAL = new ArrayList<>();
+            ObservableList blank = FXCollections.observableArrayList(blankAL);
+            listviewAtributos.setItems(blank);
+        }
+    }
+
+    public void btnAñadirClaseAction(ActionEvent event) {
+        TextInputDialog td = new TextInputDialog();
+        Optional<String> res = td.showAndWait();
+
+        //Comprobacion cancelado
+        if (!res.isPresent()) {
+            //mostrar alerta
+            mostrarAlertaBlank(event);
+        } else {
+            //Comprobacion campo en blanco
+            String nombre_clase = res.get();
+            if(nombre_clase.isBlank()){
+                mostrarAlertaBlank(event);
+            }else{
+                //Comprobacion campo duplicado
+                boolean duplicado = comprobarDuplicidad(nombre_clase);
+                if(duplicado){
+                    mostrarAlertaDuplicado(event);
+                }else{
+                    //Todo correcto
+
+                    //Hay que mantener una lista con los nombres de las clases, y que se mantenga coherente.
+                    clasesUML.add(nombre_clase);
+                    ObservableList list = FXCollections.observableArrayList(clasesUML);
+                    listviewClases.setItems(list);
+
+                    //Guardar la clase en el archivo
+                    try {
+                        proyectos.guardarClases(clasesUML, nombreProyecto);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean comprobarDuplicidad(String nombreClase) {
+        boolean res = false;
+        for(String clase : clasesUML){
+            if(clase.equals(nombreClase)){
+                res=true;
+                break;
+            }
+        }
+        return res;
     }
 }

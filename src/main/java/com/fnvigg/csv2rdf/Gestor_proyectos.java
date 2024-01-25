@@ -1,6 +1,5 @@
 package com.fnvigg.csv2rdf;
 
-import javafx.scene.image.Image;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -10,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -346,5 +346,82 @@ public class Gestor_proyectos {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    //Guarda las clases que hay en el listview clasesUML en una lista separada por comas
+    public void guardarClases(ArrayList<String> clasesUML, String nombreProyecto) throws IOException {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        FileWriter fw = new FileWriter(ficheroDestino);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        StringBuilder clases = new StringBuilder();
+        for(String s : clasesUML){
+            clases.append(s + ",");
+        }
+        if(clases.length() > 0) {
+            clases.deleteCharAt(clases.length() - 1);
+        }
+        bw.write(clases.toString());
+        System.out.println(clases);
+
+        bw.close();
+        fw.close();
+    }
+
+    public LinkedList<String> obtenerAtributos(String clase, String nombreProyecto) throws IOException {
+        LinkedList<String> atributos = new LinkedList<>();
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        //Iterar el archivo en busca de los atributos de esa clase
+        if(ficheroDestino.exists() && !ficheroDestino.isDirectory()){
+            //Existe el archivo
+            FileReader fr = new FileReader(ficheroDestino);
+            BufferedReader br = new BufferedReader(fr);
+
+            StringBuilder atributo = new StringBuilder();
+            String linea = br.readLine();
+
+            while(linea != null){
+                //El archivo esta compuesto por una sola linea, donde va a haber tripletas x;y;z separadas por comas ;;,;;,;;,...
+                String[] tokens = linea.split(",");
+                for(String t : tokens){
+                    //Obtenemos el tercer elemento, que será la clase
+                    String[] triplet = t.split(";");
+                    if(triplet[2].equals(clase)){
+                        //Si coincide, añadimos el nombre y el tipo a la lista
+                        atributos.add(triplet[0] + " -> " + triplet[1]);
+                    }
+                }
+                break;
+            }
+        }
+        return  atributos;
+    }
+
+    public ArrayList<String> obtenerClases(File fichero) {
+        ArrayList<String> resultado = new ArrayList();
+        FileReader fr = null;
+        try {
+            fr = new FileReader(fichero);
+            BufferedReader br = new BufferedReader(fr);
+            String linea = br.readLine();
+            if(linea != null){
+                String[] tokens = linea.split(",");
+                resultado.addAll(Arrays.asList(tokens));
+            }
+            fr.close();
+            br.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return resultado;
+    }
+
+    public void guardarAtributos(String clase, String nombreProyecto, LinkedList<String> atributos) {
+        //iterar sobre el archivo atributosUML, borrar los atributos que ya pertenezcan a esa clase, luego hacer append de atributos
+        //(Fijarse en la funcion de obtener atributos para la iteracion)
     }
 }
