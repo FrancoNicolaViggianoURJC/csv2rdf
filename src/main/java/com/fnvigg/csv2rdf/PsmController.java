@@ -709,7 +709,7 @@ public class PsmController implements Initializable {
             tipo.setText("bag");
 
         }else{
-            tipo.setText("Seq");
+            tipo.setText("seq");
         }
         tipo.setDisable(true);
 

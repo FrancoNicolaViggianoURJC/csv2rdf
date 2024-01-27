@@ -1,26 +1,16 @@
 package com.fnvigg.csv2rdf;
 
 import javafx.fxml.Initializable;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class OntologyGenerator {
     //Dados clasesUML y atributosUML, producir la ontologia
 
-    /*------------------------------------------------------------
-    *   Output/Input files
-    * ------------------------------------------------------------*/
-    private File archivo;
-    private FileWriter fw;
-    private BufferedWriter bw;
-    private FileReader fr;
-    private BufferedReader br;
     /*------------------------------------------------------------
     Strings que dependen del proyecto
      ------------------------------------------------------------*/
@@ -32,39 +22,56 @@ public class OntologyGenerator {
 
 
     /*------------------------------------------------------------
-
-    String estáticos
-     ------------------------------------------------------------*/
-    private String namespaces;
-    private String information;
-    private String annotations;
-    private String ontologyInformation = "<!-- \n" +
-            "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
-            "    //\n" +
-            "    // Ontology Information\n" +
-            "    //\n" +
-            "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
-            "     -->\n";
-
-
-    /*------------------------------------------------------------
                                 Metodos
      ------------------------------------------------------------*/
     public OntologyGenerator(String nombreProyecto) throws IOException {
         this.nombreProyecto = nombreProyecto;
 
+        //Elimina el archivo si existe para partir de uno limpio
+        limpiarArchivo();
 
+        //Escritura metadatos
+        escribirDatos();
+
+        //Luego de esto, iterar sobre los archivos y generar la ontologia
+        crearClases();
+
+        //Luego de las clases, los atributos
+        crearAtributos();
+
+        //Information
+        System.out.println("Ontologia creada.");
+    }
+
+    private void limpiarArchivo() {
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+        File archivo = new File(output);
+
+        if(archivo.exists() && !archivo.isDirectory()){
+            archivo.delete();
+        }
+    }
+
+    private void escribirDatos() throws IOException {
         /*
                     File writers
          */
         String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
 
-        archivo = new File(output);
+        File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
-
+        BufferedWriter bw = new BufferedWriter(fw);
         /*
                     Strings cabecera
          */
+        String ontologyInformation = "<!-- \n" +
+                "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
+                "    //\n" +
+                "    // Ontology Information\n" +
+                "    //\n" +
+                "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
+                "     -->\n";
+
         String definedBy = "http://www.example.com/visitorsSpainOnt/ontology_v1.1_COVID-Ont.rdf";
         String preferredNamespace = "http://www.example.com/visitorsSpainOnt";
         String publisher = "PEDIR PUBLISHER";
@@ -76,7 +83,7 @@ public class OntologyGenerator {
         userSesion = AtributosSesion.getUser();
 
         //Cabecera rdf
-        namespaces = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        String namespaces = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<rdf:RDF \n" +
                 "    xml:base=\"http://www.example.com/" + nombreProyecto + "#\"\n" +
                 "    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n" +
@@ -97,7 +104,7 @@ public class OntologyGenerator {
         String año = Integer.toString(c.get(Calendar.YEAR));
         String fecha = año + "-" + mes + "-" + dia;
 
-        information = "\n" +
+        String information = "\n" +
                 "    <!-- \n" +
                 "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
                 "    //\n" +
@@ -122,7 +129,7 @@ public class OntologyGenerator {
                 "\t\t<vann:preferredNamespaceUri>"+preferredNamespace+"#</vann:preferredNamespaceUri>\n" +
                 "    </owl:Ontology>\n";
 
-        annotations = "\n <!-- \n" +
+        String annotations = "\n <!-- \n" +
                 "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
                 "    //\n" +
                 "    // Annotation properties\n" +
@@ -146,23 +153,25 @@ public class OntologyGenerator {
                 "\t<owl:AnnotationProperty rdf:about=\"http://purl.org/vocab/vann/preferredNamespaceUri\"/>\n";
 
         //Escribir los strings en el archivo
+        bw.write(ontologyInformation);
         bw.write(namespaces);
         bw.write(information);
         bw.write(annotations);
 
-        //Luego de esto, iterar sobre los archivos y generar la ontologia
-        crearClases();
-
         bw.close();
         fw.close();
-        br.close();
-        fr.close();
     }
 
     private void crearClases() throws IOException {
         String input = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/clasesUML.txt";
-        fr = new FileReader(input);
-        br = new BufferedReader(fr);
+        FileReader fr = new FileReader(input);
+        BufferedReader br = new BufferedReader(fr);
+
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+
+        File archivo = new File(output);
+        FileWriter fw = new FileWriter(archivo, true);
+        BufferedWriter bw = new BufferedWriter(fw);
 
         String header = "\n <!-- \n" +
                 "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
@@ -177,14 +186,162 @@ public class OntologyGenerator {
         String[] tokens;
         if(linea != null){
             //Obtener cada clase, y escribirla
+            tokens = linea.split(",");
+            for(String t : tokens){
+                bw.write("<owl:Class rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+t+"\">\n" +
+                        "        <rdfs:comment xml:lang=\"en\"> (descripcion en ingles) </rdfs:comment>\t\t\n" +
+                        "\t\t<rdfs:label xml:lang=\"en\">"+t+"</rdfs:label>\n" +
+                        "\t\t<rdfs:label xml:lang=\"es\">"+" (pedir en español) "+"</rdfs:label>\n" +
+                        "    </owl:Class>\n");
+            }
         }
+
+        br.close();
+        fr.close();
+        bw.close();
+        fw.close();
     }
 
-    /*
-    @Override
-    public void initialize(URL location, ResourceBundle resources){
+    private void crearAtributos() {
+        //Separar los atributos en ObjectProperties y DatatypeProperties
+
+        try {
+            Pair<LinkedList<String>,LinkedList<String>> atributos = proyectos.obtenerAtributosObject(nombreProyecto);
+            LinkedList<String> objects = atributos.getKey();
+            LinkedList<String> datatypes = atributos.getValue();
+            escribirObjects(objects);
+            escribirDatatypes(datatypes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
-    */
+
+    private void escribirDatatypes(LinkedList<String> datatypes) throws IOException {
+
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+
+        File archivo = new File(output);
+        FileWriter fw = new FileWriter(archivo, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        String headerData = "\t\t\t\n" +
+                "    <!-- \n" +
+                "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
+                "    //\n" +
+                "    // Data properties\n" +
+                "    //\n" +
+                "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
+                "     -->\t\n" +
+                "\n";
+        bw.write(headerData);
+
+        for(String tipo : datatypes){
+            //nombreAtributo, tipoAtributo, clasePertenece
+            String[] campos = tipo.split(",");
+            if(campos[1].equals("xsd:integer")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/2001/XMLSchema#integer\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("xsd:string")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("xsd:float")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/2001/XMLSchema#float\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("xsd:dateTime")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/2001/XMLSchema#dateTime\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("xsd:boolean")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/2001/XMLSchema#boolean\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("xsd:decimal")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/2001/XMLSchema#decimal\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }
+        }
+        bw.write("</rdf:RDF>\t ");
+
+        bw.close();
+        fw.close();
+    }
+
+    private void escribirObjects(LinkedList<String> objects) throws IOException {
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+
+        File archivo = new File(output);
+        FileWriter fw = new FileWriter(archivo, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        String headerObject = "\n <!-- \n" +
+                "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
+                "    //\n" +
+                "    // Object Properties\n" +
+                "    //\n" +
+                "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
+                "     -->\n \n";
+
+        bw.write(headerObject);
+        for(String objeto : objects){
+            //nombre, tipo, clasePertence
+            String[] campos = objeto.split(",");
+
+            if(campos[1].equals("alt")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Alt\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("bag")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else if(campos[1].equals("seq")){
+                bw.write("\n" +
+                        "    <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq\"/>\n" +
+                        "    </owl:DatatypeProperty>\t \n" +
+                        "\t\n");
+            }else{
+                bw.write("\t \t \n" +
+                        "\t <owl:DatatypeProperty rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+campos[0]+"\">\n" +
+                        "        <rdfs:domain rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[2]+"\"/>\n" +
+                        "        <rdfs:range rdf:resource=\"http://www.example.com/"+nombreProyecto+"#"+campos[1]+"\"/>\n" +
+                        "    </owl:DatatypeProperty>\t\n" +
+                        "\t\n");
+            }
+        }
+        bw.close();
+        fw.close();
+    }
 
 }

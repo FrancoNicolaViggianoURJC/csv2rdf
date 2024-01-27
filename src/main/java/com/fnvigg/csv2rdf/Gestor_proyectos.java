@@ -1,5 +1,6 @@
 package com.fnvigg.csv2rdf;
 
+import javafx.util.Pair;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -543,13 +544,60 @@ public class Gestor_proyectos {
         String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
         File ficheroDestino = new File(ruta);
 
-        //Iterar el archivo en busca de los atributos de esa clase
-
+        //Append del nuevo atributo
         FileWriter fw = new FileWriter(ficheroDestino, true);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(atributo);
         bw.close();
         fw.close();
 
+    }
+
+    public Pair<LinkedList<String>,LinkedList<String>> obtenerAtributosObject(String nombreProyecto) throws IOException {
+        LinkedList<String> datatypes = new LinkedList<>();
+        LinkedList<String> objects = new LinkedList<>();
+
+        //Linkedlist de tipos xsd
+        LinkedList<String> tipos = new LinkedList<>();
+        tipos.add("xsd:integer");
+        tipos.add("xsd:string");
+        tipos.add("xsd:float");
+        tipos.add("xsd:dateTime");
+        tipos.add("xsd:boolean");
+        tipos.add("xsd:decimal");
+
+        //Linkedlist de tipos object
+        //LinkedList<String> compuestos = new LinkedList<>();
+        //compuestos.add("alt");
+        //compuestos.add("bag");
+        //compuestos.add("seq");
+
+        //El primer par tendrá los object, el otro los data
+        Pair<String[],String[]> atributos;
+
+        //Lectura del archivo
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        FileReader fr = new FileReader(ficheroDestino);
+        BufferedReader br = new BufferedReader(fr);
+
+        String linea = br.readLine();
+
+        if(linea != null){
+            String[] tokens = linea.split(",");
+            for(String t : tokens){
+                String[] campos = t.split(";");
+                if(!tipos.contains(campos[1])){
+                    //quiere decir que hace referencia a una clase o compuesto
+                    objects.add(campos[0] + "," + campos[1] + "," + campos[2]);
+                }else{
+                    //Referencia a tipo simple
+                    datatypes.add(campos[0]+ "," + campos[1]+ "," + campos[2]);
+                }
+            }
+        }
+        Pair<LinkedList<String>,LinkedList<String>> ret = new Pair<>(objects, datatypes);
+        return ret;
     }
 }

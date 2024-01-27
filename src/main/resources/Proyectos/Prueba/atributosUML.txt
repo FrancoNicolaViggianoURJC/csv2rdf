@@ -1,1 +1,1 @@
-asd;xsd:integer;region,reprt_type;alt;region,region_id;Region;region,coleccion;alt;region,coleccionOrd;Seq;region,alt;xsd:integer;Region,
+enumerado;alt;region,coleccion;bag;region,coleccionOrd;seq;region,entero;xsd:integer;region,region_id;Region;region,palabra;xsd:string;region,
