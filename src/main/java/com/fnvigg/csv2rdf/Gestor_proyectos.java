@@ -370,7 +370,7 @@ public class Gestor_proyectos {
         fw.close();
     }
 
-    public LinkedList<String> obtenerAtributos(String clase, String nombreProyecto) throws IOException {
+    public LinkedList<String> obtenerAtributosFormateados(String clase, String nombreProyecto) throws IOException {
         LinkedList<String> atributos = new LinkedList<>();
         String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
         File ficheroDestino = new File(ruta);
@@ -397,10 +397,81 @@ public class Gestor_proyectos {
                 }
                 break;
             }
+            fr.close();
+            br.close();
         }
         return  atributos;
     }
 
+    public LinkedList<String> obtenerAtributosCompletos(String clase, String nombreProyecto) throws IOException {
+        LinkedList<String> atributos = new LinkedList<>();
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        //Iterar el archivo en busca de los atributos de esa clase
+        if(ficheroDestino.exists() && !ficheroDestino.isDirectory()){
+            //Existe el archivo
+            FileReader fr = new FileReader(ficheroDestino);
+            BufferedReader br = new BufferedReader(fr);
+
+            StringBuilder atributo = new StringBuilder();
+            String linea = br.readLine();
+
+            while(linea != null){
+                //El archivo esta compuesto por una sola linea, donde va a haber tripletas x;y;z separadas por comas ;;,;;,;;,...
+                String[] tokens = linea.split(",");
+                for(String t : tokens){
+                    //Obtenemos el tercer elemento, que será la clase
+                    String[] triplet = t.split(";");
+                    if(triplet[2].equals(clase)){
+                        //Si coincide, añadimos el nombre y el tipo a la lista
+                        atributos.add(triplet[0] + ";" + triplet[1]+";"+triplet[2]+",");
+                    }
+                }
+                fr.close();
+                br.close();
+                break;
+            }
+            //Quitamos la ultima coma
+            //atributo = new StringBuilder(atributos.getLast());
+            //atributo.deleteCharAt(atributo.lastIndexOf(","));
+            //atributos.removeLast();
+            //atributos.add(atributo.toString());
+        }
+        return  atributos;
+    }
+    public LinkedList<String> obtenerNombresAtributos(String clase, String nombreProyecto) throws IOException {
+        LinkedList<String> atributos = new LinkedList<>();
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        //Iterar el archivo en busca de los atributos de esa clase
+        if(ficheroDestino.exists() && !ficheroDestino.isDirectory()){
+            //Existe el archivo
+            FileReader fr = new FileReader(ficheroDestino);
+            BufferedReader br = new BufferedReader(fr);
+
+            StringBuilder atributo = new StringBuilder();
+            String linea = br.readLine();
+
+            while(linea != null){
+                //El archivo esta compuesto por una sola linea, donde va a haber tripletas x;y;z separadas por comas ;;,;;,;;,...
+                String[] tokens = linea.split(",");
+                for(String t : tokens){
+                    //Obtenemos el tercer elemento, que será la clase
+                    String[] triplet = t.split(";");
+                    if(triplet[2].equals(clase)){
+                        //Si coincide, añadimos el nombre y el tipo a la lista
+                        atributos.add(triplet[0]);
+                    }
+                }
+                br.close();
+                fr.close();
+                break;
+            }
+        }
+        return  atributos;
+    }
     public ArrayList<String> obtenerClases(File fichero) {
         ArrayList<String> resultado = new ArrayList();
         FileReader fr = null;
@@ -420,8 +491,65 @@ public class Gestor_proyectos {
         return resultado;
     }
 
-    public void guardarAtributos(String clase, String nombreProyecto, LinkedList<String> atributos) {
-        //iterar sobre el archivo atributosUML, borrar los atributos que ya pertenezcan a esa clase, luego hacer append de atributos
-        //(Fijarse en la funcion de obtener atributos para la iteracion)
+    public void guardarAtributos(String clase, String nombreProyecto, LinkedList<String> atributos) throws IOException {
+        //Actualizamos los atributos de cierta clase
+        // 1º = obtener la lista de atributos general
+        // 2º = segregar entre atributos de la clase y los que no
+        // 3º = una vez obtenidos los atributos que no son de esa clase, append de la lista de atributos que si queremos
+        LinkedList<String> atributos_aux = new LinkedList<>();
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        //Iterar el archivo en busca de los atributos de esa clase
+        if(ficheroDestino.exists() && !ficheroDestino.isDirectory()){
+            //Existe el archivo
+            FileReader fr = new FileReader(ficheroDestino);
+            BufferedReader br = new BufferedReader(fr);
+
+            StringBuilder atributo = new StringBuilder();
+            String linea = br.readLine();
+
+            while(linea != null){
+                //El archivo esta compuesto por una sola linea, donde va a haber tripletas x;y;z separadas por comas ;;,;;,;;,...
+                String[] tokens = linea.split(",");
+                for(String t : tokens){
+                    //Obtenemos el tercer elemento, que será la clase
+                    String[] triplet = t.split(";");
+                    if(!triplet[2].equals(clase)){
+                        //Si no coincide , añadimos el nombre y el tipo a la lista auxiliar
+                        atributos_aux.add(triplet[0] + " -> " + triplet[1]);
+                    }
+                }
+                //Una vez descartados los atributos que ya existian de una clase, hacemos append de la nueva lista de atributos de esa clase
+                atributos_aux.addAll(atributos);
+                break;
+            }
+            fr.close();
+            br.close();
+
+            FileWriter fw = new FileWriter(ficheroDestino);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            for(String s : atributos){
+                bw.write(s);
+            }
+
+            bw.close();
+            fw.close();
+        }
+    }
+
+    public void guardarAtributo(String clase, String nombreProyecto, String atributo) throws IOException {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        File ficheroDestino = new File(ruta);
+
+        //Iterar el archivo en busca de los atributos de esa clase
+
+        FileWriter fw = new FileWriter(ficheroDestino, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(atributo);
+        bw.close();
+        fw.close();
+
     }
 }

@@ -7,6 +7,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,16 +15,15 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class PsmController implements Initializable {
     public ImageView imageEsquemaEjemplo;
@@ -40,6 +40,8 @@ public class PsmController implements Initializable {
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private ArrayList<String> clasesUML = new ArrayList<>();
     private ArrayList<String> atributosUML = new ArrayList<>();
+    private List<String> choices = new ArrayList<>();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         nombreProyecto = AtributosSesion.getNombreProyecto();
@@ -75,8 +77,20 @@ public class PsmController implements Initializable {
             ObservableList oll = FXCollections.observableArrayList(clasesUML);
             listviewClases.setItems(oll);
         }
+
+        //Init de la lista de tipos
+        choices.add("xsd:integer");
+        choices.add("xsd:string");
+        choices.add("xsd:float");
+        choices.add("xsd:dateTime");
+        choices.add("xsd:boolean");
+        choices.add("xsd:decimal");
     }
 
+    /*----------------------------------------------------------------------------
+||                      Inyeccion FXML                                        ||
+||                                                                            ||
+----------------------------------------------------------------------------*/
     @FXML
     private boolean mostrarAlertaImagen(Event event){
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
@@ -114,7 +128,40 @@ public class PsmController implements Initializable {
         Optional<ButtonType> resultado = alerta.showAndWait();
         return false;
     }
-    //Pestaña introduccion
+
+    @FXML
+    private boolean mostrarAlertaTipo(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Atributo xsd");
+        String contenido = "Debe escribir un tipo de datos xsd correcto.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaNombre(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Atributo xsd");
+        String contenido = "Ya hay un atributo con ese nombre.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaTipoClase(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Atributo xsd");
+        String contenido = "No existe ninguna clase con ese nombre.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+    /*----------------------------------------------------------------------------
+||                      Pestaña introduccion                                 ||
+||                                                                            ||
+ ----------------------------------------------------------------------------*/
     public void btnFaseAnteriorAction(ActionEvent event) {
         try {
             root = FXMLLoader.load(getClass().getResource("fasePim.fxml"));
@@ -127,7 +174,11 @@ public class PsmController implements Initializable {
         }
     }
 
-    //Pestaña set de reglas
+
+    /*----------------------------------------------------------------------------
+||                      Pestaña set de reglas                                 ||
+||                                                                            ||
+ ----------------------------------------------------------------------------*/
     public void btnClasesOnt(ActionEvent event) {
         //Cargamos el texto y la imagen correspondiente
         String frase = "Una clase UML se transformará en una clase OWL.";
@@ -207,7 +258,10 @@ public class PsmController implements Initializable {
         }
     }
 
-    //Pestaña cargar esquema
+    /*----------------------------------------------------------------------------
+||                      Pestaña cargar esquema                                   ||
+||                                                                               ||
+ ----------------------------------------------------------------------------*/
     public void btnCargarEsquemaAction(ActionEvent event) {
         FileChooser fc = new FileChooser();
         File ficheroSeleccionado = fc.showOpenDialog(stage);
@@ -227,9 +281,12 @@ public class PsmController implements Initializable {
         }
     }
 
-    //Pestaña introducir datos
+    /*----------------------------------------------------------------------------
+    ||                      Pestaña introducir datos                              ||
+    ||                                                                            ||
+     ----------------------------------------------------------------------------*/
 
-    //Actualizar el listview izquierdo a partir de la clase derecha
+    //Actualizar el listview de atributos en base a la clase elegida
     public void listviewClasesAction(MouseEvent mouseEvent) {
         int index = listviewClases.getSelectionModel().getSelectedIndex();
         if(index != -1){
@@ -237,7 +294,7 @@ public class PsmController implements Initializable {
             if(!clase.isBlank()){
                 //Iterar el archivo de atributos buscando los que tenga esta clase
                 try {
-                    LinkedList<String> atributos = proyectos.obtenerAtributos(clase, nombreProyecto);
+                    LinkedList<String> atributos = proyectos.obtenerAtributosFormateados(clase, nombreProyecto);
                     ObservableList oll = FXCollections.observableArrayList(atributos);
                     listviewAtributos.setItems(oll);
                 } catch (IOException e) {
@@ -248,18 +305,181 @@ public class PsmController implements Initializable {
     }
 
     public void añadirTipoBasico(ActionEvent event) {
+        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+        List atributos = new ArrayList();
+        try {
+            //Lista de nombres de atributos perteneciente a x clase
+            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Pair<String, String> resultado = mostrarInputBasico();
+        String nombreAtributo = resultado.getKey();
+        String tipoAtributo = resultado.getValue();
+
+        //Comprobacion del tipo y disponibilidad nombre
+        if(choices.contains(tipoAtributo)){
+            //Tipo correcto
+
+            if(!atributos.contains(nombreAtributo)){
+                //Correcto, guardar atributo
+                String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase+",";
+                try {
+                    proyectos.guardarAtributo(clase, nombreProyecto, atributo);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                actualizarListviewAtributos(clase);
+            }else{
+                //El atributo ya existe
+                mostrarAlertaNombre(event);
+            }
+        }else{
+            //Mostrar alerta tipos
+            mostrarAlertaTipo(event);
+        }
+
     }
 
     public void añadirTipoClase(ActionEvent event) {
+        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+
+        //Obtencion lista de nombres de atributos
+        List atributos = new ArrayList();
+        try {
+            //Lista de nombres de atributos perteneciente a x clase
+            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Mostrar dialogo para el input
+        Pair<String, String> resultado = mostrarInputBasico();
+        String nombreAtributo = resultado.getKey();
+        String tipoAtributo = resultado.getValue();
+
+        //En este caso, comprobar que el tipo es una clase que ya existe
+        if(clasesUML.contains(tipoAtributo)) {
+            //Correcto, comprobacion disponibilidad nombre
+            if (!atributos.contains(nombreAtributo)) {
+                //Correcto, guardar atributo
+                String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
+                try {
+                    proyectos.guardarAtributo(clase, nombreProyecto, atributo);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                actualizarListviewAtributos(clase);
+            } else {
+                //El atributo ya existe
+                mostrarAlertaDuplicado(event);
+            }
+        }else{
+            mostrarAlertaTipoClase(event);
+        }
     }
 
     public void añadirEnumerado(ActionEvent event) {
+        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+
+        //Obtencion lista de nombres de atributos
+        List atributos = new ArrayList();
+        try {
+            //Lista de nombres de atributos perteneciente a x clase
+            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Mostrar dialogo para el input
+        Pair<String, String> resultado = mostrarInputEnum();
+        String nombreAtributo = resultado.getKey();
+        String tipoAtributo = resultado.getValue();
+
+        //En este caso, comprobacion disponibilidad nombre
+        if (!atributos.contains(nombreAtributo)) {
+            //Correcto, guardar atributo
+            String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
+            try {
+                proyectos.guardarAtributo(clase, nombreProyecto, atributo);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            actualizarListviewAtributos(clase);
+        } else {
+            //El atributo ya existe
+            mostrarAlertaDuplicado(event);
+        }
+
     }
 
     public void añadirColeccion(ActionEvent event) {
+        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+
+        //Obtencion lista de nombres de atributos
+        List atributos = new ArrayList();
+        try {
+            //Lista de nombres de atributos perteneciente a x clase
+            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Mostrar dialogo para el input
+        Pair<String, String> resultado = mostrarInputCol(true);
+        String nombreAtributo = resultado.getKey();
+        String tipoAtributo = resultado.getValue();
+
+        //En este caso, comprobacion disponibilidad nombre
+        if (!atributos.contains(nombreAtributo)) {
+            //Correcto, guardar atributo
+            String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
+            try {
+                proyectos.guardarAtributo(clase, nombreProyecto, atributo);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            actualizarListviewAtributos(clase);
+        } else {
+            //El atributo ya existe
+            mostrarAlertaDuplicado(event);
+        }
     }
 
+
+
     public void añadirColeccionOrd(ActionEvent event) {
+        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+
+        //Obtencion lista de nombres de atributos
+        List atributos = new ArrayList();
+        try {
+            //Lista de nombres de atributos perteneciente a x clase
+            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //Mostrar dialogo para el input
+        Pair<String, String> resultado = mostrarInputCol(false);
+        String nombreAtributo = resultado.getKey();
+        String tipoAtributo = resultado.getValue();
+
+        //En este caso, comprobacion disponibilidad nombre
+        if (!atributos.contains(nombreAtributo)) {
+            //Correcto, guardar atributo
+            String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
+            try {
+                proyectos.guardarAtributo(clase, nombreProyecto, atributo);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            actualizarListviewAtributos(clase);
+        } else {
+            //El atributo ya existe
+            mostrarAlertaDuplicado(event);
+        }
     }
 
     public void btnEliminarAtributo(ActionEvent event) {
@@ -269,12 +489,29 @@ public class PsmController implements Initializable {
         //Una vez obtenido el indice, hay que obtener la lista de atributos de cada clase
         LinkedList<String> atributos = new LinkedList<>();
         try {
-            atributos = proyectos.obtenerAtributos(clase, nombreProyecto);
+            //Obtenemos la lista de atributos
+            atributos = proyectos.obtenerAtributosCompletos(clase, nombreProyecto);
+            //Eliminamos el atributo deseado
             atributos.remove(index);
+            //Actualizamos el archivo de atributos
             proyectos.guardarAtributos(clase, nombreProyecto, atributos);
+            actualizarListviewAtributos(clase);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void actualizarListviewAtributos(String clase) {
+        //Actualizamos el listview con los atributos formateados
+        try {
+            LinkedList<String> atributos = proyectos.obtenerAtributosFormateados(clase, nombreProyecto);
+            ObservableList oll = FXCollections.observableArrayList(atributos);
+            listviewAtributos.setItems(oll);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void btnEliminarClaseAction(ActionEvent event) {
@@ -352,5 +589,154 @@ public class PsmController implements Initializable {
             }
         }
         return res;
+    }
+
+    @FXML
+    private Pair<String, String> mostrarInputBasico(){
+        // Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Introduzca los datos");
+        dialog.setHeaderText("Introduzca los datos para un tipo de datos basico.");
+
+        // Set the icon (must be included in the project).
+        //dialog.setGraphic(new ImageView(this.getClass().getResource("rdf graph.png").toString()));
+
+        // Set the button types.
+        ButtonType loginButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("Nombre atributo");
+        TextField tipo = new TextField();
+        tipo.setPromptText("Tipo");
+
+
+        grid.add(new Label("Nombre atributo:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("Tipo:"), 0, 1);
+        grid.add(tipo, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+
+        if(result.isPresent()){
+            String nombre = username.getText();
+            String tipo2 = tipo.getText();
+            Pair<String,String> res = new Pair<>(nombre, tipo2);
+            return res;
+        }else{
+            return new Pair<>("", "");
+        }
+
+    }
+
+    @FXML
+    private Pair<String, String> mostrarInputEnum(){
+        // Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Introduzca los datos");
+        dialog.setHeaderText("Introduzca los datos para un tipo de datos basico.");
+
+        // Set the icon (must be included in the project).
+        //dialog.setGraphic(new ImageView(this.getClass().getResource("rdf graph.png").toString()));
+
+        // Set the button types.
+        ButtonType loginButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("Nombre atributo");
+        TextField tipo = new TextField();
+        tipo.setText("alt");
+        tipo.setDisable(true);
+
+
+        grid.add(new Label("Nombre atributo:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("Tipo:"), 0, 1);
+        grid.add(tipo, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+
+        if(result.isPresent()){
+            String nombre = username.getText();
+            String tipo2 = tipo.getText();
+            Pair<String,String> res = new Pair<>(nombre, tipo2);
+            return res;
+        }else{
+            return new Pair<>("", "");
+        }
+
+    }
+
+    private Pair<String, String> mostrarInputCol(boolean b) {
+        // Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Introduzca los datos");
+        dialog.setHeaderText("Introduzca los datos para un tipo de datos basico.");
+
+        // Set the icon (must be included in the project).
+        //dialog.setGraphic(new ImageView(this.getClass().getResource("rdf graph.png").toString()));
+
+        // Set the button types.
+        ButtonType loginButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField username = new TextField();
+        username.setPromptText("Nombre atributo");
+        TextField tipo = new TextField();
+        //Collection or CollectionOrd
+        if(b) {
+            tipo.setText("bag");
+
+        }else{
+            tipo.setText("Seq");
+        }
+        tipo.setDisable(true);
+
+        grid.add(new Label("Nombre atributo:"), 0, 0);
+        grid.add(username, 1, 0);
+        grid.add(new Label("Tipo:"), 0, 1);
+        grid.add(tipo, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        Optional<Pair<String, String>> result = dialog.showAndWait();
+
+        if(result.isPresent()){
+            String nombre = username.getText();
+            String tipo2 = tipo.getText();
+            Pair<String,String> res = new Pair<>(nombre, tipo2);
+            return res;
+        }else{
+            return new Pair<>("", "");
+        }
+
+    }
+
+    public void btnProcesarAction(ActionEvent event) {
+        try {
+            OntologyGenerator og = new OntologyGenerator(nombreProyecto);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
