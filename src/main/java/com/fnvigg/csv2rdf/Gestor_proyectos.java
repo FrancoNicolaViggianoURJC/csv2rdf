@@ -238,6 +238,22 @@ public class Gestor_proyectos {
         }
     }
 
+    public ArrayList<String> obtenerCamposList(String path) {
+        ArrayList<String> columnas = new ArrayList<>();
+        try {
+            Reader input = new FileReader(path);
+            Iterable<CSVRecord> campos = CSVFormat.EXCEL.parse(input);
+            //Solo leeremos la primera fila del archivo CSV, por ello el break
+            for(CSVRecord campo : campos){
+                columnas.addAll(Arrays.asList(campo.values()));
+                input.close();
+                break;
+            }
+            return columnas;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void addRequerimiento(String requerimiento, String proyecto) throws IOException {
         //Obtener ruta
         String ruta = System.getProperty("user.dir");

@@ -61,14 +61,11 @@
                         <Button layoutX="492.0" layoutY="197.0" mnemonicParsing="false" onAction="#añadirEnumerado" prefHeight="25.0" prefWidth="88.0" text="Enumerado" />
                         <Button layoutX="493.0" layoutY="234.0" mnemonicParsing="false" onAction="#añadirColeccion" prefHeight="25.0" prefWidth="87.0" text="Colección" />
                         <Button layoutX="492.0" layoutY="271.0" mnemonicParsing="false" onAction="#añadirColeccionOrd" text="ColecciónOrd" />
-                        <Button layoutX="505.0" layoutY="388.0" mnemonicParsing="false" onAction="#btnProcesarAction" text="Procesar" />
-                        <Button layoutX="32.0" layoutY="341.0" mnemonicParsing="false" onAction="#btnAñadirClaseAction" text="Añadir clase" />
-                        <Button layoutX="325.0" layoutY="341.0" mnemonicParsing="false" onAction="#btnEliminarAtributo" text="Eliminar atributo" />
+                        <Button layoutX="250.0" layoutY="388.0" mnemonicParsing="false" onAction="#btnProcesarAction" prefHeight="25.0" prefWidth="84.0" text="Procesar" />
                         <Label layoutX="56.0" layoutY="14.0" prefHeight="34.0" prefWidth="471.0" text="A continuación, el usuario introducirá los datos del esquema y se generará la ontología." textAlignment="CENTER" />
                         <Label layoutX="496.0" layoutY="94.0" text="Añadir atributo" />
                         <Label layoutX="102.0" layoutY="69.0" text="Clases UML" />
                         <Label layoutX="338.0" layoutY="69.0" text="Atributos UML" />
-                        <Button layoutX="144.0" layoutY="341.0" mnemonicParsing="false" onAction="#btnEliminarClaseAction" text="Eliminar clase" />
                      </children></AnchorPane>
               </content>
             </TitledPane>

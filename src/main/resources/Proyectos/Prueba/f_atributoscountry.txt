@@ -1,0 +1,1 @@
+xsd:integer,xsd:string,alt,xsd:string,xsd:float,xsd:float,xsd:float,

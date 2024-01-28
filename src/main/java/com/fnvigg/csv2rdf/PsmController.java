@@ -20,8 +20,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -70,13 +69,8 @@ public class PsmController implements Initializable {
         }
 
         //Cargar listview de clases
-        ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
-        f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            clasesUML = proyectos.obtenerClases(f);
-            ObservableList oll = FXCollections.observableArrayList(clasesUML);
-            listviewClases.setItems(oll);
-        }
+        //Obtener todos los archivos csv de la carpeta del proyecto
+        cargarClases();
 
         //Init de la lista de tipos
         choices.add("xsd:integer");
@@ -154,6 +148,16 @@ public class PsmController implements Initializable {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
         alerta.setTitle("Atributo xsd");
         String contenido = "No existe ninguna clase con ese nombre.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaOntologia(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Atributos");
+        String contenido = "Aun faltan atributos por especificar.";
         alerta.setContentText(contenido);
         Optional<ButtonType> resultado = alerta.showAndWait();
         return false;
@@ -286,457 +290,342 @@ public class PsmController implements Initializable {
     ||                                                                            ||
      ----------------------------------------------------------------------------*/
 
-    //Actualizar el listview de atributos en base a la clase elegida
+    //Init listview
+    private void cargarClases() {
+        //Las clases se obtienen a partir de los nombres de archivos
+
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        File ficheroDestino = new File( ruta);
+
+        //Filtro para no obtener los archivos de configuracion
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File f, String name)
+            {
+                return (name.endsWith(".csv"));
+            }
+
+        };
+
+        File[] ficheros = ficheroDestino.listFiles(filter);
+        ArrayList<String> nombres = new ArrayList<>();
+
+        if(ficheros != null) {
+            for (File f : ficheros) {
+                nombres.add(f.getName());
+            }
+        }
+        ObservableList oll = FXCollections.observableArrayList(nombres);
+        listviewClases.setItems(oll);
+    }
+
+    //Al escoger una clase, listar sus campos
     public void listviewClasesAction(MouseEvent mouseEvent) {
+        try {
+            actualizarListViewAtributos();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void actualizarListViewAtributos() throws IOException {
         int index = listviewClases.getSelectionModel().getSelectedIndex();
         if(index != -1){
             String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
             if(!clase.isBlank()){
-                //Iterar el archivo de atributos buscando los que tenga esta clase
-                try {
-                    LinkedList<String> atributos = proyectos.obtenerAtributosFormateados(clase, nombreProyecto);
-                    ObservableList oll = FXCollections.observableArrayList(atributos);
-                    listviewAtributos.setItems(oll);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
+                //Campos del archivo csv (atributos)
+                ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
+
+                //Acceso al archivo de atributos correspondiente
+                String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv",".txt");
+                File atributosFile = new File(rutaAtr);
+                if(atributosFile.exists() && !atributosFile.isDirectory()) {
+                    FileReader fr = new FileReader(atributosFile);
+                    BufferedReader br = new BufferedReader(fr);
+
+                    //Lectura archivo atributos
+                    String linea = br.readLine();
+                    String[] tokens = {};
+                    if (linea != null) {
+                        //formato: nombreAtr;tipoAtr,nombreAtr;tipoAtr,...
+                        tokens = linea.split(",");
+                    }
+                    List<String> tipos = Arrays.asList(tokens);
+
+                    //Si hay un tipo distinto de "_" guardado en la posicion, indica que el atributo tiene un tipo
+                    for (int i = 0; i < campos.size(); i++) {
+                        String tipo = tipos.get(i);
+                        if (!tipo.equals("_")) {
+                            String nombre = campos.get(i);
+                            campos.set(i, nombre + ";" + tipo);
+                        }
+                    }
+                    fr.close();
+                    br.close();
                 }
+                ObservableList oll = FXCollections.observableArrayList(campos);
+                listviewAtributos.setItems(oll);
             }
         }
-    }
 
+    }
     public void añadirTipoBasico(ActionEvent event) {
         String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
-        List atributos = new ArrayList();
-        try {
-            //Lista de nombres de atributos perteneciente a x clase
-            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+
+        //Obtencion tipo via dialog
+        String tipo = mostrarInputBasico();
+
+        if(tipo.isEmpty()){
+            mostrarAlertaSeleccion(event);
+        }else {
+            actualizarArchivoAtributos(clase, index, tipo);
         }
-
-        Pair<String, String> resultado = mostrarInputBasico();
-        String nombreAtributo = resultado.getKey();
-        String tipoAtributo = resultado.getValue();
-
-        //Comprobacion del tipo y disponibilidad nombre
-        if(choices.contains(tipoAtributo)){
-            //Tipo correcto
-
-            if(!atributos.contains(nombreAtributo)){
-                //Correcto, guardar atributo
-                String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase+",";
-                try {
-                    proyectos.guardarAtributo(clase, nombreProyecto, atributo);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                actualizarListviewAtributos(clase);
-            }else{
-                //El atributo ya existe
-                mostrarAlertaNombre(event);
-            }
-        }else{
-            //Mostrar alerta tipos
-            mostrarAlertaTipo(event);
-        }
-
     }
 
     public void añadirTipoClase(ActionEvent event) {
         String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
 
-        //Obtencion lista de nombres de atributos
-        List atributos = new ArrayList();
-        try {
-            //Lista de nombres de atributos perteneciente a x clase
-            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        //Obtencion tipo via dialog
+        String tipo = mostrarInputClase();
+
+        if(tipo.isEmpty()){
+            mostrarAlertaSeleccion(event);
+        }else {
+            actualizarArchivoAtributos(clase, index, tipo);
         }
 
-        //Mostrar dialogo para el input
-        Pair<String, String> resultado = mostrarInputBasico();
-        String nombreAtributo = resultado.getKey();
-        String tipoAtributo = resultado.getValue();
-
-        //En este caso, comprobar que el tipo es una clase que ya existe
-        if(clasesUML.contains(tipoAtributo)) {
-            //Correcto, comprobacion disponibilidad nombre
-            if (!atributos.contains(nombreAtributo)) {
-                //Correcto, guardar atributo
-                String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
-                try {
-                    proyectos.guardarAtributo(clase, nombreProyecto, atributo);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                actualizarListviewAtributos(clase);
-            } else {
-                //El atributo ya existe
-                mostrarAlertaDuplicado(event);
-            }
-        }else{
-            mostrarAlertaTipoClase(event);
-        }
     }
 
-    public void añadirEnumerado(ActionEvent event) {
+    public void añadirEnumerado(ActionEvent event){
         String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
-
-        //Obtencion lista de nombres de atributos
-        List atributos = new ArrayList();
-        try {
-            //Lista de nombres de atributos perteneciente a x clase
-            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //Mostrar dialogo para el input
-        Pair<String, String> resultado = mostrarInputEnum();
-        String nombreAtributo = resultado.getKey();
-        String tipoAtributo = resultado.getValue();
-
-        //En este caso, comprobacion disponibilidad nombre
-        if (!atributos.contains(nombreAtributo)) {
-            //Correcto, guardar atributo
-            String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
-            try {
-                proyectos.guardarAtributo(clase, nombreProyecto, atributo);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            actualizarListviewAtributos(clase);
-        } else {
-            //El atributo ya existe
-            mostrarAlertaDuplicado(event);
-        }
-
+        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        actualizarArchivoAtributos(clase, index, "alt");
     }
 
     public void añadirColeccion(ActionEvent event) {
         String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
-
-        //Obtencion lista de nombres de atributos
-        List atributos = new ArrayList();
-        try {
-            //Lista de nombres de atributos perteneciente a x clase
-            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //Mostrar dialogo para el input
-        Pair<String, String> resultado = mostrarInputCol(true);
-        String nombreAtributo = resultado.getKey();
-        String tipoAtributo = resultado.getValue();
-
-        //En este caso, comprobacion disponibilidad nombre
-        if (!atributos.contains(nombreAtributo)) {
-            //Correcto, guardar atributo
-            String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
-            try {
-                proyectos.guardarAtributo(clase, nombreProyecto, atributo);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            actualizarListviewAtributos(clase);
-        } else {
-            //El atributo ya existe
-            mostrarAlertaDuplicado(event);
-        }
+        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        actualizarArchivoAtributos(clase, index, "bag");
     }
-
-
 
     public void añadirColeccionOrd(ActionEvent event) {
         String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
-
-        //Obtencion lista de nombres de atributos
-        List atributos = new ArrayList();
-        try {
-            //Lista de nombres de atributos perteneciente a x clase
-            atributos = proyectos.obtenerNombresAtributos(clase, nombreProyecto);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //Mostrar dialogo para el input
-        Pair<String, String> resultado = mostrarInputCol(false);
-        String nombreAtributo = resultado.getKey();
-        String tipoAtributo = resultado.getValue();
-
-        //En este caso, comprobacion disponibilidad nombre
-        if (!atributos.contains(nombreAtributo)) {
-            //Correcto, guardar atributo
-            String atributo = nombreAtributo + ";" + tipoAtributo + ";" + clase + ",";
-            try {
-                proyectos.guardarAtributo(clase, nombreProyecto, atributo);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            actualizarListviewAtributos(clase);
-        } else {
-            //El atributo ya existe
-            mostrarAlertaDuplicado(event);
-        }
-    }
-
-    public void btnEliminarAtributo(ActionEvent event) {
-        String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
         int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        actualizarArchivoAtributos(clase, index, "seq");
+    }
+    private void actualizarArchivoAtributos(String clase, int index, String tipo) {
+        String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv", ".txt");
+        File atributos = new File(rutaAtr);
 
-        //Una vez obtenido el indice, hay que obtener la lista de atributos de cada clase
-        LinkedList<String> atributos = new LinkedList<>();
         try {
-            //Obtenemos la lista de atributos
-            atributos = proyectos.obtenerAtributosCompletos(clase, nombreProyecto);
-            //Eliminamos el atributo deseado
-            atributos.remove(index);
-            //Actualizamos el archivo de atributos
-            proyectos.guardarAtributos(clase, nombreProyecto, atributos);
-            actualizarListviewAtributos(clase);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void actualizarListviewAtributos(String clase) {
-        //Actualizamos el listview con los atributos formateados
-        try {
-            LinkedList<String> atributos = proyectos.obtenerAtributosFormateados(clase, nombreProyecto);
-            ObservableList oll = FXCollections.observableArrayList(atributos);
-            listviewAtributos.setItems(oll);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public void btnEliminarClaseAction(ActionEvent event) {
-        int index = listviewClases.getSelectionModel().getSelectedIndex();
-        if(index == -1){
-            //Mostrar alerta seleccion
-            mostrarAlertaSeleccion(event);
-        }else{
-            //Eliminamos el objeto de la lista
-            clasesUML.remove(index);
-
-            //Eliminamos el objeto de la listview
-            ArrayList<String> listLL = new ArrayList<>(listviewClases.getItems());
-            listLL.remove(index);
-            ObservableList obsList = FXCollections.observableArrayList(listLL);
-            listviewClases.setItems(obsList);
-
-            //Actualizamos la lista de clases
-            try {
-                proyectos.guardarClases(clasesUML, nombreProyecto);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            //Limpiamos el listview de atributos, al no haber ninguna clase seleccionada
-            ArrayList<String> blankAL = new ArrayList<>();
-            ObservableList blank = FXCollections.observableArrayList(blankAL);
-            listviewAtributos.setItems(blank);
-        }
-    }
-
-    public void btnAñadirClaseAction(ActionEvent event) {
-        TextInputDialog td = new TextInputDialog();
-        Optional<String> res = td.showAndWait();
-
-        //Comprobacion cancelado
-        if (!res.isPresent()) {
-            //mostrar alerta
-            mostrarAlertaBlank(event);
-        } else {
-            //Comprobacion campo en blanco
-            String nombre_clase = res.get();
-            if(nombre_clase.isBlank()){
-                mostrarAlertaBlank(event);
-            }else{
-                //Comprobacion campo duplicado
-                boolean duplicado = comprobarDuplicidad(nombre_clase);
-                if(duplicado){
-                    mostrarAlertaDuplicado(event);
-                }else{
-                    //Todo correcto
-
-                    //Hay que mantener una lista con los nombres de las clases, y que se mantenga coherente.
-                    clasesUML.add(nombre_clase);
-                    ObservableList list = FXCollections.observableArrayList(clasesUML);
-                    listviewClases.setItems(list);
-
-                    //Guardar la clase en el archivo
-                    try {
-                        proyectos.guardarClases(clasesUML, nombreProyecto);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+            if (!atributos.exists() && !atributos.isDirectory()) {
+                //El archivo no está inicializado, llenarlo
+                FileWriter fw = new FileWriter(atributos);
+                BufferedWriter bw = new BufferedWriter(fw);
+                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
+                ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
+                for (int i = 0; i <= campos.size()-1; i++) {
+                    bw.write("_,");
                 }
+                bw.close();
+                fw.close();
             }
+
+            //Escritura atributo
+            FileReader fr = new FileReader(atributos);
+            BufferedReader br = new BufferedReader(fr);
+            List<String> tokens = new LinkedList<>();
+            String linea = br.readLine();
+            if (linea != null) {
+                tokens = Arrays.asList(linea.split(","));
+                br.close();
+                fr.close();
+                tokens.set(index, tipo);
+                //Reescribir el archivo con el nuevo atributo
+                FileWriter fw = new FileWriter(atributos);
+                BufferedWriter bw = new BufferedWriter(fw);
+                for (String t : tokens) {
+                    bw.write(t + ",");
+                }
+                bw.close();
+                fw.close();
+                actualizarListViewAtributos();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private boolean comprobarDuplicidad(String nombreClase) {
-        boolean res = false;
-        for(String clase : clasesUML){
-            if(clase.equals(nombreClase)){
-                res=true;
-                break;
-            }
+
+    @FXML
+    private String mostrarInputBasico(){
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("xsd:integer", choices);
+        dialog.setTitle("Tipo básico");
+        dialog.setHeaderText("Eleccion");
+        dialog.setContentText("Elige el tipo básico:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            return result.get();
+        }else{
+            return "";
         }
-        return res;
     }
 
     @FXML
-    private Pair<String, String> mostrarInputBasico(){
-        // Create the custom dialog.
-        Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Introduzca los datos");
-        dialog.setHeaderText("Introduzca los datos para un tipo de datos basico.");
+    private String mostrarInputClase(){
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Tipo clase");
+        dialog.setHeaderText("Introduzca el nombre de la clase a la que referencia");
+        dialog.setContentText("Clase:");
 
-        // Set the icon (must be included in the project).
-        //dialog.setGraphic(new ImageView(this.getClass().getResource("rdf graph.png").toString()));
-
-        // Set the button types.
-        ButtonType loginButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-        // Create the username and password labels and fields.
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField username = new TextField();
-        username.setPromptText("Nombre atributo");
-        TextField tipo = new TextField();
-        tipo.setPromptText("Tipo");
-
-
-        grid.add(new Label("Nombre atributo:"), 0, 0);
-        grid.add(username, 1, 0);
-        grid.add(new Label("Tipo:"), 0, 1);
-        grid.add(tipo, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        Optional<Pair<String, String>> result = dialog.showAndWait();
-
-        if(result.isPresent()){
-            String nombre = username.getText();
-            String tipo2 = tipo.getText();
-            Pair<String,String> res = new Pair<>(nombre, tipo2);
-            return res;
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            return result.get();
         }else{
-            return new Pair<>("", "");
+            return "";
         }
-
-    }
-
-    @FXML
-    private Pair<String, String> mostrarInputEnum(){
-        // Create the custom dialog.
-        Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Introduzca los datos");
-        dialog.setHeaderText("Introduzca los datos para un tipo de datos basico.");
-
-        // Set the icon (must be included in the project).
-        //dialog.setGraphic(new ImageView(this.getClass().getResource("rdf graph.png").toString()));
-
-        // Set the button types.
-        ButtonType loginButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-        // Create the username and password labels and fields.
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField username = new TextField();
-        username.setPromptText("Nombre atributo");
-        TextField tipo = new TextField();
-        tipo.setText("alt");
-        tipo.setDisable(true);
-
-
-        grid.add(new Label("Nombre atributo:"), 0, 0);
-        grid.add(username, 1, 0);
-        grid.add(new Label("Tipo:"), 0, 1);
-        grid.add(tipo, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        Optional<Pair<String, String>> result = dialog.showAndWait();
-
-        if(result.isPresent()){
-            String nombre = username.getText();
-            String tipo2 = tipo.getText();
-            Pair<String,String> res = new Pair<>(nombre, tipo2);
-            return res;
-        }else{
-            return new Pair<>("", "");
-        }
-
-    }
-
-    private Pair<String, String> mostrarInputCol(boolean b) {
-        // Create the custom dialog.
-        Dialog<Pair<String, String>> dialog = new Dialog<>();
-        dialog.setTitle("Introduzca los datos");
-        dialog.setHeaderText("Introduzca los datos para un tipo de datos basico.");
-
-        // Set the icon (must be included in the project).
-        //dialog.setGraphic(new ImageView(this.getClass().getResource("rdf graph.png").toString()));
-
-        // Set the button types.
-        ButtonType loginButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-        // Create the username and password labels and fields.
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField username = new TextField();
-        username.setPromptText("Nombre atributo");
-        TextField tipo = new TextField();
-        //Collection or CollectionOrd
-        if(b) {
-            tipo.setText("bag");
-
-        }else{
-            tipo.setText("seq");
-        }
-        tipo.setDisable(true);
-
-        grid.add(new Label("Nombre atributo:"), 0, 0);
-        grid.add(username, 1, 0);
-        grid.add(new Label("Tipo:"), 0, 1);
-        grid.add(tipo, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        Optional<Pair<String, String>> result = dialog.showAndWait();
-
-        if(result.isPresent()){
-            String nombre = username.getText();
-            String tipo2 = tipo.getText();
-            Pair<String,String> res = new Pair<>(nombre, tipo2);
-            return res;
-        }else{
-            return new Pair<>("", "");
-        }
-
     }
 
     public void btnProcesarAction(ActionEvent event) {
         try {
-            OntologyGenerator og = new OntologyGenerator(nombreProyecto);
+            //Transformar las estructuras de datos para que las acepte el generador de ontologias
+            if(comprobarAtributos()) {
+                limpiarArchivosUML();
+                crearClasesUml();
+                crearAtributosUML();
+                OntologyGenerator og = new OntologyGenerator(nombreProyecto);
+            }else{
+                //Mostrar alerta falta completar atributos
+                mostrarAlertaOntologia(event);
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private boolean comprobarAtributos() throws IOException {
+        //Iterar sobre los archivos de atributos y buscar "_", si hay alguno, devolver false
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        File ficheroDestino = new File( ruta);
+
+        //Filtro para no obtener los archivos de configuracion
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File f, String name)
+            {
+                return (name.startsWith("f_atributos"));
+            }
+
+        };
+
+        File[] ficheros = ficheroDestino.listFiles(filter);
+        if(ficheros != null && ficheros.length>1) {
+            //Iterar por los ficheros de atributos buscando "_"
+            for (File f : ficheros) {
+                FileReader fr = new FileReader(f);
+                BufferedReader br = new BufferedReader(fr);
+                String linea = br.readLine();
+
+                if(linea != null){
+                    //formato: tipo1,tipo2,tipoN
+                    String[] tokens = linea.split(",");
+                    for(String t : tokens){
+                        if(t.equals("_")){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }else{
+            return false;
+        }
+        //Si llega aqui, es porque todos los atributos estan configurados
+        return true;
+    }
+
+    private void limpiarArchivosUML() {
+        String clasesUML = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        String atributosUML = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+
+        File clases = new File(clasesUML);
+        if(clases.exists() && !clases.isDirectory()){
+            clases.delete();
+        }
+        File atts = new File(atributosUML);
+        if(atts.exists() && !atts.isDirectory()){
+            atts.delete();
+        }
+    }
+
+    private void crearClasesUml() throws IOException {
+        List<String> ll = listviewClases.getItems();
+        //LinkedList<String> ll = (LinkedList) listviewClases.getItems();
+
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        File clasesUML = new File(ruta);
+        //Borrado si existe el archivo
+        if(clasesUML.exists() && !clasesUML.isDirectory()){
+            clasesUML.delete();
+        }
+
+        FileWriter fw = new FileWriter(clasesUML, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        for(String clase : ll){
+            String format = clase.replace(".csv","");
+            bw.write(format+",");
+        }
+        bw.close();
+        fw.close();
+    }
+
+    private void crearAtributosUML() throws IOException {
+        List<String> clases = listviewClases.getItems();
+
+        for(String clase : clases){
+
+            String claseFormateada = clase.replace(".csv", ".txt");
+            String claseAux = clase.replace(".csv", "");
+
+            String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + claseFormateada;
+            File atributos = new File(rutaAtr);
+            if(atributos.exists()){
+                //Crear un string: nombreAtr;tipoAtr;clase
+                FileReader fr = new FileReader(rutaAtr);
+                BufferedReader br = new BufferedReader(fr);
+                String linea = br.readLine();
+
+                //Obtencion tipos de cada atributo
+                if(linea != null){
+                    String[] tokens = linea.split(",");
+                    br.close();
+                    fr.close();
+
+                    String rutaOutput = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+                    File atributosUML = new File(rutaOutput);
+                    FileWriter fw = new FileWriter(atributosUML, true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    //Obtencion campos de esa clase
+                    String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
+                    ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
+
+                    int ind = 0;
+                    for(String campo : campos){
+                        bw.write( campo+";"+tokens[ind]+";"+claseAux+",");
+                        ind += 1;
+                    }
+                    bw.close();
+                    fw.close();
+                }
+
+            }
         }
     }
 }
