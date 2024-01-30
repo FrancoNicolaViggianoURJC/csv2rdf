@@ -1,1 +1,0 @@
-countryCode;xsd:integer;country,name;xsd:string;country,continent;alt;country,capital;xsd:string;country,area;xsd:float;country,latitude;xsd:float;country,longitude;xsd:float;country,countryCode;country;country_population,period;bag;country_population,population;seq;country_population,

@@ -500,6 +500,9 @@ public class PsmController implements Initializable {
                 crearClasesUml();
                 crearAtributosUML();
                 OntologyGenerator og = new OntologyGenerator(nombreProyecto);
+                //transicionar pantalla
+                transicionarPantalla(event);
+
             }else{
                 //Mostrar alerta falta completar atributos
                 mostrarAlertaOntologia(event);
@@ -626,6 +629,17 @@ public class PsmController implements Initializable {
                 }
 
             }
+        }
+    }
+    public void transicionarPantalla(ActionEvent event) {
+        try {
+            root = FXMLLoader.load(getClass().getResource("faseDsl.fxml"));
+            stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
