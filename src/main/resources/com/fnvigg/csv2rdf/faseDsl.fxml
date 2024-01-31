@@ -19,10 +19,16 @@
                         <Button fx:id="btnEnumerado" layoutX="433.0" layoutY="418.0" mnemonicParsing="false" onAction="#btnEnumeradoAction" prefHeight="25.0" prefWidth="108.0" text="Enumerado" />
                         <ListView fx:id="listviewClases" layoutX="55.0" layoutY="121.0" onMouseClicked="#listviewClasesAction" prefHeight="282.0" prefWidth="215.0" />
                         <Button layoutX="268.0" layoutY="466.0" mnemonicParsing="false" onAction="#generarDSL" text="Procesar" />
+                        <Label fx:id="atributoPrimarioLabel" layoutX="55.0" layoutY="422.0" prefHeight="17.0" prefWidth="214.0" text="Atributo primario: " />
                      </children>
                   </AnchorPane>
             </content>
           </TitledPane>
+            <TitledPane animated="false" text="Rutas">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
+            </TitledPane>
         </panes>
       </Accordion>
    </children>

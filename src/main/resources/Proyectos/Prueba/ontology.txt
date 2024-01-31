@@ -7,7 +7,7 @@
      -->
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF 
-    xml:base="http://www.example.com/pruebaOnt#"
+    xml:base="http://www.example.com/Prueba#"
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:owl="http://www.w3.org/2002/07/owl#"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -17,7 +17,7 @@
 	xmlns:vann="http://purl.org/vocab/vann/"
 	xmlns:dcterms="http://purl.org/dc/terms/"
 	xmlns:gn="http://www.geonames.org/ontology#"	
-	xmlns:vSont="http://www.example.com/pruebaOnt#">
+	xmlns:vSont="http://www.example.com/Prueba#">
 
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -27,9 +27,9 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
  
-	<owl:Ontology rdf:about="http://www.example.com/pruebaOnt#">
-		<dc:title>pruebaOnt</dc:title>
-		<rdfs:label>pruebaOnt</rdfs:label>
+	<owl:Ontology rdf:about="http://www.example.com/Prueba#">
+		<dc:title>Prueba</dc:title>
+		<rdfs:label>Prueba</rdfs:label>
 		<owl:versionInfo>Version 1.0 -2024-1-30</owl:versionInfo>        
         <dc:creator>Valentina</dc:creator>
 		<dc:creator>Franco</dc:creator>
@@ -76,12 +76,17 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
  
-<owl:Class rdf:about="http://www.example.com/pruebaOnt#country">
+<owl:Class rdf:about="http://www.example.com/Prueba#country">
         <rdfs:comment xml:lang="en"> (descripcion en ingles) </rdfs:comment>		
 		<rdfs:label xml:lang="en">country</rdfs:label>
 		<rdfs:label xml:lang="es"> (pedir en español) </rdfs:label>
     </owl:Class>
-<owl:Class rdf:about="http://www.example.com/pruebaOnt#region">
+<owl:Class rdf:about="http://www.example.com/Prueba#country_population">
+        <rdfs:comment xml:lang="en"> (descripcion en ingles) </rdfs:comment>		
+		<rdfs:label xml:lang="en">country_population</rdfs:label>
+		<rdfs:label xml:lang="es"> (pedir en español) </rdfs:label>
+    </owl:Class>
+<owl:Class rdf:about="http://www.example.com/Prueba#region">
         <rdfs:comment xml:lang="en"> (descripcion en ingles) </rdfs:comment>		
 		<rdfs:label xml:lang="en">region</rdfs:label>
 		<rdfs:label xml:lang="es"> (pedir en español) </rdfs:label>
@@ -95,6 +100,24 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
  
+
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#capital">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country"/>
+        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq"/>
+    </owl:DatatypeProperty>	 
+	
+
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#period">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country_population"/>
+        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Alt"/>
+    </owl:DatatypeProperty>	 
+	
+
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#area">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#region"/>
+        <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag"/>
+    </owl:DatatypeProperty>	 
+	
 			
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -105,80 +128,56 @@
      -->	
 
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#countryCode">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#countryCode">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#name">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#name">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#continent">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#continent">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#capital">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    </owl:DatatypeProperty>	 
-	
-
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#area">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#area">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#latitude">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#countryCode">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country_population"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#longitude">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#country"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    </owl:DatatypeProperty>	 
-	
-
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#regionCode">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#region"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#population">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#country_population"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#name">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#region"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#regionCode">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#region"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#countryCode">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#region"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#name">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#region"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	
 
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#area">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#region"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
-    </owl:DatatypeProperty>	 
-	
-
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#latitude">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#region"/>
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-    </owl:DatatypeProperty>	 
-	
-
-    <owl:DatatypeProperty rdf:about="http://www.example.com/pruebaOnt#longitude">
-        <rdfs:domain rdf:resource="http://www.example.com/pruebaOnt#region"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.com/Prueba#countryCode">
+        <rdfs:domain rdf:resource="http://www.example.com/Prueba#region"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>	 
 	

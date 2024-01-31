@@ -177,9 +177,7 @@ public class CimController implements Initializable {
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File f, String name)
             {
-                return (!name.contentEquals("config.txt") && !name.contentEquals("esquema.png") && !name.contentEquals("requerimientos.txt")
-                 && !name.contentEquals("MDO.png") && !name.contentEquals("esquemaOnt.png") && !name.contentEquals("clasesUML.txt")
-                        && !name.contentEquals("atributosUML.txt")) && !name.contentEquals("ontology.txt");
+                return (name.endsWith(".csv") );
             }
         };
 

@@ -23,16 +23,24 @@ public class DslController implements Initializable {
     public Button btnEnumerado;
     public Button btnAtributoPrimario;
     public Accordion accordion;
+    public Label atributoPrimarioLabel;
     private String nombreProyecto;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private Map<String, String> keyFlds;
     private ArrayList<Map<String, String>> enumerados;
+    private List<String> choices = new ArrayList<>();
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.accordion.setExpandedPane(accordion.getPanes().get(0));
         this.nombreProyecto = AtributosSesion.getNombreProyecto();
         this.keyFlds = new HashMap<>();
         this.enumerados = new ArrayList<>();
+        choices.add("xsd:integer");
+        choices.add("xsd:string");
+        choices.add("xsd:float");
+        choices.add("xsd:dateTime");
+        choices.add("xsd:boolean");
+        choices.add("xsd:decimal");
 
         //Init listview clases
         cargarClases();
@@ -42,6 +50,9 @@ public class DslController implements Initializable {
         for(int i = 0; i < numeroClases; i++){
             enumerados.add(new HashMap<String, String>());
         }
+
+        btnEnumerado.setDisable(true);
+        btnAtributoPrimario.setDisable(true);
 
     }
 
@@ -118,7 +129,18 @@ public class DslController implements Initializable {
                 }
                 ObservableList oll = FXCollections.observableArrayList(campos);
                 listviewAtributos.setItems(oll);
+
+                //Actualizacion label
+                String key = clase.replaceAll(".csv", "");
+                String field = keyFlds.get(key);
+                if(field != null){
+                    atributoPrimarioLabel.setText("Atributo Primario: " + field);
+                }else{
+                    atributoPrimarioLabel.setText("Atributo Primario: ");
+                }
+
             }
+
         }
 
     }
@@ -155,6 +177,8 @@ public class DslController implements Initializable {
         //Metemos el par clave-valor [clase - atributo]
         keyFlds.put(clase, nombreAtributo);
 
+        atributoPrimarioLabel.setText("Atributo Primario: "+nombreAtributo);
+
     }
 
     public void btnEnumeradoAction(ActionEvent event) {
@@ -179,12 +203,124 @@ public class DslController implements Initializable {
     public void generarDSL(ActionEvent event) {
         //Comprobar que todos los keyfields fueron introducidos
         if(keyFlds.size() == listviewClases.getItems().size()){
-            DslGenerator dslGen = new DslGenerator(keyFlds, enumerados);
+
+            try {
+                List<String> clasesFormateadas = preprocesarDatos();
+                DslGenerator dslGen = new DslGenerator(clasesFormateadas);
+                limpiarCarpeta();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }else{
             //mostrar alerta
             mostrarAlertaClave(event);
         }
 
+    }
+
+    private void limpiarCarpeta() {
+        String rutaClase = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        File directorio = new File( rutaClase);
+
+        //Filtro para no obtener los archivos de configuracion
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File f, String name)
+            {
+                return (!name.contentEquals("ontology.txt") && !name.contentEquals("DSLCode.txt") &&
+                        !name.contentEquals("config.txt") && !name.endsWith(".csv") &&
+                        !name.endsWith(".png"));
+            }
+        };
+
+        File[] ficheros = directorio.listFiles(filter);
+
+
+        //Inicializacion linkedlists
+        for(File f : ficheros){
+            f.delete();
+        }
+    }
+
+    private List<String> preprocesarDatos() throws IOException {
+        //Preprocesamiento -> separar cada cosa en su clase
+        List<String> clases = listviewClases.getItems();
+
+        //Formateo lista de clases
+        List<String> clasesFormateadas = new ArrayList<>();
+        for(String clase : clases){
+            clasesFormateadas.add(clase.replaceAll(".csv", ""));
+        }
+
+        int indexClass = 0;
+        //Generar por cada clase el archivo DSL correspondiente
+        for(String nombreClase : clasesFormateadas){
+            //Archivo de la clase especifica
+            String rutaClase = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + nombreClase + "DSL.txt";
+            File claseFile = new File(rutaClase);
+            if(claseFile.exists()){
+                claseFile.delete();
+            }
+            FileWriter fw = new FileWriter(claseFile, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            // SUBJECT
+            String clave = keyFlds.get(nombreClase);
+            bw.write("SUBJECT(#"+nombreClase+"."+clave+","+nombreProyecto+":"+nombreClase+")\n");
+
+            //DATATYPES & OBJECTS
+
+            // I/O
+            String rutaAtributos = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+            File atributosUML = new File(rutaAtributos);
+            FileReader fr = new FileReader(atributosUML);
+            BufferedReader br = new BufferedReader(fr);
+
+            //Lectura atributos
+            String linea = br.readLine();
+            if(linea != null){
+                String[] tokens = linea.split(",");
+                // [nombreAtr; tipoAtr;claseAtr],[],[],...
+                for(String atributo : tokens){
+                    // [nombreAtr;tipoAtr;claseAtr]
+                    String[] campos = atributo.split(";");
+                    String nombreAtr = campos[0];
+                    String tipo = campos[1];
+                    String clasePertenece = campos[2];
+                    //Si pertenece a la clase que estamos analizando ahora
+                    if(nombreClase.equals(clasePertenece)){
+                        if(choices.contains(tipo)){
+                            //Datatype
+                            bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtr+"),OBJECT("+nombreProyecto+":#"+nombreClase+"."+nombreAtr+"))\n");
+                        }else{
+                            //Object
+                            if(tipo.equals("bag")){
+                                //escribir collection
+                                bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtr+"),OBJECT(CONTAINER(BAG,#"+nombreClase+"."+nombreAtr+")))\n");
+                            }else if(tipo.equals("seq")){
+                                //Collection ord
+                                bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtr+"),OBJECT(CONTAINER(SEQ,#"+nombreClase+"."+nombreAtr+")))\n");
+                            }
+                        }
+                    }
+                }
+            }
+
+            //ENUMS
+            Map<String, String> enumeradosClase = enumerados.get(indexClass);
+            indexClass++;
+            for(String key : enumeradosClase.keySet()){
+                // key -> nombre atributo
+                // valor -> VALUES(..),ENUM(...)))
+                String valor = enumeradosClase.get(key);
+                bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+key+"),OBJECT(#"+nombreClase+"."+key+","+valor+"\n");
+            }
+            bw.close();
+            fw.close();
+            fr.close();
+            br.close();
+        }
+        return clasesFormateadas;
     }
 
     @FXML
