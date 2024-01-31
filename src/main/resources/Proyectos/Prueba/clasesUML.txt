@@ -1,1 +1,0 @@
-country,country_population,nonRelevant_destination_region_visitors,nonRelevant_length_stay_visitors,region,

@@ -301,7 +301,7 @@ public class PsmController implements Initializable {
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File f, String name)
             {
-                return (name.endsWith(".csv"));
+                return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
             }
 
         };

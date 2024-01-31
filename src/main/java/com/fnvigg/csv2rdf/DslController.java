@@ -19,6 +19,9 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.*;
+
+import org.javatuples.Quartet;
+import org.javatuples.Quintet;
 import org.javatuples.Triplet;
 public class DslController implements Initializable {
 
@@ -36,6 +39,8 @@ public class DslController implements Initializable {
     public Button btnSeleccionarAtributo;
     public Label atributoClaveLbl;
     public ChoiceBox classChoice;
+    public Label clasePerteneceLbl;
+    public Label atributoFinalLbl;
     private String nombreProyecto;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private Map<String, String> keyFlds;
@@ -67,10 +72,14 @@ public class DslController implements Initializable {
             enumerados.add(new HashMap<String, String>());
         }
 
+        //Botones panel 1
         btnEnumerado.setDisable(true);
         btnAtributoPrimario.setDisable(true);
 
+        //Panel 2
+        cargarChoicebox();
     }
+
 
     /*
         --------------------------------- PANEL KEYFIELDS Y ENUM --------------------------------
@@ -86,7 +95,7 @@ public class DslController implements Initializable {
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File f, String name)
             {
-                return (name.endsWith(".csv"));
+                return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
             }
 
         };
@@ -224,6 +233,8 @@ public class DslController implements Initializable {
         if(keyFlds.size() == listviewClases.getItems().size()){
 
             try {
+                //Añadir las rutas de los datos, si las hubiera, a clasesUML
+                añadirRutas();
                 List<String> clasesFormateadas = preprocesarDatos();
                 DslGenerator dslGen = new DslGenerator(clasesFormateadas);
                 limpiarCarpeta();
@@ -236,6 +247,24 @@ public class DslController implements Initializable {
             mostrarAlertaClave(event);
         }
 
+    }
+
+    private void añadirRutas() throws IOException {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        File clasesUML = new File(ruta);
+        FileWriter fw = new FileWriter(clasesUML, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        for(Quartet<String, String, ArrayList<String>, ArrayList<String>> paths : rutas){
+            ArrayList<String> archivos = paths.getValue2();
+            for(String archivo : archivos){
+                String nombreClase = archivo.replace(".csv", "")+",";
+                bw.write(nombreClase);
+                //System.out.println(archivo);
+            }
+        }
+        bw.close();
+        fw.close();
     }
 
     private void limpiarCarpeta() {
@@ -334,6 +363,32 @@ public class DslController implements Initializable {
                 String valor = enumeradosClase.get(key);
                 bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+key+"),OBJECT(#"+nombreClase+"."+key+","+valor+"\n");
             }
+
+            //RUTAS
+            for(Quartet<String, String, ArrayList<String>, ArrayList<String>> paths : rutas){
+                String clase = paths.getValue0();
+                String nombreAtrFinal = paths.getValue1();
+                ArrayList<String> archivos = paths.getValue2();
+                ArrayList<String> intermedios = paths.getValue3();
+                StringBuilder cadena = new StringBuilder();
+                String ultimoArchivo = "";
+                for(int i = 0; i <= archivos.size()-1; i++){
+                    String archivo = archivos.get(i);
+                    String atributoIntermedio = intermedios.get(i);
+
+                    cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+",");
+                    if(i== archivos.size()-1){
+                        ultimoArchivo = archivo.replace(".csv", "");
+                    }
+                }
+                cadena.append(nombreProyecto+":#"+ultimoArchivo+"."+nombreAtrFinal+"))");
+                if(nombreClase.equals(clase)){
+                    //Es un path perteneciente a esa clase
+                    bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtrFinal+"),OBJECT" +
+                            "(QUERY(MATCH("+cadena+")\n");
+                }
+            }
+
             bw.close();
             fw.close();
             fr.close();
@@ -416,16 +471,24 @@ public class DslController implements Initializable {
      */
     // nombreRuta , Archivos[], Atributos[]
     // Para el archivo[0], su atributo relevante es el atributos[0]
-    List<Triplet<String, ArrayList<String>, ArrayList<String>> > rutas = new ArrayList<>();
+    List<Quartet<String, String, ArrayList<String>, ArrayList<String>>> rutas = new ArrayList<>();
+
+    private void cargarChoicebox() {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        File clasesUML = new File(ruta);
+        ArrayList<String> clases = proyectos.obtenerClases(clasesUML);
+        ObservableList oll = FXCollections.observableArrayList(clases);
+        classChoice.setItems(oll);
+    }
 
     public void listviewRutasAction(MouseEvent mouseEvent) {
         int index = listviewRutas.getSelectionModel().getSelectedIndex();
         if (index != -1) {
             //Obtenemos la tripleta asociada a esa ruta
-            Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(index);
+            Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(index);
 
             //Actualizacion listview archivos
-            ArrayList<String> archivos = ruta.getValue1();
+            ArrayList<String> archivos = ruta.getValue2();
             ObservableList ollArchivos = FXCollections.observableArrayList(archivos);
             listviewArchivosRelevantes.setItems(ollArchivos);
 
@@ -436,15 +499,19 @@ public class DslController implements Initializable {
             ArrayList<String> blank = new ArrayList<>();
             ObservableList ollAtributos = FXCollections.observableArrayList(blank);
             listviewAtributoClave.setItems(ollAtributos);
+
+            //Actualizar el lbl de clases
+            String clasePertenece = ruta.getValue0();
+            clasePerteneceLbl.setText("Clase: "+clasePertenece);
         }
     }
     public void listviewArchivosRelevantesAction(MouseEvent mouseEvent) {
         int indexRuta = listviewRutas.getSelectionModel().getSelectedIndex();
         int indexArchivo = listviewArchivosRelevantes.getSelectionModel().getSelectedIndex();
         if (indexRuta != -1) {
-            Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(indexRuta);
-            ArrayList<String> archivos = ruta.getValue1();
-            ArrayList<String> atributos = ruta.getValue2();
+            Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(indexRuta);
+            ArrayList<String> archivos = ruta.getValue2();
+            ArrayList<String> atributos = ruta.getValue3();
 
             //Mostrar campos de ese archivo
             String nombreArchivo = archivos.get(indexArchivo);
@@ -477,9 +544,10 @@ public class DslController implements Initializable {
 
     public void btnAñadirRutaAction(ActionEvent event) {
         String nombreRuta = pedirNombreRuta();
+        String clase = (String)classChoice.getSelectionModel().getSelectedItem();
         ArrayList<String> archivos = new ArrayList<>();
         ArrayList<String> atributos = new ArrayList<>();
-        Triplet<String, ArrayList<String>, ArrayList<String>> ruta = new Triplet<>(nombreRuta, archivos, atributos);
+        Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = new Quartet<>(clase, nombreRuta, archivos, atributos);
         rutas.add(ruta);
         actualizarlistViewRutas();
     }
@@ -489,7 +557,7 @@ public class DslController implements Initializable {
     public void btnAñadirArchivoAction(ActionEvent event) {
         int index = listviewRutas.getSelectionModel().getSelectedIndex();
         if(index != -1){
-            Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(index);
+            Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(index);
 
             //Funcion para abrir el explorador de archivos
             File ficheroSeleccionado = fileChooser.showOpenDialog(stage);
@@ -502,11 +570,11 @@ public class DslController implements Initializable {
                 crearCopias(ficheroSeleccionado, ficheroDestino);
 
                 //Actualizar las listas
-                ArrayList<String> ficheros = ruta.getValue1();
+                ArrayList<String> ficheros = ruta.getValue2();
                 ficheros.add(ficheroDestino.getName());
 
                 //Actualizamos la lista de ficheros
-                ruta.setAt1(ficheros);
+                ruta.setAt2(ficheros);
                 //Actualizamos la lista de rutas general
                 rutas.set(index, ruta);
 
@@ -540,18 +608,18 @@ public class DslController implements Initializable {
         int indexRuta = listviewRutas.getSelectionModel().getSelectedIndex();
         int indexArchivo = listviewArchivosRelevantes.getSelectionModel().getSelectedIndex();
         String nombreAtributo = (String)listviewAtributoClave.getSelectionModel().getSelectedItem();
-        Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(indexRuta);
-        ArrayList<String> atributos = ruta.getValue2();
+        Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(indexRuta);
+        ArrayList<String> atributos = ruta.getValue3();
         if(atributos.isEmpty()){
             atributos.add(nombreAtributo);
-            ruta.setAt2(atributos);
+            ruta.setAt3(atributos);
         }else{
             if(indexArchivo <= atributos.size()-1){
                 atributos.set(indexArchivo, nombreAtributo);
-                ruta.setAt2(atributos);
+                ruta.setAt3(atributos);
             }else{
                 atributos.add(nombreAtributo);
-                ruta.setAt2(atributos);
+                ruta.setAt3(atributos);
             }
         }
 
@@ -589,8 +657,8 @@ public class DslController implements Initializable {
     private void actualizarlistViewRutas(){
 
         ArrayList<String> nombres = new ArrayList<>();
-        for(Triplet<String, ArrayList<String>, ArrayList<String>> t : rutas){
-            String nombreRuta = t.getValue0();
+        for(Quartet<String, String, ArrayList<String>, ArrayList<String>> t : rutas){
+            String nombreRuta = t.getValue1();
             nombres.add(nombreRuta);
         }
         ObservableList oll = FXCollections.observableArrayList(nombres);
@@ -599,4 +667,5 @@ public class DslController implements Initializable {
 
     public void classChoiceAction(ActionEvent event) {
     }
+
 }
