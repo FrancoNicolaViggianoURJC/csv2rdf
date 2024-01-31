@@ -1,0 +1,1 @@
+countryCode;xsd:string;country,name;xsd:string;country,continent;xsd:string;country,capital;xsd:string;country,area;xsd:float;country,countryCode;xsd:string;country_population,period;xsd:string;country_population,population;xsd:float;country_population,regionCode;xsd:string;region,name;xsd:string;region,countryCode;xsd:string;region,area;xsd:float;region,

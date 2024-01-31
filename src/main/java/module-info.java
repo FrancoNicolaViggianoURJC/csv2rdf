@@ -8,6 +8,7 @@ module com.fnvigg.csv2rdf {
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.apache.commons.csv;
+    requires javatuples;
     //requires eu.hansolo.tilesfx;
 
     opens com.fnvigg.csv2rdf to javafx.fxml;

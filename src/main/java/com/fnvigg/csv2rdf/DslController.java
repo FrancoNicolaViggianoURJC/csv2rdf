@@ -7,15 +7,19 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.scene.layout.GridPane;
 import java.io.*;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.*;
-
+import org.javatuples.Triplet;
 public class DslController implements Initializable {
 
     public ListView listviewAtributos;
@@ -24,11 +28,23 @@ public class DslController implements Initializable {
     public Button btnAtributoPrimario;
     public Accordion accordion;
     public Label atributoPrimarioLabel;
+    public ListView listviewRutas;
+    public ListView listviewArchivosRelevantes;
+    public ListView listviewAtributoClave;
+    public Button btnAñadirRuta;
+    public Button btnAñadirArchivo;
+    public Button btnSeleccionarAtributo;
+    public Label atributoClaveLbl;
+    public ChoiceBox classChoice;
     private String nombreProyecto;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private Map<String, String> keyFlds;
     private ArrayList<Map<String, String>> enumerados;
     private List<String> choices = new ArrayList<>();
+    private Stage stage;
+    private Scene scene;
+    private Parent root;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.accordion.setExpandedPane(accordion.getPanes().get(0));
@@ -56,6 +72,9 @@ public class DslController implements Initializable {
 
     }
 
+    /*
+        --------------------------------- PANEL KEYFIELDS Y ENUM --------------------------------
+     */
     private void cargarClases() {
 
         //Las clases se obtienen a partir de los nombres de archivos
@@ -371,5 +390,213 @@ public class DslController implements Initializable {
         alerta.setContentText(contenido);
         Optional<ButtonType> resultado = alerta.showAndWait();
         return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaTipoFichero(Event event){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Ficheros csv");
+        String contenido = "El fichero debe ser de tipo csv.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+
+    @FXML
+    private boolean mostrarAlertaSeleccionRuta() {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Ruta");
+        String contenido = "Debe seleccionar una ruta primero.";
+        alerta.setContentText(contenido);
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+    /*
+    ----------------------- PANEL RUTAS ---------------------------------------
+     */
+    // nombreRuta , Archivos[], Atributos[]
+    // Para el archivo[0], su atributo relevante es el atributos[0]
+    List<Triplet<String, ArrayList<String>, ArrayList<String>> > rutas = new ArrayList<>();
+
+    public void listviewRutasAction(MouseEvent mouseEvent) {
+        int index = listviewRutas.getSelectionModel().getSelectedIndex();
+        if (index != -1) {
+            //Obtenemos la tripleta asociada a esa ruta
+            Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(index);
+
+            //Actualizacion listview archivos
+            ArrayList<String> archivos = ruta.getValue1();
+            ObservableList ollArchivos = FXCollections.observableArrayList(archivos);
+            listviewArchivosRelevantes.setItems(ollArchivos);
+
+            //Limpiar el lbl
+            atributoClaveLbl.setText("Atributo primario: ");
+
+            //Limpiar el listview atributos
+            ArrayList<String> blank = new ArrayList<>();
+            ObservableList ollAtributos = FXCollections.observableArrayList(blank);
+            listviewAtributoClave.setItems(ollAtributos);
+        }
+    }
+    public void listviewArchivosRelevantesAction(MouseEvent mouseEvent) {
+        int indexRuta = listviewRutas.getSelectionModel().getSelectedIndex();
+        int indexArchivo = listviewArchivosRelevantes.getSelectionModel().getSelectedIndex();
+        if (indexRuta != -1) {
+            Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(indexRuta);
+            ArrayList<String> archivos = ruta.getValue1();
+            ArrayList<String> atributos = ruta.getValue2();
+
+            //Mostrar campos de ese archivo
+            String nombreArchivo = archivos.get(indexArchivo);
+            String rutaArchivo = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + nombreArchivo;
+            ArrayList<String> campos = proyectos.obtenerCamposList(rutaArchivo);
+            ObservableList oll = FXCollections.observableArrayList(campos);
+            listviewAtributoClave.setItems(oll);
+
+            //Actualizacion label
+            boolean b = indexArchivo <= atributos.size()-1;
+            if(indexArchivo != -1 && !atributos.isEmpty() && b)  {
+                String atributo = atributos.get(indexArchivo);
+                if (atributo != null) {
+                    atributoClaveLbl.setText("Atributo primario: " + atributo);
+                }
+            }else{
+                atributoClaveLbl.setText("Atributo primario: ");
+            }
+
+            //Bloqueo boton añadir archivos si aun no se ha seleccionado un atributo clave
+            if(atributoClaveLbl.getText().equals("Atributo primario: ")){
+                btnAñadirArchivo.setDisable(true);
+            }
+        }
+
+    }
+
+    public void listviewAtributoClaveAction(MouseEvent mouseEvent) {
+    }
+
+    public void btnAñadirRutaAction(ActionEvent event) {
+        String nombreRuta = pedirNombreRuta();
+        ArrayList<String> archivos = new ArrayList<>();
+        ArrayList<String> atributos = new ArrayList<>();
+        Triplet<String, ArrayList<String>, ArrayList<String>> ruta = new Triplet<>(nombreRuta, archivos, atributos);
+        rutas.add(ruta);
+        actualizarlistViewRutas();
+    }
+
+    @FXML
+    private FileChooser fileChooser = new FileChooser();
+    public void btnAñadirArchivoAction(ActionEvent event) {
+        int index = listviewRutas.getSelectionModel().getSelectedIndex();
+        if(index != -1){
+            Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(index);
+
+            //Funcion para abrir el explorador de archivos
+            File ficheroSeleccionado = fileChooser.showOpenDialog(stage);
+            String archivoRuta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/nonRelevant_" + ficheroSeleccionado.getName();
+            File ficheroDestino = new File(archivoRuta);
+            if(!ficheroSeleccionado.getName().endsWith(".csv")){
+            //Mostrar warning
+            mostrarAlertaTipoFichero(event);
+            }else {
+                crearCopias(ficheroSeleccionado, ficheroDestino);
+
+                //Actualizar las listas
+                ArrayList<String> ficheros = ruta.getValue1();
+                ficheros.add(ficheroDestino.getName());
+
+                //Actualizamos la lista de ficheros
+                ruta.setAt1(ficheros);
+                //Actualizamos la lista de rutas general
+                rutas.set(index, ruta);
+
+                //Actualizar listview de archivos
+                ObservableList<String> oll = FXCollections.observableArrayList(ficheros);
+                listviewArchivosRelevantes.setItems(oll);
+            }
+        }else{
+            mostrarAlertaSeleccionRuta();
+        }
+    }
+
+
+
+    private void crearCopias(File ficheroSeleccionado, File ficheroDestino) {
+        //Crear las copias de archivos para no trabajar sobre los originales
+        FileChannel sourceChannel = null;
+        FileChannel destChannel = null;
+        try {
+            sourceChannel = new FileInputStream(ficheroSeleccionado).getChannel();
+            destChannel = new FileOutputStream(ficheroDestino).getChannel();
+            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+            sourceChannel.close();
+            destChannel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void btnSeleccionarAtributoAction(ActionEvent event) {
+        int indexRuta = listviewRutas.getSelectionModel().getSelectedIndex();
+        int indexArchivo = listviewArchivosRelevantes.getSelectionModel().getSelectedIndex();
+        String nombreAtributo = (String)listviewAtributoClave.getSelectionModel().getSelectedItem();
+        Triplet<String, ArrayList<String>, ArrayList<String>> ruta = rutas.get(indexRuta);
+        ArrayList<String> atributos = ruta.getValue2();
+        if(atributos.isEmpty()){
+            atributos.add(nombreAtributo);
+            ruta.setAt2(atributos);
+        }else{
+            if(indexArchivo <= atributos.size()-1){
+                atributos.set(indexArchivo, nombreAtributo);
+                ruta.setAt2(atributos);
+            }else{
+                atributos.add(nombreAtributo);
+                ruta.setAt2(atributos);
+            }
+        }
+
+        //Actualizacion label
+        if(indexArchivo != -1 && !atributos.isEmpty()) {
+            String atributo = atributos.get(indexArchivo);
+            if (atributo != null) {
+                atributoClaveLbl.setText("Atributo primario: " + atributo);
+            }
+        }
+
+        //Bloqueo boton añadir archivos si aun no se ha seleccionado un atributo clave
+        if(atributoClaveLbl.getText().equals("Atributo primario: ")){
+            btnAñadirArchivo.setDisable(true);
+        }else{
+            btnAñadirArchivo.setDisable(false);
+        }
+    }
+
+    private String pedirNombreRuta() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Nombre del atributo");
+        dialog.setHeaderText("");
+        dialog.setContentText("Introduzca el nombre del atributo a guardar a partir de paths:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            return result.get();
+        }else{
+            return "";
+        }
+    }
+
+    private void actualizarlistViewRutas(){
+
+        ArrayList<String> nombres = new ArrayList<>();
+        for(Triplet<String, ArrayList<String>, ArrayList<String>> t : rutas){
+            String nombreRuta = t.getValue0();
+            nombres.add(nombreRuta);
+        }
+        ObservableList oll = FXCollections.observableArrayList(nombres);
+        listviewRutas.setItems(oll);
+    }
+
+    public void classChoiceAction(ActionEvent event) {
     }
 }

@@ -18,15 +18,30 @@
                         <Label layoutX="367.0" layoutY="104.0" text="Selecciona el atributo" />
                         <Button fx:id="btnEnumerado" layoutX="433.0" layoutY="418.0" mnemonicParsing="false" onAction="#btnEnumeradoAction" prefHeight="25.0" prefWidth="108.0" text="Enumerado" />
                         <ListView fx:id="listviewClases" layoutX="55.0" layoutY="121.0" onMouseClicked="#listviewClasesAction" prefHeight="282.0" prefWidth="215.0" />
-                        <Button layoutX="268.0" layoutY="466.0" mnemonicParsing="false" onAction="#generarDSL" text="Procesar" />
                         <Label fx:id="atributoPrimarioLabel" layoutX="55.0" layoutY="422.0" prefHeight="17.0" prefWidth="214.0" text="Atributo primario: " />
                      </children>
                   </AnchorPane>
             </content>
           </TitledPane>
-            <TitledPane animated="false" text="Rutas">
+            <TitledPane animated="false" text="Atributos a partir de paths">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView fx:id="listviewRutas" layoutX="29.0" layoutY="128.0" onMouseClicked="#listviewRutasAction" prefHeight="200.0" prefWidth="166.0" />
+                        <ListView fx:id="listviewArchivosRelevantes" layoutX="217.0" layoutY="128.0" onMouseClicked="#listviewArchivosRelevantesAction" prefHeight="200.0" prefWidth="166.0" />
+                        <ListView fx:id="listviewAtributoClave" layoutX="403.0" layoutY="128.0" onMouseClicked="#listviewAtributoClaveAction" prefHeight="200.0" prefWidth="166.0" />
+                        <Button layoutX="268.0" layoutY="447.0" mnemonicParsing="false" onAction="#generarDSL" text="Procesar" />
+                        <Label layoutX="28.0" layoutY="26.0" text="Para especificar cada ruta, hay que identificar los archivos que se cruzan, asi como los atributos claves&#10; para la identificación entre contenedores." textAlignment="CENTER" />
+                        <Label layoutX="90.0" layoutY="111.0" text="Atributo" />
+                        <Label layoutX="249.0" layoutY="111.0" text="Archivos relevantes" />
+                        <Label layoutX="449.0" layoutY="111.0" text="Atributo clave" />
+                        <Button fx:id="btnAñadirRuta" layoutX="51.0" layoutY="339.0" minWidth="122.0" mnemonicParsing="false" onAction="#btnAñadirRutaAction" text="Añadir atributo" />
+                        <Button fx:id="btnAñadirArchivo" layoutX="240.0" layoutY="339.0" minWidth="122.0" mnemonicParsing="false" onAction="#btnAñadirArchivoAction" text="Añadir archivo" />
+                        <Button fx:id="btnSeleccionarAtributo" layoutX="425.0" layoutY="339.0" mnemonicParsing="false" onAction="#btnSeleccionarAtributoAction" text="Seleccionar atributo" />
+                        <Label fx:id="atributoClaveLbl" layoutX="403.0" layoutY="371.0" text="Atributo primario: " />
+                        <ChoiceBox fx:id="classChoice" onAction="#classChoiceAction" layoutX="187.0" layoutY="77.0" prefWidth="150.0" />
+                        <Label layoutX="48.0" layoutY="81.0" text="Clase a la que pertenece:" />
+                     </children></AnchorPane>
               </content>
             </TitledPane>
         </panes>
