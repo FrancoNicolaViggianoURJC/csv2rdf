@@ -156,10 +156,10 @@
     <rdf:type rdf:resource="http://www.example.com/VisitorsSpain#region"/>
   </rdf:Description>
   <rdf:Description rdf:about="http://www.example.com/VisitorsSpain#es">
+    <VisitorsSpain:capital></VisitorsSpain:capital>
     <VisitorsSpain:longitude rdf:resource="http://www.example.com/VisitorsSpain#-3.74922"/>
     <VisitorsSpain:latitude rdf:resource="http://www.example.com/VisitorsSpain#40.463667"/>
     <VisitorsSpain:area rdf:resource="http://www.example.com/VisitorsSpain#505987"/>
-    <VisitorsSpain:capital rdf:resource="http://www.example.com/VisitorsSpain#Madrid"/>
     <VisitorsSpain:continent rdf:resource="http://www.example.com/VisitorsSpain#Europe"/>
     <VisitorsSpain:name rdf:resource="http://www.example.com/VisitorsSpain#Spain"/>
     <VisitorsSpain:countryCode rdf:resource="http://www.example.com/VisitorsSpain#es"/>

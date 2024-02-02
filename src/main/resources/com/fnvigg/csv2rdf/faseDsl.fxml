@@ -11,7 +11,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="22.0" layoutY="36.0" text="Antes de generar el código DSL, hay que especificar algunos aspectos de la ontología como los atributos&#10;clave, los valores de los enumerados, o las rutas de los archivos." textAlignment="CENTER" />
+                        <Label layoutX="22.0" layoutY="36.0" text="En función de la ontología generada en la fase anterior, hay que especificar algunos aspectos como&#10;los atributos clave, los valores de los enumerados, o las rutas de los archivos. &#10;Durante esta fase los cambios no se guardan en el proyecto." textAlignment="CENTER" />
                         <ListView fx:id="listviewAtributos" layoutX="325.0" layoutY="121.0" onMouseClicked="#listviewAtributosAction" prefHeight="282.0" prefWidth="215.0" />
                         <Button fx:id="btnAtributoPrimario" layoutX="325.0" layoutY="418.0" mnemonicParsing="false" onAction="#btnAtributoPrimarioAction" text="Atributo primario" />
                         <Label layoutX="114.0" layoutY="104.0" text="Selecciona la clase" />

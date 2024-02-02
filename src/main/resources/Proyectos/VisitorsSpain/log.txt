@@ -1,0 +1,6 @@
+Exception in thread "main" java.lang.NullPointerException
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:149)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:112)
+	at java.base/java.io.FileReader.<init>(FileReader.java:60)
+	at urjc.vortic3.DSLengine2RDF.BuildRDF.generateRDF(BuildRDF.java:307)
+	at urjc.vortic3.DSLengine2RDF.App.main(App.java:32)

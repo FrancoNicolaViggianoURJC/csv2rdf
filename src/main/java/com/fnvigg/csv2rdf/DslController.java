@@ -1,5 +1,6 @@
 package com.fnvigg.csv2rdf;
 
+import java.awt.Desktop;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -41,6 +42,7 @@ public class DslController implements Initializable {
     public ChoiceBox classChoice;
     public Label clasePerteneceLbl;
     public Label atributoFinalLbl;
+    public Label rutaOutputlbl;
     private String nombreProyecto;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private Map<String, String> keyFlds;
@@ -239,7 +241,7 @@ public class DslController implements Initializable {
                 DslGenerator dslGen = new DslGenerator(clasesFormateadas);
                 //limpiarCarpeta();
                 ejecutarJar();
-                GraphGenerator graphGen = new GraphGenerator();
+                abrirDirectorio();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -251,12 +253,20 @@ public class DslController implements Initializable {
 
     }
 
+    private void abrirDirectorio() throws IOException {
+        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        File rdf = new File(directorio);
+        Desktop.getDesktop().open(rdf);
+    }
+
+
     private void ejecutarJar() throws IOException {
         String rutaJar = System.getProperty("user.dir") + "/src/main/resources/DSLengine2RDF.jar";
         String rutaJarDest = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLengine2RDF.jar";
         File jar = new File(rutaJar);
         File jarDest = new File(rutaJarDest);
-        jar.renameTo(jarDest);
+        crearCopias(jar, jarDest);
+
         String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
         String rutaOut = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/out.txt";
         File out = new File(rutaOut);
@@ -272,7 +282,8 @@ public class DslController implements Initializable {
         processBuilder.redirectOutput(out);
         Process process = processBuilder.start();
 
-        jarDest.delete();
+        //jarDest.delete();
+
     }
 
     private void añadirRutas() throws IOException {
@@ -286,7 +297,6 @@ public class DslController implements Initializable {
             for(String archivo : archivos){
                 String nombreClase = archivo.replace(".csv", "")+",";
                 bw.write(nombreClase);
-                //System.out.println(archivo);
             }
         }
         bw.close();
