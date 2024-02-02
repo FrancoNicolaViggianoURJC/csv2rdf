@@ -28,7 +28,7 @@ public class AtributosSesion {
     }
 
     public static void setNombreProyecto(String nombreProyecto) {
-        AtributosSesion.nombreProyecto = nombreProyecto;
+        AtributosSesion.nombreProyecto = nombreProyecto.replace(" ", "");
     }
 
     public static String getUltimaPantalla() {

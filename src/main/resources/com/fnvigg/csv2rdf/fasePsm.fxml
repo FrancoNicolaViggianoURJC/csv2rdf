@@ -54,18 +54,33 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ListView fx:id="listviewClases" layoutX="32.0" layoutY="86.0" onMouseClicked="#listviewClasesAction" prefHeight="246.0" prefWidth="200.0" />
-                        <ListView fx:id="listviewAtributos" layoutX="276.0" layoutY="86.0" prefHeight="245.0" prefWidth="200.0" />
+                        <ListView fx:id="listviewClases" layoutX="32.0" layoutY="86.0" onMouseClicked="#listviewClasesAction" prefHeight="290.0" prefWidth="200.0" />
+                        <ListView fx:id="listviewAtributos" layoutX="276.0" layoutY="86.0" prefHeight="291.0" prefWidth="200.0" />
                         <Button layoutX="493.0" layoutY="123.0" mnemonicParsing="false" onAction="#añadirTipoBasico" prefHeight="25.0" prefWidth="87.0" text="Tipo básico" />
                         <Button layoutX="492.0" layoutY="160.0" mnemonicParsing="false" onAction="#añadirTipoClase" prefHeight="25.0" prefWidth="88.0" text="Tipo clase" />
                         <Button layoutX="492.0" layoutY="197.0" mnemonicParsing="false" onAction="#añadirEnumerado" prefHeight="25.0" prefWidth="88.0" text="Enumerado" />
                         <Button layoutX="493.0" layoutY="234.0" mnemonicParsing="false" onAction="#añadirColeccion" prefHeight="25.0" prefWidth="87.0" text="Colección" />
                         <Button layoutX="492.0" layoutY="271.0" mnemonicParsing="false" onAction="#añadirColeccionOrd" text="ColecciónOrd" />
-                        <Button layoutX="250.0" layoutY="388.0" mnemonicParsing="false" onAction="#btnProcesarAction" prefHeight="25.0" prefWidth="84.0" text="Procesar" />
-                        <Label layoutX="56.0" layoutY="14.0" prefHeight="34.0" prefWidth="471.0" text="A continuación, el usuario introducirá los datos del esquema y se generará la ontología." textAlignment="CENTER" />
+                        <Label layoutX="16.0" layoutY="14.0" prefHeight="49.0" prefWidth="567.0" text="A continuación, el usuario especificará el tipo de dato que compone cada campo de los archivos fuentes." textAlignment="CENTER" />
                         <Label layoutX="496.0" layoutY="94.0" text="Añadir atributo" />
                         <Label layoutX="102.0" layoutY="69.0" text="Clases UML" />
                         <Label layoutX="338.0" layoutY="69.0" text="Atributos UML" />
+                     </children></AnchorPane>
+              </content>
+            </TitledPane>
+            <TitledPane animated="false" text="Metadatos">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="30.0" text="El último paso antes de generar la ontología es el de especificar los metadatos de la misma:" />
+                        <Label layoutX="46.0" layoutY="73.0" text="Publisher" />
+                        <Label layoutX="46.0" layoutY="147.0" text="Descripción de la ontología" />
+                        <Label layoutX="46.0" layoutY="262.0" text="Descripción de la ontología en inglés" />
+                        <TextField fx:id="publisherInput" layoutX="265.0" layoutY="69.0" prefHeight="25.0" prefWidth="274.0" />
+                        <TextArea fx:id="descripcionSPInput" layoutX="267.0" layoutY="111.0" prefHeight="88.0" prefWidth="274.0" />
+                        <TextArea fx:id="descripcionENGInput" layoutX="265.0" layoutY="226.0" prefHeight="88.0" prefWidth="275.0" />
+                        <Button layoutX="236.0" layoutY="368.0" mnemonicParsing="false" onAction="#btnProcesarAction" text="Procesar" />
+                        <Label layoutX="77.0" layoutY="333.0" text="Al pulsar el botón se generará la ontología en el directorio del proyecto." />
                      </children></AnchorPane>
               </content>
             </TitledPane>

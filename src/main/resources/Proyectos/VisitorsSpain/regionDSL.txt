@@ -1,0 +1,7 @@
+SUBJECT(#region.regionCode,VisitorsSpain:region)
+PREDICATE-OBJECT(PREDICATE(VisitorsSpain:regionCode),OBJECT(VisitorsSpain:#region.regionCode))
+PREDICATE-OBJECT(PREDICATE(VisitorsSpain:name),OBJECT(VisitorsSpain:#region.name))
+PREDICATE-OBJECT(PREDICATE(VisitorsSpain:countryCode),OBJECT(VisitorsSpain:#region.countryCode))
+PREDICATE-OBJECT(PREDICATE(VisitorsSpain:area),OBJECT(VisitorsSpain:#region.area))
+PREDICATE-OBJECT(PREDICATE(VisitorsSpain:latitude),OBJECT(VisitorsSpain:#region.latitude))
+PREDICATE-OBJECT(PREDICATE(VisitorsSpain:longitude),OBJECT(VisitorsSpain:#region.longitude))

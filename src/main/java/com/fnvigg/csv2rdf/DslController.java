@@ -237,7 +237,9 @@ public class DslController implements Initializable {
                 añadirRutas();
                 List<String> clasesFormateadas = preprocesarDatos();
                 DslGenerator dslGen = new DslGenerator(clasesFormateadas);
-                limpiarCarpeta();
+                //limpiarCarpeta();
+                ejecutarJar();
+                GraphGenerator graphGen = new GraphGenerator();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -247,6 +249,30 @@ public class DslController implements Initializable {
             mostrarAlertaClave(event);
         }
 
+    }
+
+    private void ejecutarJar() throws IOException {
+        String rutaJar = System.getProperty("user.dir") + "/src/main/resources/DSLengine2RDF.jar";
+        String rutaJarDest = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLengine2RDF.jar";
+        File jar = new File(rutaJar);
+        File jarDest = new File(rutaJarDest);
+        jar.renameTo(jarDest);
+        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
+        String rutaOut = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/out.txt";
+        File out = new File(rutaOut);
+        String rutaLog = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/log.txt";
+        File log = new File(rutaLog);
+
+        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        File dirFile = new File(directorio);
+
+        ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar" , rutaJarDest , rutaDSL);
+        processBuilder.directory(dirFile);
+        processBuilder.redirectError(log);
+        processBuilder.redirectOutput(out);
+        Process process = processBuilder.start();
+
+        jarDest.delete();
     }
 
     private void añadirRutas() throws IOException {
@@ -276,8 +302,8 @@ public class DslController implements Initializable {
             public boolean accept(File f, String name)
             {
                 return (!name.contentEquals("ontology.txt") && !name.contentEquals("DSLCode.txt") &&
-                        !name.contentEquals("config.txt") && !name.endsWith(".csv") &&
-                        !name.endsWith(".png"));
+                        !name.contentEquals("config.txt") && !name.contentEquals("metadatos.txt") &&
+                        !name.endsWith(".csv") && !name.endsWith(".png"));
             }
         };
 
@@ -376,9 +402,11 @@ public class DslController implements Initializable {
                     String archivo = archivos.get(i);
                     String atributoIntermedio = intermedios.get(i);
 
-                    cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+",");
                     if(i== archivos.size()-1){
+                        cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+"),");
                         ultimoArchivo = archivo.replace(".csv", "");
+                    }else{
+                        cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+",");
                     }
                 }
                 cadena.append(nombreProyecto+":#"+ultimoArchivo+"."+nombreAtrFinal+"))");
@@ -544,12 +572,14 @@ public class DslController implements Initializable {
 
     public void btnAñadirRutaAction(ActionEvent event) {
         String nombreRuta = pedirNombreRuta();
-        String clase = (String)classChoice.getSelectionModel().getSelectedItem();
-        ArrayList<String> archivos = new ArrayList<>();
-        ArrayList<String> atributos = new ArrayList<>();
-        Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = new Quartet<>(clase, nombreRuta, archivos, atributos);
-        rutas.add(ruta);
-        actualizarlistViewRutas();
+        if(!nombreRuta.isBlank()) {
+            String clase = (String) classChoice.getSelectionModel().getSelectedItem();
+            ArrayList<String> archivos = new ArrayList<>();
+            ArrayList<String> atributos = new ArrayList<>();
+            Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = new Quartet<>(clase, nombreRuta, archivos, atributos);
+            rutas.add(ruta);
+            actualizarlistViewRutas();
+        }
     }
 
     @FXML

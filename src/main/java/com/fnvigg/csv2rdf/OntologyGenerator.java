@@ -19,13 +19,19 @@ public class OntologyGenerator {
     private String ingDatos = new String();
     private String ingOntologico = new String();
     private String userSesion = new String();
+    private String publisher = new String();
+    private String descripcion = new String();
+    private String description = new String();
 
 
     /*------------------------------------------------------------
                                 Metodos
      ------------------------------------------------------------*/
-    public OntologyGenerator(String nombreProyecto) throws IOException {
+    public OntologyGenerator(String nombreProyecto, String publisher, String descripcion, String description) throws IOException {
         this.nombreProyecto = nombreProyecto;
+        this.publisher = publisher;
+        this.descripcion = descripcion;
+        this.description = description;
 
         //Elimina el archivo si existe para partir de uno limpio
         limpiarArchivo();
@@ -72,11 +78,8 @@ public class OntologyGenerator {
                 "    ///////////////////////////////////////////////////////////////////////////////////////\n" +
                 "     -->\n";
 
-        String definedBy = "http://www.example.com/visitorsSpainOnt/ontology_v1.1_COVID-Ont.rdf";
-        String preferredNamespace = "http://www.example.com/visitorsSpainOnt";
-        String publisher = "PEDIR PUBLISHER";
-        String descripcion = "HAY QUE PEDIR LA DESCRIPCION EN ALGUN MOMENTO";
-        String descripcionEng = "HAY QUE PEDIR LA DESCRIPCION EN INGLES EN ALGUN MOMENTO";
+        String definedBy = "http://www.example.com/"+nombreProyecto+"/ontology.rdf";
+        String preferredNamespace = "http://www.example.com/"+nombreProyecto+"";
         String[] ingenieros = proyectos.obtenerPropiedades(nombreProyecto);
         ingDatos = ingenieros[0];
         ingOntologico = ingenieros[1];
@@ -117,12 +120,12 @@ public class OntologyGenerator {
                 "\t\t<owl:versionInfo>Version 1.0 -"+ fecha +"</owl:versionInfo>        \n" +
                 "        <dc:creator>"+ingDatos+"</dc:creator>\n" +
                 "\t\t<dc:creator>"+ingOntologico+"</dc:creator>\n" +
-                "        <dc:description xml:lang=\"en\">"+descripcion+"</dc:description>\n" +
-                "        <dc:publisher>"+publisher+"</dc:publisher>\n" +
+                "        <dc:description xml:lang=\"es\">"+descripcion+"</dc:description>\n" +
+                "        <dc:publisher>"+this.publisher+"</dc:publisher>\n" +
                 "        <dc:rights>CC BY 4.0</dc:rights>\n" +
-                "        <dc:subject>"+descripcion+"</dc:subject>   \n" +
+                "        <dc:subject>"+this.descripcion+"</dc:subject>   \n" +
                 "\t\t<rdfs:isDefinedBy rdf:resource=\""+definedBy+"\"/> \t\t\n" +
-                "\t\t<rdfs:comment xml:lang=\"en\">"+descripcionEng+"</rdfs:comment>\n" +
+                "\t\t<rdfs:comment xml:lang=\"en\">"+this.description+"</rdfs:comment>\n" +
                 "\t\t<dcterms:issued>"+fecha+"</dcterms:issued>\t\n" +
                 "\t\t<dcterms:modified>"+fecha+"</dcterms:modified>\t\n" +
                 "\t\t<vann:preferredNamespacePrefix>vSont</vann:preferredNamespacePrefix>\n" +
@@ -189,9 +192,7 @@ public class OntologyGenerator {
             tokens = linea.split(",");
             for(String t : tokens){
                 bw.write("<owl:Class rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+t+"\">\n" +
-                        "        <rdfs:comment xml:lang=\"en\"> (descripcion en ingles) </rdfs:comment>\t\t\n" +
                         "\t\t<rdfs:label xml:lang=\"en\">"+t+"</rdfs:label>\n" +
-                        "\t\t<rdfs:label xml:lang=\"es\">"+" (pedir en español) "+"</rdfs:label>\n" +
                         "    </owl:Class>\n");
             }
         }

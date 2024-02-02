@@ -154,7 +154,7 @@ public class ProyectosController implements Initializable {
 
     public void onClickRegistrarProyecto(ActionEvent event) {
         //Obtencion de los campos
-        String nombreProyecto = nameProyectFld.getText();
+        String nombreProyecto = nameProyectFld.getText().replace(" ", "");
         String nombreOntologico = ontologicProyectFld.getText();
         String nombreDato = dataProyectFld.getText();
         //Comprobacion que ninguno esté vacio

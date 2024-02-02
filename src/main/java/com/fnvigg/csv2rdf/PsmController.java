@@ -32,6 +32,9 @@ public class PsmController implements Initializable {
     public ImageView imageEsquema;
     public ListView listviewClases;
     public ListView listviewAtributos;
+    public TextField publisherInput;
+    public TextArea descripcionSPInput;
+    public TextArea descripcionENGInput;
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -41,6 +44,9 @@ public class PsmController implements Initializable {
     private ArrayList<String> atributosUML = new ArrayList<>();
     private List<String> choices = new ArrayList<>();
 
+    private String publisher;
+    private String descripcion;
+    private String description;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         nombreProyecto = AtributosSesion.getNombreProyecto();
@@ -79,6 +85,13 @@ public class PsmController implements Initializable {
         choices.add("xsd:dateTime");
         choices.add("xsd:boolean");
         choices.add("xsd:decimal");
+
+        //Init inputs de metadatos
+        try {
+            cargarMetadatos();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /*----------------------------------------------------------------------------
@@ -492,27 +505,6 @@ public class PsmController implements Initializable {
         }
     }
 
-    public void btnProcesarAction(ActionEvent event) {
-        try {
-            //Transformar las estructuras de datos para que las acepte el generador de ontologias
-            if(comprobarAtributos()) {
-                limpiarArchivosUML();
-                crearClasesUml();
-                crearAtributosUML();
-                OntologyGenerator og = new OntologyGenerator(nombreProyecto);
-                //transicionar pantalla
-                transicionarPantalla(event);
-
-            }else{
-                //Mostrar alerta falta completar atributos
-                mostrarAlertaOntologia(event);
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private boolean comprobarAtributos() throws IOException {
         //Iterar sobre los archivos de atributos y buscar "_", si hay alguno, devolver false
         String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
@@ -640,6 +632,69 @@ public class PsmController implements Initializable {
             stage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /*
+                Panel metadatos
+     */
+
+    public void btnProcesarAction(ActionEvent event) {
+
+        try {
+            //Transformar las estructuras de datos para que las acepte el generador de ontologias
+            if(comprobarAtributos()) {
+                guardarMetadatos();
+                limpiarArchivosUML();
+                crearClasesUml();
+                crearAtributosUML();
+                OntologyGenerator og = new OntologyGenerator(nombreProyecto, publisher, descripcion, description);
+                //transicionar pantalla
+                transicionarPantalla(event);
+
+            }else{
+                //Mostrar alerta falta completar atributos
+                mostrarAlertaOntologia(event);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void guardarMetadatos() throws IOException {
+        this.publisher = publisherInput.getText();
+        this.descripcion = descripcionSPInput.getText();
+        this.description = descripcionENGInput.getText();
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/metadatos.txt";
+        File metadatos = new File(ruta);
+        FileWriter fw = new FileWriter(metadatos);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        bw.write(publisher + "," + descripcion + "," + description);
+
+        bw.close();
+        fw.close();
+    }
+
+    private void cargarMetadatos() throws IOException {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/metadatos.txt";
+        File metadatos = new File(ruta);
+        if(metadatos.exists() && !metadatos.isDirectory()) {
+            FileReader fr = new FileReader(metadatos);
+            BufferedReader br = new BufferedReader(fr);
+
+            String linea = br.readLine();
+            if(linea != null){
+                String[] tokens = linea.split(",");
+
+                publisherInput.setText(tokens[0]);
+                descripcionSPInput.setText(tokens[1]);
+                descripcionENGInput.setText(tokens[2]);
+            }
+
+            br.close();
+            fr.close();
         }
     }
 }

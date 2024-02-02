@@ -48,8 +48,8 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="146.0" layoutY="54.0" text="Para generar el dataset anotado, pulse el siguiente botón:" />
-                        <Button layoutX="268.0" layoutY="89.0" mnemonicParsing="false" onAction="#generarDSL" text="Procesar" />
+                        <Label layoutX="146.0" layoutY="177.0" text="Para generar el dataset anotado, pulse el siguiente botón:" />
+                        <Button layoutX="268.0" layoutY="212.0" mnemonicParsing="false" onAction="#generarDSL" text="Procesar" />
                      </children>
                   </AnchorPane>
               </content>
