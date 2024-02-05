@@ -52,6 +52,16 @@ public class RegistrarUsuarioController implements Initializable {
         return false;
     }
 
+    @FXML
+    private boolean mostrarAlertaBlank(){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Aviso");
+        alerta.setContentText("Los campos no deben estar vacios");
+        Optional<ButtonType> resultado = alerta.showAndWait();
+
+        return false;
+    }
+
     private final String[] roles = {"Ingeniero de datos","Ingeniero Ontológico"};
 
     @Override
@@ -66,18 +76,21 @@ public class RegistrarUsuarioController implements Initializable {
         String pass1 = passFld1.getText();
         String pass2 = passFld2.getText();
         String rol = rolCheckBox.getValue();
-        if(pass1.equals(pass2)){
-            errContraseñas.setVisible(false);
-            //llamar gestion usuarios
-            exito = usuarios.registrarUsuario(user, pass1, rol);
-            if(exito){
-              volver(event);
-            }else{
-              //mostrar mensaje error
+        if (!user.isBlank() && !pass1.isBlank() && rol.equals("")) {
+            if(pass1.equals(pass2)){
+                errContraseñas.setVisible(false);
+                //llamar gestion usuarios
+                exito = usuarios.registrarUsuario(user, pass1, rol);
+                if(exito){
+                    volver(event);
+                }else{
 
+                }
+            }else{
+                errContraseñas.setVisible(true);
             }
         }else{
-            errContraseñas.setVisible(true);
+            mostrarAlertaBlank();
         }
 
     }

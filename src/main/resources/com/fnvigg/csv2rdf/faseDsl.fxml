@@ -11,7 +11,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="22.0" layoutY="36.0" text="En función de la ontología generada en la fase anterior, hay que especificar algunos aspectos como&#10;los atributos clave, los valores de los enumerados, o las rutas de los archivos. &#10;Durante esta fase los cambios no se guardan en el proyecto." textAlignment="CENTER" />
+                        <Label layoutX="37.0" layoutY="46.0" text="En función de la ontología generada en la fase anterior, hay que especificar algunos aspectos como&#10;los atributos clave, los valores de los enumerados, o las rutas de los archivos. &#10;Durante esta fase los cambios no se guardan en la aplicación." textAlignment="CENTER" />
                         <ListView fx:id="listviewAtributos" layoutX="325.0" layoutY="121.0" onMouseClicked="#listviewAtributosAction" prefHeight="282.0" prefWidth="215.0" />
                         <Button fx:id="btnAtributoPrimario" layoutX="325.0" layoutY="418.0" mnemonicParsing="false" onAction="#btnAtributoPrimarioAction" text="Atributo primario" />
                         <Label layoutX="114.0" layoutY="104.0" text="Selecciona la clase" />
@@ -19,6 +19,7 @@
                         <Button fx:id="btnEnumerado" layoutX="433.0" layoutY="418.0" mnemonicParsing="false" onAction="#btnEnumeradoAction" prefHeight="25.0" prefWidth="108.0" text="Enumerado" />
                         <ListView fx:id="listviewClases" layoutX="55.0" layoutY="121.0" onMouseClicked="#listviewClasesAction" prefHeight="282.0" prefWidth="215.0" />
                         <Label fx:id="atributoPrimarioLabel" layoutX="55.0" layoutY="422.0" prefHeight="17.0" prefWidth="214.0" text="Atributo primario: " />
+                        <Button layoutX="29.0" layoutY="14.0" mnemonicParsing="false" onAction="#faseAnteriorAction" text="Fase anterior" />
                      </children>
                   </AnchorPane>
             </content>
@@ -38,7 +39,7 @@
                         <Button fx:id="btnAñadirArchivo" layoutX="240.0" layoutY="339.0" minWidth="122.0" mnemonicParsing="false" onAction="#btnAñadirArchivoAction" text="Añadir archivo" />
                         <Button fx:id="btnSeleccionarAtributo" layoutX="425.0" layoutY="339.0" mnemonicParsing="false" onAction="#btnSeleccionarAtributoAction" text="Seleccionar atributo" />
                         <Label fx:id="atributoClaveLbl" layoutX="403.0" layoutY="371.0" text="Atributo primario: " />
-                        <ChoiceBox fx:id="classChoice" layoutX="165.0" layoutY="77.0" onAction="#classChoiceAction" prefWidth="150.0" />
+                        <ChoiceBox fx:id="classChoice" layoutX="165.0" layoutY="77.0" prefWidth="150.0" />
                         <Label layoutX="29.0" layoutY="81.0" text="Clase a la que pertenece:" />
                         <Label fx:id="clasePerteneceLbl" layoutX="29.0" layoutY="343.0" text="Clase:" />
                      </children></AnchorPane>

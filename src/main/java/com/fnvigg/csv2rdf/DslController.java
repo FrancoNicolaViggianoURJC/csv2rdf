@@ -6,8 +6,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -20,10 +22,8 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.*;
-
 import org.javatuples.Quartet;
-import org.javatuples.Quintet;
-import org.javatuples.Triplet;
+
 public class DslController implements Initializable {
 
     public ListView listviewAtributos;
@@ -41,8 +41,6 @@ public class DslController implements Initializable {
     public Label atributoClaveLbl;
     public ChoiceBox classChoice;
     public Label clasePerteneceLbl;
-    public Label atributoFinalLbl;
-    public Label rutaOutputlbl;
     private String nombreProyecto;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private Map<String, String> keyFlds;
@@ -80,6 +78,10 @@ public class DslController implements Initializable {
 
         //Panel 2
         cargarChoicebox();
+
+        //Actualizar la fase en el setting
+        proyectos.setFase(nombreProyecto, "PSM");
+
     }
 
 
@@ -113,6 +115,7 @@ public class DslController implements Initializable {
         ObservableList oll = FXCollections.observableArrayList(nombres);
         listviewClases.setItems(oll);
     }
+
     public void listviewClasesAction(MouseEvent mouseEvent) {
         try {
             actualizarListViewAtributos();
@@ -261,21 +264,25 @@ public class DslController implements Initializable {
 
 
     private void ejecutarJar() throws IOException {
+        //direccion donde está el motor, y la direccion temporal donde ejecutarlo en el proyecto
         String rutaJar = System.getProperty("user.dir") + "/src/main/resources/DSLengine2RDF.jar";
         String rutaJarDest = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLengine2RDF.jar";
         File jar = new File(rutaJar);
         File jarDest = new File(rutaJarDest);
-        crearCopias(jar, jarDest);
+        crearCopias(jar, jarDest); //copia del motor
 
+        //ruta donde se encuentra el codigo DSL, asi como archivos de salida/error de la ejecucion
         String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
         String rutaOut = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/out.txt";
-        File out = new File(rutaOut);
         String rutaLog = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/log.txt";
         File log = new File(rutaLog);
+        File out = new File(rutaOut);
 
+        //Configurar el env del jar
         String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
         File dirFile = new File(directorio);
 
+        //Ejecucion del jar
         ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar" , rutaJarDest , rutaDSL);
         processBuilder.directory(dirFile);
         processBuilder.redirectError(log);
@@ -326,6 +333,7 @@ public class DslController implements Initializable {
         }
     }
 
+    //Preparar los datos para la clase DSLGenerator
     private List<String> preprocesarDatos() throws IOException {
         //Preprocesamiento -> separar cada cosa en su clase
         List<String> clases = listviewClases.getItems();
@@ -413,6 +421,7 @@ public class DslController implements Initializable {
                     String atributoIntermedio = intermedios.get(i);
 
                     if(i== archivos.size()-1){
+                        //Ultimo archivo de la ruta
                         cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+"),");
                         ultimoArchivo = archivo.replace(".csv", "");
                     }else{
@@ -705,7 +714,16 @@ public class DslController implements Initializable {
         listviewRutas.setItems(oll);
     }
 
-    public void classChoiceAction(ActionEvent event) {
-    }
 
+    public void faseAnteriorAction(ActionEvent event) {
+        try {
+            root = FXMLLoader.load(getClass().getResource("fasePsm.fxml"));
+            stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

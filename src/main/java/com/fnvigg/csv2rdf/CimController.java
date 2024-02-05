@@ -219,18 +219,22 @@ public class CimController implements Initializable {
             listViewArchivos.setItems(listaObservable);
 
             //Crear las copias de archivos para no trabajar sobre los originales
-            FileChannel sourceChannel = null;
-            FileChannel destChannel = null;
-            try {
-                sourceChannel = new FileInputStream(ficheroSeleccionado).getChannel();
-                destChannel = new FileOutputStream(ficheroDestino).getChannel();
-                destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-                sourceChannel.close();
-                destChannel.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            crearCopias(ficheroSeleccionado, ficheroDestino);
 
+        }
+    }
+
+    private void crearCopias(File ficheroSeleccionado, File ficheroDestino) {
+        FileChannel sourceChannel = null;
+        FileChannel destChannel = null;
+        try {
+            sourceChannel = new FileInputStream(ficheroSeleccionado).getChannel();
+            destChannel = new FileOutputStream(ficheroDestino).getChannel();
+            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+            sourceChannel.close();
+            destChannel.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -315,22 +319,10 @@ public class CimController implements Initializable {
             mostrarAlertaTipoImagen(event);
         }else {
             //Crear las copias de archivos para no trabajar sobre los originales
-            FileChannel sourceChannel = null;
-            FileChannel destChannel = null;
-            try {
+            crearCopias(ficheroSeleccionado, ficheroDestino);
+            Image img = new Image(ficheroDestino.getAbsolutePath());
+            imageEsquema.setImage(img);
 
-                sourceChannel = new FileInputStream(ficheroSeleccionado).getChannel();
-                destChannel = new FileOutputStream(ficheroDestino).getChannel();
-                destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-
-                Image img = new Image(ficheroDestino.getAbsolutePath());
-                imageEsquema.setImage(img);
-
-                sourceChannel.close();
-                destChannel.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 

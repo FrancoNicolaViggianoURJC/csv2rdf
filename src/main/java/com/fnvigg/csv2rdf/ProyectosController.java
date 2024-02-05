@@ -40,6 +40,7 @@ public class ProyectosController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
+
         //Llamar al gestor archivos para obtener la lista de proyectos
         try {
             List<String> listaProyectos = proyectos.getProyectos();

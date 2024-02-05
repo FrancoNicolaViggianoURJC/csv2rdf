@@ -56,13 +56,11 @@
                      <children>
                         <ListView fx:id="listviewClases" layoutX="32.0" layoutY="86.0" onMouseClicked="#listviewClasesAction" prefHeight="290.0" prefWidth="200.0" />
                         <ListView fx:id="listviewAtributos" layoutX="276.0" layoutY="86.0" prefHeight="291.0" prefWidth="200.0" />
-                        <Button layoutX="493.0" layoutY="123.0" mnemonicParsing="false" onAction="#añadirTipoBasico" prefHeight="25.0" prefWidth="87.0" text="Tipo básico" />
-                        <Button layoutX="492.0" layoutY="160.0" mnemonicParsing="false" onAction="#añadirTipoClase" prefHeight="25.0" prefWidth="88.0" text="Tipo clase" />
-                        <Button layoutX="492.0" layoutY="197.0" mnemonicParsing="false" onAction="#añadirEnumerado" prefHeight="25.0" prefWidth="88.0" text="Enumerado" />
-                        <Button layoutX="493.0" layoutY="234.0" mnemonicParsing="false" onAction="#añadirColeccion" prefHeight="25.0" prefWidth="87.0" text="Colección" />
-                        <Button layoutX="492.0" layoutY="271.0" mnemonicParsing="false" onAction="#añadirColeccionOrd" text="ColecciónOrd" />
+                        <Button layoutX="494.0" layoutY="163.0" mnemonicParsing="false" onAction="#añadirTipoBasico" prefHeight="25.0" prefWidth="87.0" text="Tipo básico" />
+                        <Button layoutX="493.0" layoutY="200.0" mnemonicParsing="false" onAction="#añadirTipoClase" prefHeight="25.0" prefWidth="88.0" text="Tipo clase" />
+                        <Button layoutX="493.0" layoutY="237.0" mnemonicParsing="false" onAction="#añadirEnumerado" prefHeight="25.0" prefWidth="88.0" text="Enumerado" />
                         <Label layoutX="16.0" layoutY="14.0" prefHeight="49.0" prefWidth="567.0" text="A continuación, el usuario especificará el tipo de dato que compone cada campo de los archivos fuentes." textAlignment="CENTER" />
-                        <Label layoutX="496.0" layoutY="94.0" text="Añadir atributo" />
+                        <Label layoutX="497.0" layoutY="131.0" text="Añadir atributo" />
                         <Label layoutX="102.0" layoutY="69.0" text="Clases UML" />
                         <Label layoutX="338.0" layoutY="69.0" text="Atributos UML" />
                      </children></AnchorPane>

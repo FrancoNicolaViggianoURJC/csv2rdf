@@ -40,8 +40,6 @@ public class PsmController implements Initializable {
     private Parent root;
     private String nombreProyecto = AtributosSesion.getNombreProyecto();
     private Gestor_proyectos proyectos = new Gestor_proyectos();
-    private ArrayList<String> clasesUML = new ArrayList<>();
-    private ArrayList<String> atributosUML = new ArrayList<>();
     private List<String> choices = new ArrayList<>();
 
     private String publisher;
@@ -107,24 +105,6 @@ public class PsmController implements Initializable {
         Optional<ButtonType> resultado = alerta.showAndWait();
         return false;
     }
-    @FXML
-    private boolean mostrarAlertaBlank(Event event){
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Esquema ontológico");
-        String contenido = "El campo no debe estar en blanco.";
-        alerta.setContentText(contenido);
-        Optional<ButtonType> resultado = alerta.showAndWait();
-        return false;
-    }
-    @FXML
-    private boolean mostrarAlertaDuplicado(Event event){
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Esquema ontológico");
-        String contenido = "La clase no debe ser idéntica a otra.";
-        alerta.setContentText(contenido);
-        Optional<ButtonType> resultado = alerta.showAndWait();
-        return false;
-    }
 
     @FXML
     private boolean mostrarAlertaSeleccion(Event event){
@@ -136,35 +116,6 @@ public class PsmController implements Initializable {
         return false;
     }
 
-    @FXML
-    private boolean mostrarAlertaTipo(Event event){
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Atributo xsd");
-        String contenido = "Debe escribir un tipo de datos xsd correcto.";
-        alerta.setContentText(contenido);
-        Optional<ButtonType> resultado = alerta.showAndWait();
-        return false;
-    }
-
-    @FXML
-    private boolean mostrarAlertaNombre(Event event){
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Atributo xsd");
-        String contenido = "Ya hay un atributo con ese nombre.";
-        alerta.setContentText(contenido);
-        Optional<ButtonType> resultado = alerta.showAndWait();
-        return false;
-    }
-
-    @FXML
-    private boolean mostrarAlertaTipoClase(Event event){
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-        alerta.setTitle("Atributo xsd");
-        String contenido = "No existe ninguna clase con ese nombre.";
-        alerta.setContentText(contenido);
-        Optional<ButtonType> resultado = alerta.showAndWait();
-        return false;
-    }
 
     @FXML
     private boolean mostrarAlertaOntologia(Event event){
@@ -417,6 +368,7 @@ public class PsmController implements Initializable {
         actualizarArchivoAtributos(clase, index, "alt");
     }
 
+    /*
     public void añadirColeccion(ActionEvent event) {
         String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
         int index = listviewAtributos.getSelectionModel().getSelectedIndex();
@@ -428,6 +380,8 @@ public class PsmController implements Initializable {
         int index = listviewAtributos.getSelectionModel().getSelectedIndex();
         actualizarArchivoAtributos(clase, index, "seq");
     }
+
+     */
     private void actualizarArchivoAtributos(String clase, int index, String tipo) {
         String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv", ".txt");
         File atributos = new File(rutaAtr);

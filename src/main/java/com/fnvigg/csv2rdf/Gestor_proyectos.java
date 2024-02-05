@@ -20,6 +20,7 @@ public class Gestor_proyectos {
     public Gestor_proyectos() {
     }
 
+    //Obtencion de la lista de proyectos registrados
     public List<String> getProyectos() throws IOException {
         List<String> filenames = new LinkedList<String>();
         //pasar esto al gestor proyectos

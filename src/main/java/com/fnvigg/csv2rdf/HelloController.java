@@ -37,7 +37,9 @@ public class HelloController {
     protected void loginBtnButtonClick(ActionEvent event) throws IOException {
         String user = userFld.getText();
         String pass = passFld.getText();
+
         AtributosSesion.setUser(user);
+
 
         boolean validado = false;
         //Crear la java class gestor_usuarios pasandole como argumento el user y el pass

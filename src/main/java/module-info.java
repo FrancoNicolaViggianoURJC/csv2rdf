@@ -10,7 +10,8 @@ module com.fnvigg.csv2rdf {
     requires org.apache.commons.csv;
     requires javatuples;
     requires java.desktop;
-    //requires eu.hansolo.tilesfx;
+
+
 
     opens com.fnvigg.csv2rdf to javafx.fxml;
     exports com.fnvigg.csv2rdf;
