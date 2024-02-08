@@ -474,7 +474,7 @@ public class PsmController implements Initializable {
         };
 
         File[] ficheros = ficheroDestino.listFiles(filter);
-        if(ficheros != null && ficheros.length>1) {
+        if(ficheros != null && ficheros.length>0) {
             //Iterar por los ficheros de atributos buscando "_"
             for (File f : ficheros) {
                 FileReader fr = new FileReader(f);
@@ -639,14 +639,15 @@ public class PsmController implements Initializable {
             BufferedReader br = new BufferedReader(fr);
 
             String linea = br.readLine();
-            if(linea != null){
+            if(linea != null) {
                 String[] tokens = linea.split(",");
-
-                publisherInput.setText(tokens[0]);
-                descripcionSPInput.setText(tokens[1]);
-                descripcionENGInput.setText(tokens[2]);
+                //Comprobamos que los metadatos han sido introducidos
+                if (tokens.length > 0) {
+                    publisherInput.setText(tokens[0]);
+                    descripcionSPInput.setText(tokens[1]);
+                    descripcionENGInput.setText(tokens[2]);
+                }
             }
-
             br.close();
             fr.close();
         }

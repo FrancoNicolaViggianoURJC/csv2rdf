@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:Memoria="http://www.example.com/Memoria#" > 
+  <rdf:Description rdf:about="http://www.example.com/Memoria#12">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#2698718"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-7.86621"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#42.75508"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#29575"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Galicia"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#12"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#13">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#6755609"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-3.69063"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#40.42526"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#8028"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Madrid"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#13"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#10">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#5036278"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-0.75"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#39.5"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#23255"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Valencia"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#10"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#11">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#1059310"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-6.16667"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#39.16667"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#41634"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Extremadura"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#11"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#9">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#7655499"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#1.86768"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#41.82046"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#32113"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Catalonia"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#9"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#7">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#2391308"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-4.25"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#41.66667"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#94224"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Castille and Lion"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#7"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#8">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#2043128"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-3"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#39.5"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#79461"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Castille-La Mancha"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#8"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#16">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#2189490"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-2.75"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#43"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#7234"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Basque Country"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#16"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#1">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#8482705"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-4.58333"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#37.5"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#87599"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Andalusia"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#1"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#17">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#316137"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-2.5"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#42.3"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#5045"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#La Rioja"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#17"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#2">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#1331316"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-0.66667"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#41.5"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#47720"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Aragon"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#2"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#14">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#1509139"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-1.5"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#38"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#11314"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Murcia"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#14"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#15">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#657216"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-1.66667"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#42.75"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#10391"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Navarre"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#15"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#5">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#2244480"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-15.5"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#28"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#7447"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Canary Islands"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#5"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#6">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#582353"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-4.03333"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#43.2"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#5321"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Cantabria"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#6"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#3">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#1015425"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-6"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#43.33333"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#10604"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Asturias"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#3"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#18">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#83999"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-5.3075"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#35.89028"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#20"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Ceuta"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#18"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#4">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#1215174"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#2.90314"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#39.58876"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#4992"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Balearic  Islands"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#4"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://www.example.com/Memoria#19">
+    <Memoria:population rdf:resource="http://www.example.com/Memoria#84284"/>
+    <Memoria:longitude rdf:resource="http://www.example.com/Memoria#-2.94434"/>
+    <Memoria:latitude rdf:resource="http://www.example.com/Memoria#35.29215"/>
+    <Memoria:area rdf:resource="http://www.example.com/Memoria#12"/>
+    <Memoria:countryCode rdf:resource="http://www.example.com/Memoria#es"/>
+    <Memoria:name rdf:resource="http://www.example.com/Memoria#Melilla"/>
+    <Memoria:regionCode rdf:resource="http://www.example.com/Memoria#19"/>
+    <rdf:type rdf:resource="http://www.example.com/Memoria#region"/>
+  </rdf:Description>
+</rdf:RDF>

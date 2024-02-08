@@ -589,13 +589,17 @@ public class DslController implements Initializable {
     public void listviewAtributoClaveAction(MouseEvent mouseEvent) {
     }
 
+    //Función para añadir una ruta al codigo dsl
     public void btnAñadirRutaAction(ActionEvent event) {
+        //El nombre de la ruta será el nombre del atributo
         String nombreRuta = pedirNombreRuta();
         if(!nombreRuta.isBlank()) {
+            //Se inicializan el resto de componentes de esa ruta (clase, archivos, atributos primarios)
             String clase = (String) classChoice.getSelectionModel().getSelectedItem();
             ArrayList<String> archivos = new ArrayList<>();
             ArrayList<String> atributos = new ArrayList<>();
             Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = new Quartet<>(clase, nombreRuta, archivos, atributos);
+            //Se añade a la lista de rutas
             rutas.add(ruta);
             actualizarlistViewRutas();
         }

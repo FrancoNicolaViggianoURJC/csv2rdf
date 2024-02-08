@@ -66,6 +66,8 @@ public class CimController implements Initializable {
         nombreProyecto = AtributosSesion.getNombreProyecto();
         actualizarListview(nombreProyecto);
 
+
+
         //--------------- Panel 2 --------------------------------
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
@@ -87,6 +89,8 @@ public class CimController implements Initializable {
         }
         ObservableList listaRequerimientos = FXCollections.observableArrayList(lista);
         listviewRequerimientos.setItems(listaRequerimientos);
+        //Deshabilitar la opcion de pasar a la siguiente fase hasta que se seleccione un archivo
+
     }
 
     @FXML
@@ -194,6 +198,11 @@ public class CimController implements Initializable {
         listaObservable.addAll(nombresArchivos);
         listViewArchivos.setItems(listaObservable);
 
+        if(listaObservable.isEmpty()) {
+            btnSiguienteFase.setDisable(true);
+        }else{
+            btnSiguienteFase.setDisable(false);
+        }
     }
 
     public void btnIndicarArchivosAction(ActionEvent event) {
@@ -221,6 +230,8 @@ public class CimController implements Initializable {
             //Crear las copias de archivos para no trabajar sobre los originales
             crearCopias(ficheroSeleccionado, ficheroDestino);
 
+            //Habilitar la transicion a la siguiente fase
+            btnSiguienteFase.setDisable(false);
         }
     }
 
@@ -247,33 +258,40 @@ public class CimController implements Initializable {
         actualizarListviewCampos(campos);
     }
 
+    //Eliminar un archivo del proyecto
     public void btnQuitarArchivoAction(ActionEvent event) {
+        //Obtención del indice en la lista de archivos, asi de la ruta
         int indice = listViewArchivos.getSelectionModel().getSelectedIndex();
         String path = archivosIndicados.get(indice);
         File archivo = new File(path);
+        //Pedir confirmacion al usuario
         boolean accion = mostrarConfirmacion(event);
         if(accion){
             boolean resultado = archivo.delete();
             if(resultado){
-                System.out.println("Archivo eliminado");
-                //Actualizacion indices
+                //Si se ha eliminado correctamente
+                //System.out.println("Archivo eliminado");
+                //Actualización indices donde se ubican los paths y los nombres
                 archivosIndicados.remove(indice);
                 nombresArchivos.remove(indice);
 
-                //Actualizacion indice archivos
+                //Actualizacion lista de archivos
                 ObservableList<String> listaObservable = FXCollections.observableArrayList();
                 listaObservable.addAll(nombresArchivos);
-                //Popular el listview
                 listViewArchivos.setItems(listaObservable);
 
                 //Actualizacion indice campos
                 listViewCampos.setItems(FXCollections.observableArrayList());
             }else{
+                //En caso de no poder borrar el archivo
                 System.out.println("Error al eliminar el archivo");
             }
         }
-
-    }
+        //Deshabilitar la siguiente fase si no quedan archivos indicados
+        if(archivosIndicados.isEmpty()){
+            btnSiguienteFase.setDisable(true);
+        }
+    }//Fin método
 
     /*------------------------------------------------------------
     |                   LISTVIEW CAMPOS                           |
@@ -311,10 +329,10 @@ public class CimController implements Initializable {
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
         //Creamos el fichero de destino
-        String ruta = System.getProperty("user.dir");
-        File ficheroDestino = new File( "src/main/resources/Proyectos/" + proyecto + "/esquema.png");
+        String ruta = System.getProperty("user.dir")+ "src/main/resources/Proyectos/" + proyecto + "/esquema.png";
+        File ficheroDestino = new File( ruta );
 
-        if(!ficheroSeleccionado.getName().endsWith(".png")){
+        if(ficheroSeleccionado != null && !ficheroSeleccionado.getName().endsWith(".png")){
             //Mostrar warning
             mostrarAlertaTipoImagen(event);
         }else {

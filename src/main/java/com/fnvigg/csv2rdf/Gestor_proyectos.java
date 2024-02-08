@@ -20,13 +20,16 @@ public class Gestor_proyectos {
     public Gestor_proyectos() {
     }
 
-    //Obtencion de la lista de proyectos registrados
+    //Obtención de la lista de proyectos registrados
     public List<String> getProyectos() throws IOException {
+        //Variable donde se almacenan los nombres de los proyectos
         List<String> filenames = new LinkedList<String>();
-        //pasar esto al gestor proyectos
+        //Directorio donde se encuentran
         File directorio = new File("src/main/resources/Proyectos");
         File[] listado = directorio.listFiles();
+        //Comprobacion de la existencia del directorio
         if(listado != null){
+            //Se añaden todos los ficheros (subdirectorios) contenidos
             for(File fichero : listado){
                 fichero.listFiles();
                 filenames.add(fichero.getName());
@@ -160,6 +163,7 @@ public class Gestor_proyectos {
 
     }
 
+    //Algoritmo para eliminar campos de un archivo csv. Elimina cabeceras y valores asociados.
     public void removerCampo(String ruta, int indiceCampo) {
         String rutaAux = ruta+"_copia";
         try {

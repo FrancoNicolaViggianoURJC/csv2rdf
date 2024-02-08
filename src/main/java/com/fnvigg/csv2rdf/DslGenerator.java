@@ -94,7 +94,7 @@ public class DslGenerator {
         System.out.println("clases escritas");
     }
 
-    private void crearPrefixes() throws IOException {
+    private void PcrearPrefixes() throws IOException {
         String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
         File dslCode = new File(rutaDSL);
 

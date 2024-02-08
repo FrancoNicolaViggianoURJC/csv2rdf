@@ -117,8 +117,10 @@ public class ProyectosController implements Initializable {
     }
     public void onClickCargarProyecto(ActionEvent event) {
         String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
+        //En obtener fase se establece el atributo nombreProyecto en el atributo estatico
         String fase = proyectos.obtenerFase(nombreProyecto);
 
+        //Cargar la escena en funcion de la fase
         if(fase.equals("PIM")){
             cargarEscena("fasePim.fxml", event);
         }else if(fase.equals("PSM")){

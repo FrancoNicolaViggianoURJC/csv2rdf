@@ -190,9 +190,9 @@ public class OntologyGenerator {
         if(linea != null){
             //Obtener cada clase, y escribirla
             tokens = linea.split(",");
-            for(String t : tokens){
-                bw.write("<owl:Class rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+t+"\">\n" +
-                        "\t\t<rdfs:label xml:lang=\"en\">"+t+"</rdfs:label>\n" +
+            for(String clase : tokens){
+                bw.write("<owl:Class rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+clase+"\">\n" +
+                        "\t\t<rdfs:label xml:lang=\"en\">"+clase+"</rdfs:label>\n" +
                         "    </owl:Class>\n");
             }
         }

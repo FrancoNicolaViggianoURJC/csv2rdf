@@ -27,6 +27,7 @@ public class PimController implements Initializable {
     public Label lblTexto;
     public ImageView imageAyuda;
     public ImageView imageMDO;
+    public Button btnSiguienteFase;
     private Stage stage;
     private Scene scene;
     private Parent root;
@@ -43,13 +44,18 @@ public class PimController implements Initializable {
             proyectos.setFase(nombreProyecto, "PIM");
         }
 
+        //Deshabilitar el boton hasta que el usuario suba el MDO
+        btnSiguienteFase.setDisable(true);
+
         //Cargar el MDO si lo hubiera
         String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/MDO.png";
         File f = new File(ruta);
         if(f.exists() && !f.isDirectory()){
             Image img = new Image(ruta);
             imageMDO.setImage(img);
+            btnSiguienteFase.setDisable(false);
         }
+
     }
 
     @FXML
@@ -146,6 +152,7 @@ public class PimController implements Initializable {
                 Image img = new Image(ruta);
 
                 imageMDO.setImage(img);
+                btnSiguienteFase.setDisable(false);
             } else {
                 //Mostrar alerta tipo
                 mostrarAlertaImagen(event);
