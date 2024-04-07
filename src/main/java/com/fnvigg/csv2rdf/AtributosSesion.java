@@ -38,4 +38,5 @@ public class AtributosSesion {
     public static void setUltimaPantalla(String ultimaPantalla) {
         AtributosSesion.ultimaPantalla = ultimaPantalla;
     }
+
 }

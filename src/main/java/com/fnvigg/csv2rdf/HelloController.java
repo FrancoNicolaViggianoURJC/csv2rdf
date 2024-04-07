@@ -31,25 +31,14 @@ public class HelloController {
     public PasswordField passFld;
     public Label errLbl;
 
-    private Gestor_usuarios users = new Gestor_usuarios();
-
     @FXML
     protected void loginBtnButtonClick(ActionEvent event) throws IOException {
         String user = userFld.getText();
         String pass = passFld.getText();
 
-        AtributosSesion.setUser(user);
+        boolean validado = DatabaseH2.getUser(user, pass);
 
-
-        boolean validado = false;
-        //Crear la java class gestor_usuarios pasandole como argumento el user y el pass
-        validado = users.validar_Usuario(user, pass);
-
-        //if validado ...
         if (validado){
-            //Asignamos los roles a la sesion
-            String rol = users.obtenerRoles(user);
-            AtributosSesion.setRol(rol);
             errLbl.setVisible(false);
             //transicionar a pantalla inicial de proyectos
             transicionar(event);

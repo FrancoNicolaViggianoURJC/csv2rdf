@@ -10,7 +10,7 @@ module com.fnvigg.csv2rdf {
     requires org.apache.commons.csv;
     requires javatuples;
     requires java.desktop;
-
+    requires java.sql;
 
 
     opens com.fnvigg.csv2rdf to javafx.fxml;

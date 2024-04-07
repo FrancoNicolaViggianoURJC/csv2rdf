@@ -20,7 +20,6 @@ public class RegistrarUsuarioController implements Initializable {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private Gestor_usuarios usuarios = new Gestor_usuarios();
 
     public Label errContraseñas;
     public Button registrarBtn;
@@ -62,6 +61,15 @@ public class RegistrarUsuarioController implements Initializable {
         return false;
     }
 
+    @FXML
+    private boolean mostrarAlertaUsuario(){
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Aviso");
+        alerta.setContentText("Ya existe un usuario con ese nombre");
+        Optional<ButtonType> resultado = alerta.showAndWait();
+
+        return false;
+    }
     private final String[] roles = {"Ingeniero de datos","Ingeniero Ontológico"};
 
     @Override
@@ -76,15 +84,15 @@ public class RegistrarUsuarioController implements Initializable {
         String pass1 = passFld1.getText();
         String pass2 = passFld2.getText();
         String rol = rolCheckBox.getValue();
-        if (!user.isBlank() && !pass1.isBlank() && rol.equals("")) {
+        if (!user.isBlank() && !pass1.isBlank() && !rol.equals("")) {
             if(pass1.equals(pass2)){
                 errContraseñas.setVisible(false);
-                //llamar gestion usuarios
-                exito = usuarios.registrarUsuario(user, pass1, rol);
+                //Llamar a la base de datos para guardar el usuario
+                exito = DatabaseH2.insertUser(user, pass1, rol);
                 if(exito){
                     volver(event);
                 }else{
-
+                    mostrarAlertaUsuario();
                 }
             }else{
                 errContraseñas.setVisible(true);

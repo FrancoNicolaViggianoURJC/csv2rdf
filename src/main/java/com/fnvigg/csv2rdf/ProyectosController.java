@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -26,7 +27,6 @@ public class ProyectosController implements Initializable {
     private Stage stage;
     private Scene scene;
     private Parent root;
-    private Gestor_proyectos proyectos = new Gestor_proyectos();
     public TextField nameProyectFld;
     public Label nameLbl;
     public TextField ontologicProyectFld;
@@ -41,29 +41,13 @@ public class ProyectosController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources){
 
-        //Llamar al gestor archivos para obtener la lista de proyectos
-        try {
-            List<String> listaProyectos = proyectos.getProyectos();
-            ObservableList<String> listaObservable = FXCollections.observableArrayList();
-            listaObservable.addAll(listaProyectos);
-            //Popular el listview
-            listProyects.setItems(listaObservable);
+        //Llenar el listview de proyectos
+        List<String> listaProyectos = DatabaseH2.getProyectos();
+        ObservableList<String> oll = FXCollections.observableArrayList(listaProyectos);
+        listProyects.setItems(oll);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //Llenar y bloquear el rol asociado
-        String rol = AtributosSesion.getRol();
-        String nombre = AtributosSesion.getUser();
-        if(rol.equals("Ingeniero de datos")){
-            dataProyectFld.setDisable(true);
-            dataProyectFld.setText(nombre);
-
-        } else if (rol.equals("Ingeniero Ontológico")) {
-            ontologicProyectFld.setDisable(true);
-            ontologicProyectFld.setText(nombre);
-        }
+        //Rellenar los campos para registrar un proyecto
+        initCampos();
     }
 
     @FXML
@@ -103,22 +87,26 @@ public class ProyectosController implements Initializable {
         Optional<ButtonType> resultado = alertaNombre.showAndWait();
         return false;
     }
-    private void actualizarLista(){
-        try {
-            List<String> listaProyectos = proyectos.getProyectos();
-            ObservableList<String> listaObservable = FXCollections.observableArrayList();
-            listaObservable.addAll(listaProyectos);
-            //Popular el listview
-            listProyects.setItems(listaObservable);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @FXML
+    private boolean mostrarAlertaBorrado(ActionEvent event){
+        Alert alertaNombre = new Alert(Alert.AlertType.INFORMATION);
+        alertaNombre.setTitle("Atencion");
+        alertaNombre.setContentText("No se eliminó correctamente el proyecto");
+        Optional<ButtonType> resultado = alertaNombre.showAndWait();
+        return false;
     }
+
+    private void actualizarLista(){
+            List<String> listaProyectos = DatabaseH2.getProyectos();
+            ObservableList<String> oll = FXCollections.observableArrayList(listaProyectos);
+            listProyects.setItems(oll);
+    }
+
     public void onClickCargarProyecto(ActionEvent event) {
+
         String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
-        //En obtener fase se establece el atributo nombreProyecto en el atributo estatico
-        String fase = proyectos.obtenerFase(nombreProyecto);
+        String fase = DatabaseH2.getProyectosFase(nombreProyecto);
 
         //Cargar la escena en funcion de la fase
         if(fase.equals("PIM")){
@@ -147,57 +135,66 @@ public class ProyectosController implements Initializable {
 
     public void onClickBorrarProyecto(ActionEvent event) {
         if(mostrarAlerta(event)) {
-            String proyecto = (String) listProyects.getSelectionModel().getSelectedItem();
-            proyectos.borrarProyecto(proyecto);
-            actualizarLista();
-            lblDatos.setVisible(false);
-            lblOntologico.setVisible(false);
+            String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
+            Boolean exito = DatabaseH2.deleteProyecto(nombreProyecto);
+            if(exito){
+                actualizarLista();
+                lblDatos.setVisible(false);
+                lblOntologico.setVisible(false);
+
+            }else{
+                mostrarAlertaBorrado(event);
+            }
         }
     }
 
     public void onClickRegistrarProyecto(ActionEvent event) {
         //Obtencion de los campos
-        String nombreProyecto = nameProyectFld.getText().replace(" ", "");
+        String nombreProyecto = nameProyectFld.getText();
         String nombreOntologico = ontologicProyectFld.getText();
         String nombreDato = dataProyectFld.getText();
         //Comprobacion que ninguno esté vacio
         if(nombreProyecto.equals("") || nombreDato.equals("") || nombreOntologico.equals("")){
             mostrarAlertaCampos(event);
         }else{
-            //Comprobacion nombre disponible
-            boolean nombreDisponible = true;
-            for (Object proyecto : listProyects.getItems()){
-                String proyectoString = (String) proyecto;
-                if(nombreProyecto.equals(proyectoString)){
-                    nombreDisponible = false;
-                    break;
-                }
-            }
+            boolean insertado = DatabaseH2.insertProyecto(nombreDato, nombreOntologico, nombreProyecto);
 
-            //Creacion del proyecto
-            if(nombreDisponible) {
-                proyectos.crearProyecto(nombreProyecto, nombreDato, nombreOntologico);
+            if(insertado){
+                //Se crea el proyecto
                 actualizarLista();
-                nameProyectFld.setText("");
-                ontologicProyectFld.setText("");
-                dataProyectFld.setText("");
+                initCampos();
             }else{
-                //mostrar mensaje error...
+                //No se crea el proyecto
                 mostrarAlertaNombre(event);
             }
         }
 
     }
 
-    public void onClickDatosProyecto(MouseEvent mouseEvent) {
-        //Recoger los nombres del ing datos, ontologico y cambiar las properties de las label de abajo
-        String proyecto = (String) listProyects.getSelectionModel().getSelectedItem();
-        String[] ingenieros = proyectos.obtenerPropiedades(proyecto);
-        String ingDatos = ingenieros[0];
-        String ingOntologico = ingenieros[1];
-        String userSesion = AtributosSesion.getUser();
+    private void initCampos() {
+        String rol = AtributosSesion.getRol();
+        String nombre = AtributosSesion.getUser();
 
-        if(userSesion.equals(ingDatos) || userSesion.equals(ingOntologico)){
+        nameProyectFld.setText("");
+        if(rol.equals("Ingeniero de datos")){
+            dataProyectFld.setText(nombre);
+            dataProyectFld.setDisable(true);
+            ontologicProyectFld.setText("");
+        }else{
+            ontologicProyectFld.setText(nombre);
+            ontologicProyectFld.setDisable(true);
+            dataProyectFld.setText("");
+        }
+    }
+
+    public void onClickDatosProyecto(MouseEvent mouseEvent) {
+        //Recoger datos del proyecto
+        String proyecto = (String) listProyects.getSelectionModel().getSelectedItem();
+        ArrayList<String> datosProyecto = DatabaseH2.getProyectosDatos(proyecto);
+        String ingDatos = datosProyecto.get(0);
+        String ingOntologico = datosProyecto.get(1);
+
+        if(AtributosSesion.getUser().equals(ingDatos) || AtributosSesion.getUser().equals(ingOntologico)){
             //No coincide con ningun miembro del proyecto
             deleteBtn.setDisable(false);
             loadBtn.setDisable(false);
@@ -210,7 +207,7 @@ public class ProyectosController implements Initializable {
         lblOntologico.setText(ingOntologico);
         lblDatos.setVisible(true);
         lblOntologico.setVisible(true);
-    }
 
+    }
 
 }
