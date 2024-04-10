@@ -7,6 +7,7 @@ public class AtributosSesion {
     private static String nombreProyecto;
 
     private static String ultimaPantalla;
+    private static String idProyecto;
     public static void setUser(String user){
         AtributosSesion.user = user;
     }
@@ -39,4 +40,11 @@ public class AtributosSesion {
         AtributosSesion.ultimaPantalla = ultimaPantalla;
     }
 
+    public static String getIdProyecto() {
+        return idProyecto;
+    }
+
+    public static void setIdProyecto(String idProyecto) {
+        AtributosSesion.idProyecto = idProyecto;
+    }
 }

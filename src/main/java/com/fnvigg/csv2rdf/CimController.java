@@ -20,10 +20,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class CimController implements Initializable {
 
@@ -48,23 +45,17 @@ public class CimController implements Initializable {
     private Scene scene;
     private Parent root;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
-    //Paths absolutos a los archivos
-    private LinkedList<String> archivosIndicados;
-    //Nombres archivos
-    private LinkedList<String> nombresArchivos;
-    private String nombreProyecto;
-
+    private String idProyecto;
+    private String idArchivoSeleccionado;
     @Override
     public void initialize(URL location, ResourceBundle resources){
         accordion.setExpandedPane(panel1);
 
+        idProyecto = AtributosSesion.getIdProyecto();
         //--------------- Panel 1 --------------------------------
-        archivosIndicados = new LinkedList<String>();
-        nombresArchivos = new LinkedList<String>();
 
-        //Actualizacion listview e inicializacion de linkedlists
-        nombreProyecto = AtributosSesion.getNombreProyecto();
-        actualizarListview(nombreProyecto);
+        //Actualizacion listview
+        actualizarListview();
 
 
 
@@ -172,33 +163,13 @@ public class CimController implements Initializable {
     |                   LISTVIEW ARCHIVOS                        |
     ------------------------------------------------------------*/
 
-    private void actualizarListview(String proyecto) {
-        //Rellenar el listview de archivos en la init por si ya hubiera de antes
-        String ruta = System.getProperty("user.dir");
-        File ficheroDestino = new File( ruta + "/src/main/resources/Proyectos/" + proyecto + "/");
+    private void actualizarListview() {
 
-        //Filtro para no obtener los archivos de configuracion
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File f, String name)
-            {
-                return (name.endsWith(".csv") );
-            }
-        };
+        List<String> listaFicheros = DatabaseH2.getCimNombresArchivos(idProyecto);
+        ObservableList oll = FXCollections.observableArrayList(listaFicheros);
+        listViewArchivos.setItems(oll);
 
-        File[] ficheros = ficheroDestino.listFiles(filter);
-
-        //Inicializacion linkedlists
-        for(File f : ficheros){
-            archivosIndicados.add(f.getAbsolutePath());
-            nombresArchivos.add(f.getName());
-        }
-
-        //Popular lista
-        ObservableList<String> listaObservable = FXCollections.observableArrayList();
-        listaObservable.addAll(nombresArchivos);
-        listViewArchivos.setItems(listaObservable);
-
-        if(listaObservable.isEmpty()) {
+        if(oll.isEmpty()) {
             btnSiguienteFase.setDisable(true);
         }else{
             btnSiguienteFase.setDisable(false);
@@ -211,24 +182,25 @@ public class CimController implements Initializable {
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
         //Creamos el fichero de destino
-        String ruta = System.getProperty("user.dir");
-        File ficheroDestino = new File( "src/main/resources/Proyectos/" + proyecto + "/" + ficheroSeleccionado.getName());
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/" + ficheroSeleccionado.getName();
+        File ficheroDestino = new File(ruta);
 
         if(!ficheroSeleccionado.getName().endsWith(".csv")){
             //Mostrar warning
             mostrarAlertaTipoFichero(event);
         }else {
-            //Actualizar las listas
-            archivosIndicados.add(ficheroDestino.getAbsolutePath());
-            nombresArchivos.add(ficheroDestino.getName());
-
-            ObservableList<String> listaObservable = FXCollections.observableArrayList();
-            listaObservable.addAll(nombresArchivos);
-            //Popular el listview
-            listViewArchivos.setItems(listaObservable);
+            actualizarListview();
 
             //Crear las copias de archivos para no trabajar sobre los originales
             crearCopias(ficheroSeleccionado, ficheroDestino);
+            //Insercion de la ruta del archivo nuevo en la bbdd
+            DatabaseH2.insertCimArchivo(ruta, ficheroDestino.getName(),idProyecto);
+            String idArchivo = DatabaseH2.getCimIdArchivo(ruta);
+            actualizarListview();
+
+            //Insercion de los campos en la bbdd
+            String[] camposArchivo = proyectos.obtenerCampos(ruta);
+            DatabaseH2.insertCimAtributos(camposArchivo, idArchivo, idProyecto);
 
             //Habilitar la transicion a la siguiente fase
             btnSiguienteFase.setDisable(false);
@@ -250,17 +222,17 @@ public class CimController implements Initializable {
     }
 
     public void archivoIndicado(MouseEvent mouseEvent) {
-        //Las rutas de los archivos vienen indicadas en el linkedlist de la clase
-        //Los indices deberian coincidir en todo momento, comprobar esto
-        int indice = listViewArchivos.getSelectionModel().getSelectedIndex();
-        String path = archivosIndicados.get(indice);
-        String[] campos = proyectos.obtenerCampos(path);
-        actualizarListviewCampos(campos);
+        //Se ejecuta cada vez que se indica un archivo en la listview de archivos
+        String nombreArchivo = (String) listViewArchivos.getSelectionModel().getSelectedItem();
+        String ruta = DatabaseH2.getCimRutaIndividual(nombreArchivo);
+        idArchivoSeleccionado = DatabaseH2.getCimIdArchivo(ruta);
+        actualizarListviewCampos();
     }
 
     //Eliminar un archivo del proyecto
     public void btnQuitarArchivoAction(ActionEvent event) {
-        //Obtención del indice en la lista de archivos, asi de la ruta
+        //todo: obtener el nombre del archivo, su id, borrar tanto el archivo en disco como sus entrada en la bbdd, sus atributos tmb
+        //Obtención del nombre del archivo
         int indice = listViewArchivos.getSelectionModel().getSelectedIndex();
         String path = archivosIndicados.get(indice);
         File archivo = new File(path);
@@ -296,23 +268,26 @@ public class CimController implements Initializable {
     /*------------------------------------------------------------
     |                   LISTVIEW CAMPOS                           |
      ------------------------------------------------------------*/
-    private void actualizarListviewCampos(String[] campos) {
-        //Actualiza el list view derecho
-        ObservableList<String> listaObservable = FXCollections.observableArrayList();
-        listaObservable.addAll(campos);
-        //Añadimos la lista observable al listview
-        listViewCampos.setItems(listaObservable);
+    private void actualizarListviewCampos() {
+        List<String> campos = DatabaseH2.getCimAtributos(idArchivoSeleccionado);
+        ObservableList oll = FXCollections.observableArrayList(campos);
+        listViewCampos.setItems(oll);
     }
     public void btnQuitarCampoAction(ActionEvent event) {
-        //Coger indice de la listview
-        //Quitar header del archivo y sus respectivos valores
-        //Al leerse las cabeceras en orden, el indice de la listview corresponde a la posicion en el csv
-        int indiceCampo = listViewCampos.getSelectionModel().getSelectedIndex();
-        int indiceArchivo = listViewArchivos.getSelectionModel().getSelectedIndex();
 
-        String ruta = archivosIndicados.get(indiceArchivo);
-        proyectos.removerCampo(ruta, indiceCampo);
-        actualizarListviewCampos(proyectos.obtenerCampos(ruta));
+        String nombreArchivo = (String) listViewArchivos.getSelectionModel().getSelectedItem();
+        String rutaArchivo = DatabaseH2.getCimRutaIndividual(nombreArchivo);
+        String idArchivo = DatabaseH2.getCimIdArchivo(rutaArchivo);
+        String nombreAtributo = (String) listViewCampos.getSelectionModel().getSelectedItem();
+
+        //Remover ese campo de la bbdd
+        DatabaseH2.deleteCimAtributo(nombreAtributo, idArchivo);
+        actualizarListviewCampos();
+
+        //Remover ese campo en el archivo duplicado
+        int indexAtributo = listViewCampos.getSelectionModel().getSelectedIndex();
+        proyectos.removerCampo(rutaArchivo, indexAtributo);
+
     }
 
 

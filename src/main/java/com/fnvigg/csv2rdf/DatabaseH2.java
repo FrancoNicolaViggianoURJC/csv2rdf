@@ -1,4 +1,5 @@
 package com.fnvigg.csv2rdf;
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,6 +27,8 @@ public class DatabaseH2 {
         //Crear cada tabla
         createTableUsersDB();
         createTableProyecto();
+        createTableArchivo();
+        createTableAtributo();
         System.out.println("Base de datos inicializada");
     }
 
@@ -83,6 +86,41 @@ public class DatabaseH2 {
             statement.executeUpdate(createTableSQL);
 
             System.out.println("Tabla proyecto creada correctamente.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createTableArchivo() {
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+            //idProyecto INT AUTO_INCREMENT UNIQUE
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS Archivo ("
+                    + "idProyecto INT NOT NULL,"
+                    + "rutaArchivo VARCHAR(255) PRIMARY KEY,"
+                    + "nombreArchivo VARCHAR(255) UNIQUE,"
+                    + "idArchivo INT AUTO_INCREMENT UNIQUE)";
+            statement.executeUpdate(createTableSQL);
+
+            System.out.println("Tabla Archivo creada correctamente.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createTableAtributo() {
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+            //idProyecto INT AUTO_INCREMENT UNIQUE
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS Atributo ("
+                    + "idArchivo INT NOT NULL,"
+                    + "idProyecto INT NOT NULL,"
+                    + "idAtributo INT AUTO_INCREMENT PRIMARY KEY,"
+                    + "nombre VARCHAR(255),"
+                    + "valor VARCHAR(255))";
+            statement.executeUpdate(createTableSQL);
+
+            System.out.println("Tabla Archivo creada correctamente.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -147,8 +185,9 @@ public class DatabaseH2 {
 
     //Gestion de proyectos
     public static boolean insertProyecto(String ingDatos, String ingOntologico, String nombreProyecto) {
-        String sql = "INSERT INTO Proyecto (nombreProyecto, ingenieroDatos, ingenieroOntologico)" +
-                     " VALUES ('"+nombreProyecto+"','"+ingDatos+"','"+ingOntologico+"')";
+        String cim = "CIM";
+        String sql = "INSERT INTO Proyecto (nombreProyecto, ingenieroDatos, ingenieroOntologico, fase)" +
+                     " VALUES ('"+nombreProyecto+"','"+ingDatos+"','"+ingOntologico+"','"+cim+"')";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -237,6 +276,26 @@ public class DatabaseH2 {
         return "";
     }
 
+    public static String getProyectosID(String nombreProyecto) {
+        String sql = "SELECT idProyecto FROM Proyecto WHERE nombreProyecto = '"+nombreProyecto+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Solo deberia haber un resultado
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    return resultSet.getString("idProyecto");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return "";
+    }
+
     public static Boolean deleteProyecto(String nombreProyecto) {
         String sql = "DELETE FROM Proyecto WHERE nombreProyecto = '"+nombreProyecto+"';";
         try (Connection connection = getConnection();
@@ -255,6 +314,165 @@ public class DatabaseH2 {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    //Fase CIM
+    public static Boolean insertCimArchivo(String ruta, String nombre, String idProyecto) {
+        String sql = "INSERT INTO Archivo (idProyecto, rutaArchivo, nombreArchivo)" +
+                " VALUES ('"+idProyecto+"','"+ruta+"','"+nombre+"')";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0){
+                return true;
+            }else
+                return false;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    public static LinkedList<File> getCimRutasArchivos(String idProyecto) {
+        LinkedList<File> ficheros = new LinkedList<>();
+        File aux;
+        String sql = "SELECT rutaArchivo FROM Archivo WHERE idProyecto = '"+idProyecto+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    String ruta = resultSet.getString("rutaArchivo");
+                    aux = new File(ruta);
+                    ficheros.add(aux);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return ficheros;
+    }
+
+    public static LinkedList<String> getCimNombresArchivos(String idProyecto) {
+        LinkedList<String> nombres = new LinkedList<>();
+        String sql = "SELECT nombreArchivo FROM Archivo WHERE idProyecto = '"+idProyecto+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    String nombre = resultSet.getString("nombreArchivo");
+                    nombres.add(nombre);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return nombres;
+    }
+
+    public static String getCimRutaIndividual(String nombreArchivo) {
+        String sql = "SELECT rutaArchivo FROM Archivo WHERE nombreArchivo = '"+nombreArchivo+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    return resultSet.getString("rutaArchivo");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return "";
+    }
+
+    public static String getCimIdArchivo(String ruta) {
+        String sql = "SELECT idArchivo FROM Archivo WHERE rutaArchivo = '"+ruta+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    return resultSet.getString("idArchivo");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return "";
+    }
+    //Tabla atributos
+    public static boolean insertCimAtributos(String[] camposArchivo, String idArchivo, String idProyecto) {
+        int count = 0;
+        for(String atributo : camposArchivo){
+            String sql = "INSERT INTO Atributo (idArchivo, idProyecto, nombre)" +
+                    " VALUES ('"+idArchivo+"','"+idProyecto+"','"+atributo+"')";
+            try (Connection connection = getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+
+                // Ejecutar la sentencia SQL de inserción
+                int filasInsertadas = statement.executeUpdate();
+                count += filasInsertadas; //Se incrementa de uno en uno
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return count == camposArchivo.length;
+    }
+
+
+    public static LinkedList<String> getCimAtributos(String idArchivo) {
+        LinkedList<String> atributos = new LinkedList<>();
+        String sql = "SELECT nombre FROM Atributo WHERE idArchivo = '"+idArchivo+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    atributos.add(resultSet.getString("nombre"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return atributos;
+    }
+
+    public static boolean deleteCimAtributo(String nombreAtributo, String idArchivo) {
+        String sql = "DELETE FROM Atributo WHERE nombre = '"+nombreAtributo+"' AND idArchivo = '"+idArchivo+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasEliminadas = statement.executeUpdate();
+            return filasEliminadas != 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
         return false;
     }
 }

@@ -107,7 +107,7 @@ public class ProyectosController implements Initializable {
 
         String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
         String fase = DatabaseH2.getProyectosFase(nombreProyecto);
-
+        AtributosSesion.setIdProyecto(DatabaseH2.getProyectosID(nombreProyecto));
         //Cargar la escena en funcion de la fase
         if(fase.equals("PIM")){
             cargarEscena("fasePim.fxml", event);
@@ -158,9 +158,10 @@ public class ProyectosController implements Initializable {
             mostrarAlertaCampos(event);
         }else{
             boolean insertado = DatabaseH2.insertProyecto(nombreDato, nombreOntologico, nombreProyecto);
-
+            String idProyecto = DatabaseH2.getProyectosID(nombreProyecto);
             if(insertado){
                 //Se crea el proyecto
+                crearDirectorio(idProyecto);
                 actualizarLista();
                 initCampos();
             }else{
@@ -169,6 +170,14 @@ public class ProyectosController implements Initializable {
             }
         }
 
+    }
+
+    private void crearDirectorio(String id) {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + id;
+        File directorio = new File(ruta);
+        if (!directorio.exists()){
+            directorio.mkdirs();
+        }
     }
 
     private void initCampos() {
