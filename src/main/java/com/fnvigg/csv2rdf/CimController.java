@@ -68,7 +68,7 @@ public class CimController implements Initializable {
         //--------------- Panel 3 --------------------------------
         ArrayList lista;
         try {
-            lista = proyectos.obtenerRequerimientos(nombreProyecto);
+            lista = proyectos.obtenerRequerimientos(idProyecto);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -317,7 +317,7 @@ public class CimController implements Initializable {
             //Borrar la linea igual al indice seleccionado
             String proyecto = AtributosSesion.getNombreProyecto();
             try {
-                proyectos.borrarRequerimiento(indice, proyecto);
+                proyectos.borrarRequerimiento(indice, idProyecto);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -338,7 +338,7 @@ public class CimController implements Initializable {
 
             try {
                 //Actualizamos el archivo de requerimientos
-                proyectos.addRequerimiento(requerimiento, proyecto);
+                proyectos.addRequerimiento(requerimiento, idProyecto);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

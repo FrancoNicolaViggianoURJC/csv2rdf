@@ -22,7 +22,7 @@ public class OntologyGenerator {
     private String publisher = new String();
     private String descripcion = new String();
     private String description = new String();
-
+    private String idProyecto = AtributosSesion.getIdProyecto();
 
     /*------------------------------------------------------------
                                 Metodos
@@ -50,7 +50,7 @@ public class OntologyGenerator {
     }
 
     private void limpiarArchivo() {
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
         File archivo = new File(output);
 
         if(archivo.exists() && !archivo.isDirectory()){
@@ -62,7 +62,7 @@ public class OntologyGenerator {
         /*
                     File writers
          */
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
@@ -80,7 +80,7 @@ public class OntologyGenerator {
 
         String definedBy = "http://www.example.com/"+nombreProyecto+"/ontology.rdf";
         String preferredNamespace = "http://www.example.com/"+nombreProyecto+"";
-        String[] ingenieros = proyectos.obtenerPropiedades(nombreProyecto);
+        String[] ingenieros = proyectos.obtenerPropiedades(idProyecto);
         ingDatos = ingenieros[0];
         ingOntologico = ingenieros[1];
         userSesion = AtributosSesion.getUser();
@@ -166,11 +166,11 @@ public class OntologyGenerator {
     }
 
     private void crearClases() throws IOException {
-        String input = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/clasesUML.txt";
+        String input = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/clasesUML.txt";
         FileReader fr = new FileReader(input);
         BufferedReader br = new BufferedReader(fr);
 
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
@@ -221,7 +221,7 @@ public class OntologyGenerator {
 
     private void escribirDatatypes(LinkedList<String> datatypes) throws IOException {
 
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
@@ -292,7 +292,7 @@ public class OntologyGenerator {
     }
 
     private void escribirObjects(LinkedList<String> objects) throws IOException {
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+nombreProyecto+"/ontology.txt";
+        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);

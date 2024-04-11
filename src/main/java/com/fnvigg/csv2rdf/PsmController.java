@@ -45,35 +45,23 @@ public class PsmController implements Initializable {
     private String publisher;
     private String descripcion;
     private String description;
+    private String idProyecto;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idProyecto = AtributosSesion.getIdProyecto();
         nombreProyecto = AtributosSesion.getNombreProyecto();
         accordion.setExpandedPane(accordion.getPanes().get(0));
         
         //Actualizar la fase en el setting
-        String faseUltima = proyectos.obtenerFase(nombreProyecto);
-        if(!faseUltima.equals("DSL")){
-            proyectos.setFase(nombreProyecto, "PSM");
+        String fase = DatabaseH2.getProyectosFase(nombreProyecto);
+        if(!fase.equals("DSL")){
+            DatabaseH2.updateProyectosFase("PSM", idProyecto);
         }
 
-        //Carga de la imagen por default
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/esquemaOntDef.png";
-        File f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageEsquemaEjemplo.setImage(img);
-        }
-
-        //Cargar imagen esquema si la hubiera
-        ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/esquemaOnt.png";
-        f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageEsquema.setImage(img);
-        }
+        //Init de las imagenes
+        cargarImagenes();
 
         //Cargar listview de clases
-        //Obtener todos los archivos csv de la carpeta del proyecto
         cargarClases();
 
         //Init de la lista de tipos
@@ -130,6 +118,23 @@ public class PsmController implements Initializable {
 ||                      Pestaña introduccion                                 ||
 ||                                                                            ||
  ----------------------------------------------------------------------------*/
+    private void cargarImagenes() {
+        //Carga de la imagen por default
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/esquemaOntDef.png";
+        File f = new File(ruta);
+        if(f.exists() && !f.isDirectory()){
+            Image img = new Image(ruta);
+            imageEsquemaEjemplo.setImage(img);
+        }
+
+        //Cargar imagen esquema si la hubiera
+        ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/esquemaOnt.png";
+        f = new File(ruta);
+        if(f.exists() && !f.isDirectory()){
+            Image img = new Image(ruta);
+            imageEsquema.setImage(img);
+        }
+    }
     public void btnFaseAnteriorAction(ActionEvent event) {
         try {
             root = FXMLLoader.load(getClass().getResource("fasePim.fxml"));
@@ -241,6 +246,9 @@ public class PsmController implements Initializable {
                 String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/esquemaOnt.png";
                 Image img = new Image(ruta);
 
+                //Carga en la bbdd
+                DatabaseH2.insertPsmEsquemaOntologico(ruta, idProyecto);
+
                 imageEsquema.setImage(img);
             } else {
                 //Mostrar alerta tipo
@@ -256,30 +264,32 @@ public class PsmController implements Initializable {
 
     //Init listview
     private void cargarClases() {
-        //Las clases se obtienen a partir de los nombres de archivos
+        //Cada clase es un archivo indicado
+        List<Pair<String, String>> clases = DatabaseH2.getPsmArchivos(idProyecto); //Pair(nombre, ruta)
 
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
-        File ficheroDestino = new File( ruta);
-
-        //Filtro para no obtener los archivos de configuracion
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File f, String name)
-            {
-                return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
-            }
-
-        };
-
-        File[] ficheros = ficheroDestino.listFiles(filter);
-        ArrayList<String> nombres = new ArrayList<>();
-
-        if(ficheros != null) {
-            for (File f : ficheros) {
-                nombres.add(f.getName());
-            }
-        }
-        ObservableList oll = FXCollections.observableArrayList(nombres);
-        listviewClases.setItems(oll);
+        //
+        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
+        //File ficheroDestino = new File( ruta);
+//
+        ////Filtro para no obtener los archivos de configuracion
+        //FilenameFilter filter = new FilenameFilter() {
+        //    public boolean accept(File f, String name)
+        //    {
+        //        return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
+        //    }
+//
+        //};
+//
+        //File[] ficheros = ficheroDestino.listFiles(filter);
+        //ArrayList<String> nombres = new ArrayList<>();
+//
+        //if(ficheros != null) {
+        //    for (File f : ficheros) {
+        //        nombres.add(f.getName());
+        //    }
+        //}
+        //ObservableList oll = FXCollections.observableArrayList(nombres);
+        //listviewClases.setItems(oll);
     }
 
     //Al escoger una clase, listar sus campos

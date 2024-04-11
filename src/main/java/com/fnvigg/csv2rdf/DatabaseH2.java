@@ -1,4 +1,6 @@
 package com.fnvigg.csv2rdf;
+import javafx.util.Pair;
+
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
@@ -524,5 +526,77 @@ public class DatabaseH2 {
             e.printStackTrace();
         }
         return false;
+    }
+
+    //PIM
+    public static boolean insertPimMDO(String ruta, String idProyecto) {
+        String sql = "UPDATE Proyecto SET rutaModeloDominioObjetivo = '"+ruta+"' WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean updateProyectosFase(String pim, String idProyecto) {
+        String sql = "UPDATE Proyecto SET fase = '"+pim+"' WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean insertPsmEsquemaOntologico(String ruta, String idProyecto) {
+        String sql = "UPDATE Proyecto SET rutaEsquemaOntologico = '"+ruta+"' WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static List<Pair<String, String>> getPsmArchivos(String idProyecto) {
+        List<Pair<String, String>> archivos = new LinkedList<>();
+        String sql = "SELECT rutaArchivo, nombreArchivo FROM Archivo WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+
+                    Pair<String, String> par = new Pair<>(resultSet.getString("nombreArchivo"),resultSet.getString("rutaArchivo"));
+                    archivos.add(par);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return archivos;
     }
 }

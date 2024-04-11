@@ -49,9 +49,10 @@ public class DslController implements Initializable {
     private Stage stage;
     private Scene scene;
     private Parent root;
-
+    private String idProyecto;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idProyecto = AtributosSesion.getIdProyecto();
         this.accordion.setExpandedPane(accordion.getPanes().get(0));
         this.nombreProyecto = AtributosSesion.getNombreProyecto();
         this.keyFlds = new HashMap<>();
@@ -80,8 +81,7 @@ public class DslController implements Initializable {
         cargarChoicebox();
 
         //Actualizar la fase en el setting
-        proyectos.setFase(nombreProyecto, "PSM");
-
+        DatabaseH2.updateProyectosFase("PSM", idProyecto);
     }
 
 

@@ -32,23 +32,23 @@ public class PimController implements Initializable {
     private Scene scene;
     private Parent root;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
-    private String nombreProyecto;
+    private String idProyecto;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        nombreProyecto = AtributosSesion.getNombreProyecto();
+        idProyecto = AtributosSesion.getIdProyecto();
         accordion.setExpandedPane(accordion.getPanes().get(0));
 
-        //Hay que escribir en el archivo de config la fase en la que estamos
-        String faseUltima = proyectos.obtenerFase(nombreProyecto);
-        if(!faseUltima.equals("PSM") && !faseUltima.equals("DSL")){
-            proyectos.setFase(nombreProyecto, "PIM");
+        //Update de la BBDD con la fase en la que estamos
+        String fase = DatabaseH2.getProyectosFase(idProyecto);
+        if(!fase.equals("PSM") && !fase.equals("DSL")){
+            DatabaseH2.updateProyectosFase("PIM", idProyecto);
         }
 
         //Deshabilitar el boton hasta que el usuario suba el MDO
         btnSiguienteFase.setDisable(true);
 
         //Cargar el MDO si lo hubiera
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/MDO.png";
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
         File f = new File(ruta);
         if(f.exists() && !f.isDirectory()){
             Image img = new Image(ruta);
@@ -146,10 +146,12 @@ public class PimController implements Initializable {
 
         if(ficheroSeleccionado != null) {
             if (ficheroSeleccionado.getName().endsWith(".png")) {
-                proyectos.guardarMDO(ficheroSeleccionado, nombreProyecto);
+                proyectos.guardarMDO(ficheroSeleccionado, idProyecto);
 
-                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/MDO.png";
+                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
                 Image img = new Image(ruta);
+
+                DatabaseH2.insertPimMDO(ruta, idProyecto);
 
                 imageMDO.setImage(img);
                 btnSiguienteFase.setDisable(false);

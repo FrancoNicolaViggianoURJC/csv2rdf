@@ -103,7 +103,7 @@ public class Gestor_proyectos {
         }
         return fase;
     }
-
+    /*
     public void setFase(String nombreProyecto, String fase){
         String ruta = System.getProperty("user.dir");
         try {
@@ -144,10 +144,10 @@ public class Gestor_proyectos {
             e.printStackTrace();
         }
     }
-
-    public String[] obtenerPropiedades(String proyecto) {
+    */
+    public String[] obtenerPropiedades(String idProyecto) {
         try {
-            File fichero = new File("src/main/resources/Proyectos/" + proyecto + "/config.txt");
+            File fichero = new File("src/main/resources/Proyectos/" + idProyecto + "/config.txt");
             FileReader fr = new FileReader(fichero);
             BufferedReader br = new BufferedReader(fr);
             String linea = br.readLine();
@@ -259,10 +259,10 @@ public class Gestor_proyectos {
             throw new RuntimeException(e);
         }
     }
-    public void addRequerimiento(String requerimiento, String proyecto) throws IOException {
+    public void addRequerimiento(String requerimiento, String idProyecto) throws IOException {
         //Obtener ruta
         String ruta = System.getProperty("user.dir");
-        File f = new File(ruta + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos.txt");
+        File f = new File(ruta + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos.txt");
         //Abrirlo en modo append
         FileWriter fw = new FileWriter(f, true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -272,10 +272,10 @@ public class Gestor_proyectos {
         fw.close();
     }
 
-    public void borrarRequerimiento(int indice, String proyecto) throws IOException {
+    public void borrarRequerimiento(int indice, String idProyecto) throws IOException {
         //Comprobar si existe el archivo
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos.txt";
-        String rutaAux = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos_a.txt";
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos.txt";
+        String rutaAux = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos_a.txt";
         File f = new File(ruta);
         File f_aux = new File(rutaAux);
         //Comprobar si existe
@@ -313,8 +313,8 @@ public class Gestor_proyectos {
         }
     }
 
-    public ArrayList obtenerRequerimientos(String proyecto) throws IOException {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + proyecto + "/requerimientos.txt";
+    public ArrayList obtenerRequerimientos(String idProyecto) throws IOException {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos.txt";
         File f = new File(ruta);
         ArrayList<String> lista = new ArrayList<>();
         //Comprobar si existe
@@ -334,8 +334,8 @@ public class Gestor_proyectos {
         return lista;
     }
 
-    public void guardarMDO(File ficheroSeleccionado, String nombreProyecto) {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/MDO.png";
+    public void guardarMDO(File ficheroSeleccionado, String idProyecto) {
+        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
         File ficheroDestino = new File(ruta);
 
         //Crear las copias de archivos para no trabajar sobre los originales
