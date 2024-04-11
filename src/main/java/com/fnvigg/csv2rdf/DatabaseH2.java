@@ -475,4 +475,54 @@ public class DatabaseH2 {
         //return false;
         return false;
     }
+
+    public static boolean deleteCimArchivo_and_Atributos(String idArchivo) {
+        Boolean checkAtributos = false;
+        Boolean checkArchivo = false;
+        String sql = "DELETE FROM Atributo WHERE idArchivo = '"+idArchivo+"';";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasEliminadas = statement.executeUpdate();
+            if(filasEliminadas>0)
+                checkAtributos = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String sql0 = "DELETE FROM Archivo WHERE idArchivo = '"+idArchivo+"';";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql0)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasEliminadas = statement.executeUpdate();
+            if(filasEliminadas>0)
+                checkArchivo = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return (checkAtributos && checkArchivo);
+    }
+
+    public static boolean insertCimEsquemaGrafico(String ruta, String idProyecto) {
+        String sql = "UPDATE Proyecto SET rutaEsquemaGrafico = '"+ruta+"' WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

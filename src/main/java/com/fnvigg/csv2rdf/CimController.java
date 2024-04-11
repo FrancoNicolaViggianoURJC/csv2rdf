@@ -24,12 +24,10 @@ import java.util.*;
 
 public class CimController implements Initializable {
 
-    public TitledPane titledPanel;
     public Accordion accordion;
     public Button btnIndicarArchivos;
     public ListView listViewCampos;
     public ListView listViewArchivos;
-    public Button btnRestablecerCampo;
     public Button btnQuitarCampo;
     public TitledPane panel1;
     public Button btnQuitarArchivo;
@@ -46,41 +44,36 @@ public class CimController implements Initializable {
     private Parent root;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private String idProyecto;
+    private String nombreProyecto;
     private String idArchivoSeleccionado;
     @Override
     public void initialize(URL location, ResourceBundle resources){
         accordion.setExpandedPane(panel1);
 
         idProyecto = AtributosSesion.getIdProyecto();
+        nombreProyecto = AtributosSesion.getNombreProyecto();
         //--------------- Panel 1 --------------------------------
 
-        //Actualizacion listview
         actualizarListview();
 
-
-
         //--------------- Panel 2 --------------------------------
-        //Obtenemos el nombre de proyecto
-        String proyecto = AtributosSesion.getNombreProyecto();
+
         //Creamos el fichero de destino
-        String ruta = System.getProperty("user.dir");
-        File f = new File(ruta + "src/main/resources/Proyectos/" + proyecto + "/esquema.png");
+        File f = new File(System.getProperty("user.dir") + "src/main/resources/Proyectos/" + idProyecto + "/esquema.png");
         if(f.exists() && !f.isDirectory()) {
-            // do something
             Image img = new Image(f.getAbsolutePath());
             imageEsquema.setImage(img);
         }
 
         //--------------- Panel 3 --------------------------------
-        ArrayList lista = new ArrayList<>();
+        ArrayList lista;
         try {
-            lista = proyectos.obtenerRequerimientos(proyecto);
+            lista = proyectos.obtenerRequerimientos(nombreProyecto);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         ObservableList listaRequerimientos = FXCollections.observableArrayList(lista);
         listviewRequerimientos.setItems(listaRequerimientos);
-        //Deshabilitar la opcion de pasar a la siguiente fase hasta que se seleccione un archivo
 
     }
 
@@ -169,11 +162,7 @@ public class CimController implements Initializable {
         ObservableList oll = FXCollections.observableArrayList(listaFicheros);
         listViewArchivos.setItems(oll);
 
-        if(oll.isEmpty()) {
-            btnSiguienteFase.setDisable(true);
-        }else{
-            btnSiguienteFase.setDisable(false);
-        }
+        btnSiguienteFase.setDisable(oll.isEmpty());
     }
 
     public void btnIndicarArchivosAction(ActionEvent event) {
@@ -231,37 +220,19 @@ public class CimController implements Initializable {
 
     //Eliminar un archivo del proyecto
     public void btnQuitarArchivoAction(ActionEvent event) {
-        //todo: obtener el nombre del archivo, su id, borrar tanto el archivo en disco como sus entrada en la bbdd, sus atributos tmb
-        //Obtención del nombre del archivo
-        int indice = listViewArchivos.getSelectionModel().getSelectedIndex();
-        String path = archivosIndicados.get(indice);
-        File archivo = new File(path);
-        //Pedir confirmacion al usuario
-        boolean accion = mostrarConfirmacion(event);
-        if(accion){
-            boolean resultado = archivo.delete();
-            if(resultado){
-                //Si se ha eliminado correctamente
-                //System.out.println("Archivo eliminado");
-                //Actualización indices donde se ubican los paths y los nombres
-                archivosIndicados.remove(indice);
-                nombresArchivos.remove(indice);
+        //Obtención de atributos del archivo
+        String nombreArchivo = (String) listViewArchivos.getSelectionModel().getSelectedItem();
+        String rutaArchivo = DatabaseH2.getCimRutaIndividual(nombreArchivo);
+        String idArchivo = DatabaseH2.getCimIdArchivo(rutaArchivo);
 
-                //Actualizacion lista de archivos
-                ObservableList<String> listaObservable = FXCollections.observableArrayList();
-                listaObservable.addAll(nombresArchivos);
-                listViewArchivos.setItems(listaObservable);
-
-                //Actualizacion indice campos
-                listViewCampos.setItems(FXCollections.observableArrayList());
-            }else{
-                //En caso de no poder borrar el archivo
-                System.out.println("Error al eliminar el archivo");
-            }
-        }
-        //Deshabilitar la siguiente fase si no quedan archivos indicados
-        if(archivosIndicados.isEmpty()){
-            btnSiguienteFase.setDisable(true);
+        File archivo = new File(rutaArchivo);
+        if(archivo.delete()){
+            DatabaseH2.deleteCimArchivo_and_Atributos(idArchivo);
+            actualizarListview();
+            listViewCampos.setItems(FXCollections.observableArrayList());
+        }else{
+            //En caso de no poder borrar el archivo
+            System.out.println("Error al eliminar el archivo");
         }
     }//Fin método
 
@@ -316,6 +287,8 @@ public class CimController implements Initializable {
             Image img = new Image(ficheroDestino.getAbsolutePath());
             imageEsquema.setImage(img);
 
+            //Guardar la ruta en la bbdd
+            DatabaseH2.insertCimEsquemaGrafico(ruta, idProyecto);
         }
     }
 
