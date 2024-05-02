@@ -6,7 +6,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 public class DatabaseH2 {
 
     private static String urlBBDD;
@@ -118,7 +117,7 @@ public class DatabaseH2 {
                     + "idArchivo INT NOT NULL,"
                     + "idProyecto INT NOT NULL,"
                     + "idAtributo INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "nombre VARCHAR(255),"
+                    + "nombre VARCHAR(255) NOT NULL,"
                     + "valor VARCHAR(255))";
             statement.executeUpdate(createTableSQL);
 
@@ -579,7 +578,7 @@ public class DatabaseH2 {
 
     public static List<Pair<String, String>> getPsmArchivos(String idProyecto) {
         List<Pair<String, String>> archivos = new LinkedList<>();
-        String sql = "SELECT rutaArchivo, nombreArchivo FROM Archivo WHERE idProyecto = '"+idProyecto+"'";
+        String sql = "SELECT idArchivo, nombreArchivo FROM Archivo WHERE idProyecto = '"+idProyecto+"'";
 
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -589,7 +588,7 @@ public class DatabaseH2 {
                 while (resultSet.next()) {
                     // Leer los valores de la fila necesarios
 
-                    Pair<String, String> par = new Pair<>(resultSet.getString("nombreArchivo"),resultSet.getString("rutaArchivo"));
+                    Pair<String, String> par = new Pair<>(resultSet.getString("idArchivo"),resultSet.getString("nombreArchivo"));
                     archivos.add(par);
                 }
             }
@@ -598,5 +597,140 @@ public class DatabaseH2 {
             e.printStackTrace();
         }
         return archivos;
+    }
+
+    public static LinkedList<String> getPSMAtributos(String idArchivo) {
+        LinkedList<String> atributos = new LinkedList<>();
+        String sql = "SELECT nombre, valor FROM Atributo WHERE idArchivo = '"+idArchivo+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+
+                    String nombre = resultSet.getString("nombre");
+                    String valor = resultSet.getString("valor");
+                    if(valor != null){
+                        atributos.add(nombre+ " ; " + valor);
+                    }else{
+                        atributos.add(nombre);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return atributos;
+    }
+
+    public static boolean updateAtributo(String atributo, String tipo, String idArchivo) {
+        String sql = "UPDATE Atributo SET valor = '"+tipo+"' WHERE nombre = '"+atributo+"' AND idArchivo = '"+idArchivo+"';";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean updateMetadatos(String publisher, String descripcion, String description, String idProyecto) {
+        String sql = "UPDATE Proyecto SET publisher = '"+publisher+"', descripcionES = '"+descripcion+"', descripcionEN = '"+description+"'" +
+                " WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static List<String> getMetadatos(String idProyecto) {
+        LinkedList<String> metadatos = new LinkedList<>();
+        String sql = "SELECT publisher, descripcionES, descripcionEN FROM Proyecto WHERE idProyecto = '"+idProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+
+                    String publisher = resultSet.getString("publisher");
+                    String descripcionES = resultSet.getString("descripcionES");
+                    String descripcionEN = resultSet.getString("descripcionEN");
+                    if(publisher != null && descripcionES != null && descripcionEN != null){
+                        metadatos.add(publisher);
+                        metadatos.add(descripcionES);
+                        metadatos.add(descripcionEN);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return metadatos;
+    }
+
+    public static String getIdArchivo_nombre(String archivo) {
+        String idArchivo = "";
+        String sql = "SELECT idArchivo FROM Archivo WHERE nombreArchivo = '"+archivo+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    idArchivo = resultSet.getString("idArchivo");
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idArchivo;
+    }
+
+    public static List<String> getRoles(String nombreProyecto) {
+        List<String> roles = new LinkedList<>();
+        String sql = "SELECT ingenieroDatos, ingenieroOntologico FROM Proyecto WHERE nombreProyecto = '"+nombreProyecto+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                   String ingDatos = resultSet.getString("ingenieroDatos");
+                   String ingOnt = resultSet.getString("ingenieroOntologico");
+                   roles.add(ingDatos);
+                   roles.add(ingOnt);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roles;
     }
 }

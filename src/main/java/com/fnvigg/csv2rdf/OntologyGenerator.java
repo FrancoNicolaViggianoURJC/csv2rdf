@@ -27,8 +27,10 @@ public class OntologyGenerator {
     /*------------------------------------------------------------
                                 Metodos
      ------------------------------------------------------------*/
-    public OntologyGenerator(String nombreProyecto, String publisher, String descripcion, String description) throws IOException {
-        this.nombreProyecto = nombreProyecto;
+    public OntologyGenerator(String publisher, String descripcion, String description) throws IOException {
+        //Genera un archivo ontology.txt a partir de los datos introducidos en el proyecto.
+
+        this.nombreProyecto = AtributosSesion.getNombreProyecto();
         this.publisher = publisher;
         this.descripcion = descripcion;
         this.description = description;
@@ -80,10 +82,9 @@ public class OntologyGenerator {
 
         String definedBy = "http://www.example.com/"+nombreProyecto+"/ontology.rdf";
         String preferredNamespace = "http://www.example.com/"+nombreProyecto+"";
-        String[] ingenieros = proyectos.obtenerPropiedades(idProyecto);
-        ingDatos = ingenieros[0];
-        ingOntologico = ingenieros[1];
-        userSesion = AtributosSesion.getUser();
+        List<String> roles = DatabaseH2.getRoles(nombreProyecto);
+        ingDatos = roles.get(0);
+        ingOntologico = roles.get(1);
 
         //Cabecera rdf
         String namespaces = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +

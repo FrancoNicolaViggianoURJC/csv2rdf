@@ -63,6 +63,8 @@
                         <Label layoutX="497.0" layoutY="131.0" text="Añadir atributo" />
                         <Label layoutX="102.0" layoutY="69.0" text="Clases UML" />
                         <Label layoutX="338.0" layoutY="69.0" text="Atributos UML" />
+                        <Button layoutX="493.0" layoutY="274.0" mnemonicParsing="false" onAction="#añadirColeccion" prefHeight="25.0" prefWidth="88.0" text="Colección" />
+                        <Button layoutX="493.0" layoutY="311.0" mnemonicParsing="false" onAction="#añadirColeccionOrd" prefHeight="25.0" prefWidth="88.0" text="Bag" />
                      </children></AnchorPane>
               </content>
             </TitledPane>

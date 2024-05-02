@@ -11,6 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -261,35 +262,30 @@ public class PsmController implements Initializable {
     ||                      Pestaña introducir datos                              ||
     ||                                                                            ||
      ----------------------------------------------------------------------------*/
+    //private List<String> nombres = new LinkedList<>();
+    private LinkedHashMap<String, List<String>> atributos = new LinkedHashMap<>(); //Nombre , lista atributos
+    int contador = 0;
+    int numAtributos = 0;
+
+    private List<String> nombres = new LinkedList<>();
+    //private List<List<String>> atributos = new LinkedList<>();
 
     //Init listview
     private void cargarClases() {
         //Cada clase es un archivo indicado
-        List<Pair<String, String>> clases = DatabaseH2.getPsmArchivos(idProyecto); //Pair(nombre, ruta)
+        List<Pair<String, String>> clases = DatabaseH2.getPsmArchivos(idProyecto); //Pair(idArchivo, nombreArchivo)
 
-        //
-        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
-        //File ficheroDestino = new File( ruta);
-//
-        ////Filtro para no obtener los archivos de configuracion
-        //FilenameFilter filter = new FilenameFilter() {
-        //    public boolean accept(File f, String name)
-        //    {
-        //        return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
-        //    }
-//
-        //};
-//
-        //File[] ficheros = ficheroDestino.listFiles(filter);
-        //ArrayList<String> nombres = new ArrayList<>();
-//
-        //if(ficheros != null) {
-        //    for (File f : ficheros) {
-        //        nombres.add(f.getName());
-        //    }
-        //}
-        //ObservableList oll = FXCollections.observableArrayList(nombres);
-        //listviewClases.setItems(oll);
+        for(Pair<String, String> p : clases){
+            nombres.add(p.getValue());
+            LinkedList<String> atributosAux = DatabaseH2.getPSMAtributos(p.getKey());
+            atributos.put(p.getValue(), atributosAux);
+
+            contador += atributosAux.size();    //Numero total de atributos
+        }
+
+        ObservableList oll = FXCollections.observableArrayList(nombres);
+        listviewClases.setItems(oll);
+
     }
 
     //Al escoger una clase, listar sus campos
@@ -302,50 +298,53 @@ public class PsmController implements Initializable {
     }
 
     private void actualizarListViewAtributos() throws IOException {
-        int index = listviewClases.getSelectionModel().getSelectedIndex();
-        if(index != -1){
-            String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
-            if(!clase.isBlank()){
-                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
-                //Campos del archivo csv (atributos)
-                ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
-
-                //Acceso al archivo de atributos correspondiente
-                String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv",".txt");
-                File atributosFile = new File(rutaAtr);
-                if(atributosFile.exists() && !atributosFile.isDirectory()) {
-                    FileReader fr = new FileReader(atributosFile);
-                    BufferedReader br = new BufferedReader(fr);
-
-                    //Lectura archivo atributos
-                    String linea = br.readLine();
-                    String[] tokens = {};
-                    if (linea != null) {
-                        //formato: nombreAtr;tipoAtr,nombreAtr;tipoAtr,...
-                        tokens = linea.split(",");
-                    }
-                    List<String> tipos = Arrays.asList(tokens);
-
-                    //Si hay un tipo distinto de "_" guardado en la posicion, indica que el atributo tiene un tipo
-                    for (int i = 0; i < campos.size(); i++) {
-                        String tipo = tipos.get(i);
-                        if (!tipo.equals("_")) {
-                            String nombre = campos.get(i);
-                            campos.set(i, nombre + ";" + tipo);
-                        }
-                    }
-                    fr.close();
-                    br.close();
-                }
-                ObservableList oll = FXCollections.observableArrayList(campos);
-                listviewAtributos.setItems(oll);
-            }
-        }
+        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+        //int index = listviewClases.getSelectionModel().getSelectedIndex();
+        //if(index != -1){
+        List atributo = atributos.get(clase);
+        ObservableList oll = FXCollections.observableArrayList(atributo);
+        listviewAtributos.setItems(oll);
+            //String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
+            //if(!clase.isBlank()){
+            //    String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
+            //    //Campos del archivo csv (atributos)
+            //    ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
+//
+            //    //Acceso al archivo de atributos correspondiente
+            //    String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv",".txt");
+            //    File atributosFile = new File(rutaAtr);
+            //    if(atributosFile.exists() && !atributosFile.isDirectory()) {
+            //        FileReader fr = new FileReader(atributosFile);
+            //        BufferedReader br = new BufferedReader(fr);
+//
+            //        //Lectura archivo atributos
+            //        String linea = br.readLine();
+            //        String[] tokens = {};
+            //        if (linea != null) {
+            //            //formato: nombreAtr;tipoAtr,nombreAtr;tipoAtr,...
+            //            tokens = linea.split(",");
+            //        }
+            //        List<String> tipos = Arrays.asList(tokens);
+//
+            //        //Si hay un tipo distinto de "_" guardado en la posicion, indica que el atributo tiene un tipo
+            //        for (int i = 0; i < campos.size(); i++) {
+            //            String tipo = tipos.get(i);
+            //            if (!tipo.equals("_")) {
+            //                String nombre = campos.get(i);
+            //                campos.set(i, nombre + ";" + tipo);
+            //            }
+            //        }
+            //        fr.close();
+            //        br.close();
+            //    }
+            //    ObservableList oll = FXCollections.observableArrayList(campos);
+            //    listviewAtributos.setItems(oll);
+            //}
+        //}
 
     }
     public void añadirTipoBasico(ActionEvent event) {
-        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
-        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
 
         //Obtencion tipo via dialog
         String tipo = mostrarInputBasico();
@@ -353,13 +352,23 @@ public class PsmController implements Initializable {
         if(tipo.isEmpty()){
             mostrarAlertaSeleccion(event);
         }else {
-            actualizarArchivoAtributos(clase, index, tipo);
+            //actualizarArchivoAtributos(clase, index, tipo);
+            String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
+            String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
+            DatabaseH2.updateAtributo(atributo, tipo, idArchivo);
+            List<String> lista = listviewAtributos.getItems();
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo + " ; " + tipo);
+            ObservableList oll = FXCollections.observableArrayList(lista);
+            listviewAtributos.setItems(oll);
+
+            numAtributos += 1;
         }
     }
 
     public void añadirTipoClase(ActionEvent event) {
-        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
-        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        //int index = listviewAtributos.getSelectionModel().getSelectedIndex();
 
         //Obtencion tipo via dialog
         String tipo = mostrarInputClase();
@@ -367,31 +376,65 @@ public class PsmController implements Initializable {
         if(tipo.isEmpty()){
             mostrarAlertaSeleccion(event);
         }else {
-            actualizarArchivoAtributos(clase, index, tipo);
+            //actualizarArchivoAtributos(clase, index, tipo);
+            String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
+            String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
+            DatabaseH2.updateAtributo(atributo, tipo, idArchivo);
+
+            List<String> lista = listviewAtributos.getItems();
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo + " ; " + tipo);
+            ObservableList oll = FXCollections.observableArrayList(lista);
+            listviewAtributos.setItems(oll);
+            numAtributos += 1;
         }
 
     }
 
     public void añadirEnumerado(ActionEvent event){
-        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        //int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
+        String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
+        DatabaseH2.updateAtributo(atributo, "alt",idArchivo);
+        List<String> lista = listviewAtributos.getItems();
         int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-        actualizarArchivoAtributos(clase, index, "alt");
+        lista.set(index, atributo + " ; alt");
+        ObservableList oll = FXCollections.observableArrayList(lista);
+        listviewAtributos.setItems(oll);
+        numAtributos += 1;
     }
 
-    /*
+
     public void añadirColeccion(ActionEvent event) {
-        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        //int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+        //actualizarArchivoAtributos(clase, index, "bag");
+        String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
+        String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
+        DatabaseH2.updateAtributo(atributo, "bag", idArchivo);
+        List<String> lista = listviewAtributos.getItems();
         int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-        actualizarArchivoAtributos(clase, index, "bag");
+        lista.set(index, atributo + " ; bag");
+        ObservableList oll = FXCollections.observableArrayList(lista);
+        listviewAtributos.setItems(oll);
+        numAtributos += 1;
     }
 
     public void añadirColeccionOrd(ActionEvent event) {
-        String clase = (String) listviewClases.getSelectionModel().getSelectedItem();
+        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
+        String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
+        DatabaseH2.updateAtributo(atributo, "seq", idArchivo);
+        List<String> lista = listviewAtributos.getItems();
         int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-        actualizarArchivoAtributos(clase, index, "seq");
+        lista.set(index, atributo + " ; seq");
+        ObservableList oll = FXCollections.observableArrayList(lista);
+        listviewAtributos.setItems(oll);
+        numAtributos += 1;
     }
 
-     */
+
     private void actualizarArchivoAtributos(String clase, int index, String tipo) {
         String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv", ".txt");
         File atributos = new File(rutaAtr);
@@ -470,6 +513,12 @@ public class PsmController implements Initializable {
     }
 
     private boolean comprobarAtributos() throws IOException {
+        if(numAtributos>= contador){
+            return true;
+        }else {
+            return false;
+        }
+        /*
         //Iterar sobre los archivos de atributos y buscar "_", si hay alguno, devolver false
         String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
         File ficheroDestino = new File( ruta);
@@ -506,86 +555,87 @@ public class PsmController implements Initializable {
         }
         //Si llega aqui, es porque todos los atributos estan configurados
         return true;
+         */
     }
 
     private void limpiarArchivosUML() {
-        String clasesUML = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
-        String atributosUML = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
-
-        File clases = new File(clasesUML);
-        if(clases.exists() && !clases.isDirectory()){
-            clases.delete();
-        }
-        File atts = new File(atributosUML);
-        if(atts.exists() && !atts.isDirectory()){
-            atts.delete();
-        }
+        //String clasesUML = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        //String atributosUML = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+//
+        //File clases = new File(clasesUML);
+        //if(clases.exists() && !clases.isDirectory()){
+        //    clases.delete();
+        //}
+        //File atts = new File(atributosUML);
+        //if(atts.exists() && !atts.isDirectory()){
+        //    atts.delete();
+        //}
     }
 
     private void crearClasesUml() throws IOException {
-        List<String> ll = listviewClases.getItems();
-        //LinkedList<String> ll = (LinkedList) listviewClases.getItems();
-
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
-        File clasesUML = new File(ruta);
-        //Borrado si existe el archivo
-        if(clasesUML.exists() && !clasesUML.isDirectory()){
-            clasesUML.delete();
-        }
-
-        FileWriter fw = new FileWriter(clasesUML, true);
-        BufferedWriter bw = new BufferedWriter(fw);
-
-        for(String clase : ll){
-            String format = clase.replace(".csv","");
-            bw.write(format+",");
-        }
-        bw.close();
-        fw.close();
+        //List<String> ll = listviewClases.getItems();
+        ////LinkedList<String> ll = (LinkedList) listviewClases.getItems();
+//
+        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        //File clasesUML = new File(ruta);
+        ////Borrado si existe el archivo
+        //if(clasesUML.exists() && !clasesUML.isDirectory()){
+        //    clasesUML.delete();
+        //}
+//
+        //FileWriter fw = new FileWriter(clasesUML, true);
+        //BufferedWriter bw = new BufferedWriter(fw);
+//
+        //for(String clase : ll){
+        //    String format = clase.replace(".csv","");
+        //    bw.write(format+",");
+        //}
+        //bw.close();
+        //fw.close();
     }
 
     private void crearAtributosUML() throws IOException {
-        List<String> clases = listviewClases.getItems();
-
-        for(String clase : clases){
-
-            String claseFormateada = clase.replace(".csv", ".txt");
-            String claseAux = clase.replace(".csv", "");
-
-            String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + claseFormateada;
-            File atributos = new File(rutaAtr);
-            if(atributos.exists()){
-                //Crear un string: nombreAtr;tipoAtr;clase
-                FileReader fr = new FileReader(rutaAtr);
-                BufferedReader br = new BufferedReader(fr);
-                String linea = br.readLine();
-
-                //Obtencion tipos de cada atributo
-                if(linea != null){
-                    String[] tokens = linea.split(",");
-                    br.close();
-                    fr.close();
-
-                    String rutaOutput = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
-                    File atributosUML = new File(rutaOutput);
-                    FileWriter fw = new FileWriter(atributosUML, true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-
-                    //Obtencion campos de esa clase
-                    String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
-                    ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
-
-                    int ind = 0;
-                    for(String campo : campos){
-                        bw.write( campo+";"+tokens[ind]+";"+claseAux+",");
-                        ind += 1;
-                    }
-                    bw.close();
-                    fw.close();
-                }
-
-            }
-        }
+        //List<String> clases = listviewClases.getItems();
+//
+        //for(String clase : clases){
+//
+        //    String claseFormateada = clase.replace(".csv", ".txt");
+        //    String claseAux = clase.replace(".csv", "");
+//
+        //    String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + claseFormateada;
+        //    File atributos = new File(rutaAtr);
+        //    if(atributos.exists()){
+        //        //Crear un string: nombreAtr;tipoAtr;clase
+        //        FileReader fr = new FileReader(rutaAtr);
+        //        BufferedReader br = new BufferedReader(fr);
+        //        String linea = br.readLine();
+//
+        //        //Obtencion tipos de cada atributo
+        //        if(linea != null){
+        //            String[] tokens = linea.split(",");
+        //            br.close();
+        //            fr.close();
+//
+        //            String rutaOutput = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+        //            File atributosUML = new File(rutaOutput);
+        //            FileWriter fw = new FileWriter(atributosUML, true);
+        //            BufferedWriter bw = new BufferedWriter(fw);
+//
+        //            //Obtencion campos de esa clase
+        //            String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
+        //            ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
+//
+        //            int ind = 0;
+        //            for(String campo : campos){
+        //                bw.write( campo+";"+tokens[ind]+";"+claseAux+",");
+        //                ind += 1;
+        //            }
+        //            bw.close();
+        //            fw.close();
+        //        }
+//
+        //    }
+        //}
     }
     public void transicionarPantalla(ActionEvent event) {
         try {
@@ -609,13 +659,12 @@ public class PsmController implements Initializable {
             //Transformar las estructuras de datos para que las acepte el generador de ontologias
             if(comprobarAtributos()) {
                 guardarMetadatos();
-                limpiarArchivosUML();
-                crearClasesUml();
-                crearAtributosUML();
-                OntologyGenerator og = new OntologyGenerator(nombreProyecto, publisher, descripcion, description);
+                //limpiarArchivosUML();
+                //crearClasesUml();
+                //crearAtributosUML();
+                OntologyGenerator og = new OntologyGenerator(publisher, descripcion, description);
                 //transicionar pantalla
                 transicionarPantalla(event);
-
             }else{
                 //Mostrar alerta falta completar atributos
                 mostrarAlertaOntologia(event);
@@ -630,36 +679,46 @@ public class PsmController implements Initializable {
         this.publisher = publisherInput.getText();
         this.descripcion = descripcionSPInput.getText();
         this.description = descripcionENGInput.getText();
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/metadatos.txt";
-        File metadatos = new File(ruta);
-        FileWriter fw = new FileWriter(metadatos);
-        BufferedWriter bw = new BufferedWriter(fw);
-
-        bw.write(publisher + "," + descripcion + "," + description);
-
-        bw.close();
-        fw.close();
+        DatabaseH2.updateMetadatos(publisher, descripcion, description, idProyecto);
+        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/metadatos.txt";
+        //File metadatos = new File(ruta);
+        //FileWriter fw = new FileWriter(metadatos);
+        //BufferedWriter bw = new BufferedWriter(fw);
+//
+        //bw.write(publisher + "," + descripcion + "," + description);
+//
+        //bw.close();
+        //fw.close();
     }
 
     private void cargarMetadatos() throws IOException {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/metadatos.txt";
-        File metadatos = new File(ruta);
-        if(metadatos.exists() && !metadatos.isDirectory()) {
-            FileReader fr = new FileReader(metadatos);
-            BufferedReader br = new BufferedReader(fr);
-
-            String linea = br.readLine();
-            if(linea != null) {
-                String[] tokens = linea.split(",");
-                //Comprobamos que los metadatos han sido introducidos
-                if (tokens.length > 0) {
-                    publisherInput.setText(tokens[0]);
-                    descripcionSPInput.setText(tokens[1]);
-                    descripcionENGInput.setText(tokens[2]);
-                }
-            }
-            br.close();
-            fr.close();
+        List<String> metadatos = DatabaseH2.getMetadatos(idProyecto);
+        if(metadatos.size() > 0){
+            String publisher = metadatos.get(0);
+            String descripcionES = metadatos.get(1);
+            String descripcionEN = metadatos.get(2);
+            publisherInput.setText(publisher);
+            descripcionSPInput.setText(descripcionES);
+            descripcionENGInput.setText(descripcionEN);
         }
+        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/metadatos.txt";
+        //File metadatos = new File(ruta);
+        //if(metadatos.exists() && !metadatos.isDirectory()) {
+        //    FileReader fr = new FileReader(metadatos);
+        //    BufferedReader br = new BufferedReader(fr);
+//
+        //    String linea = br.readLine();
+        //    if(linea != null) {
+        //        String[] tokens = linea.split(",");
+        //        //Comprobamos que los metadatos han sido introducidos
+        //        if (tokens.length > 0) {
+        //            publisherInput.setText(tokens[0]);
+        //            descripcionSPInput.setText(tokens[1]);
+        //            descripcionENGInput.setText(tokens[2]);
+        //        }
+        //    }
+        //    br.close();
+        //    fr.close();
+        //}
     }
 }
