@@ -733,4 +733,24 @@ public class DatabaseH2 {
         }
         return roles;
     }
+
+    public static LinkedList<Pair<String,String>> getOntAtributos(String idArchivo) {
+        LinkedList<Pair<String,String>> atributos = new LinkedList<>();
+        String sql = "SELECT nombre, valor FROM Atributo WHERE idArchivo = '"+idArchivo+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    atributos.add(new Pair(resultSet.getString("nombre"), resultSet.getString("valor")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return atributos;
+    }
 }

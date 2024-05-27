@@ -108,6 +108,7 @@ public class ProyectosController implements Initializable {
         String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
         String fase = DatabaseH2.getProyectosFase(nombreProyecto);
         AtributosSesion.setIdProyecto(DatabaseH2.getProyectosID(nombreProyecto));
+        AtributosSesion.setNombreProyecto(nombreProyecto);
         //Cargar la escena en funcion de la fase
         if(fase.equals("PIM")){
             cargarEscena("fasePim.fxml", event);
