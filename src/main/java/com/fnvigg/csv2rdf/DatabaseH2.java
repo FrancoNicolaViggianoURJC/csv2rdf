@@ -764,7 +764,8 @@ public class DatabaseH2 {
                 // Resultados
                 while (resultSet.next()) {
                     // Leer los valores de la fila necesarios
-                    return resultSet.getString("idAtributo");
+                    int id = resultSet.getInt("idAtributo");
+                    return Integer.toString(id);
                 }
             }
         } catch (SQLException e) {
@@ -775,7 +776,7 @@ public class DatabaseH2 {
     }
 
     public static boolean updateAtributoPrimario(String idAtributo, String idArchivo) {
-        String sql = "UPDATE Archivo SET atributoPrimario = '"+idAtributo+"' WHERE idArchivo = '"+idArchivo+"'";
+        String sql = "UPDATE Archivo SET idAtributoPrimario = '"+idAtributo+"' WHERE idArchivo = '"+idArchivo+"'";
 
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -827,5 +828,23 @@ public class DatabaseH2 {
         }
         //return false;
         return "";
+    }
+
+    public static void getAtributosTable() {
+        String sql = "SELECT * FROM Atributo ;";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    resultSet.getString("nombre");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
     }
 }

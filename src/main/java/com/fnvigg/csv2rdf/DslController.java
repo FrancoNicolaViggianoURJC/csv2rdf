@@ -53,6 +53,8 @@ public class DslController implements Initializable {
     private List<Pair<String,String>> clases;   // [IdArchivo, NombreArchivo]
     private List<Pair<String,List<Pair<String, String>>>> atributos = new LinkedList<>(); // [Clase, ListaAtributos[nombreAtributo, valorAtributo]]
     private Map<String, List<Pair<String, String>>> atributosPorClase = new HashMap<>();
+    private Map<String, String> atributosPrimariosPorClase = new HashMap<>();
+    private Map<String, String> enumeradosPorClase = new HashMap<>();
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         idProyecto = AtributosSesion.getIdProyecto();
@@ -76,11 +78,9 @@ public class DslController implements Initializable {
         //Init listview clases
         cargarClases();
 
-        //Init de los mapas
-        //int numeroClases = listviewClases.getItems().size();
-        //for(int i = 0; i < numeroClases; i++){
-        //    enumerados.add(new HashMap<String, String>());
-        //}
+        //TODO
+        //Init de los atributos primarios
+        //obtener todos los atributos primarios y meterlos en atributosPrimariosPorClase
 
         //Botones panel 1
         btnEnumerado.setDisable(true);
@@ -132,6 +132,11 @@ public class DslController implements Initializable {
             //Cargar solo los atributos relativos a esa clase
             //Diccionario clase -> listaAtributos
             actualizarListViewAtributos();
+            String clase = listviewClases.getSelectionModel().getSelectedItem()+".csv";
+            String pk = atributosPrimariosPorClase.get(clase);
+            if(pk!=null){
+                atributoPrimarioLabel.setText("Atributo Primario: "+pk);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -205,7 +210,7 @@ public class DslController implements Initializable {
         String[] tokens = atributo.split(":"); // atributo = nombreAtributo ; tipoAtributo
 
         //String nombreAtributo = tokens[0];
-        String tipoAtributo = tokens[1];
+        String tipoAtributo = tokens[1].replace(" ", "");
 
         if(tipoAtributo.equals("alt")){
             //Tipo atributo, disable keyAttribute
@@ -227,13 +232,15 @@ public class DslController implements Initializable {
         String[] tokens = atributo.split(":"); // atributo = nombreAtributo ; tipoAtributo
         String nombreAtributo = tokens[0];
 
-        String idAtributo = DatabaseH2.getIdAtributo(idArchivo, nombreAtributo);
+        String idAtributo = DatabaseH2.getIdAtributo(idArchivo, nombreAtributo.replace(" ", ""));
+        //DatabaseH2.getAtributosTable();
         if(! idAtributo.isBlank()){
             //Update tabla archivo
-            DatabaseH2.updateAtributoPrimario(idAtributo, idArchivo);
-        }
 
-        atributoPrimarioLabel.setText("Atributo Primario: "+nombreAtributo);
+            DatabaseH2.updateAtributoPrimario(idAtributo, idArchivo);
+            atributosPrimariosPorClase.put(clase, nombreAtributo);
+            atributoPrimarioLabel.setText("Atributo Primario: "+nombreAtributo);
+        }
         //Obtenemos valores de las clases para formar el par
         //String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
         //clase = clase.replaceAll(".csv", "");
@@ -249,40 +256,48 @@ public class DslController implements Initializable {
     }
 
     public void btnEnumeradoAction(ActionEvent event) {
-        int index = listviewClases.getSelectionModel().getSelectedIndex();
-        //Datos del atributo
+        //Guardar asociacion entre clase : nombreAtributo : valoresLiterales
         String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
+        String claseFormatted = clase.replace(".csv", "").replace(" ", "");
         String atributo = (String)listviewAtributos.getSelectionModel().getSelectedItem();
-        String[] tokens = atributo.split(";");
-        String nombreAtributo = tokens[0];
+        String[] tokens = atributo.split(":");
+        String nombreAtributo = tokens[0].replace(" ", "");
 
+        //int index = listviewClases.getSelectionModel().getSelectedIndex();
+        ////Datos del atributo
+        //String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
+        //String atributo = (String)listviewAtributos.getSelectionModel().getSelectedItem();
+        //String[] tokens = atributo.split(":");
+        //String nombreAtributo = tokens[0];
+//
         //Formatear el input del usuario
         Pair<String, String> resultado = preguntarEnum();
         String values = resultado.getKey();
         String literales = resultado.getValue();
         String format = "VALUES(" + values+"),ENUMS(" + literales+")))";
 
-        //Obtenemso el mapa asociado a esa clase
-        Map<String, String> mapa = this.enumerados.get(index);
-        mapa.put(nombreAtributo, format);
-
+        enumeradosPorClase.put(claseFormatted+nombreAtributo, format);
+        ////Obtenemso el mapa asociado a esa clase
+        //Map<String, String> mapa = this.enumerados.get(index);
+        //mapa.put(nombreAtributo, format);
+        //System.out.println("Mapa");
     }
     public void generarDSL(ActionEvent event) {
         //Comprobar que todos los keyfields fueron introducidos
-        if(keyFlds.size() == listviewClases.getItems().size()){
-
-            try {
-                //Añadir las rutas de los datos, si las hubiera, a clasesUML
-                añadirRutas();
-                List<String> clasesFormateadas = preprocesarDatos();
-                DslGenerator dslGen = new DslGenerator(clasesFormateadas);
-                //limpiarCarpeta();
-                ejecutarJar();
-                abrirDirectorio();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
+        if(atributosPrimariosPorClase.size() == listviewClases.getItems().size()){
+//
+            //try {
+            //    //Añadir las rutas de los datos, si las hubiera, a clasesUML
+            //    añadirRutas();
+            //    List<String> clasesFormateadas = preprocesarDatos();
+            //    DslGenerator dslGen = new DslGenerator(clasesFormateadas);
+            //    //limpiarCarpeta();
+            //    ejecutarJar();
+            //    abrirDirectorio();
+            //} catch (IOException e) {
+            //    throw new RuntimeException(e);
+            //}
+//
         }else{
             //mostrar alerta
             mostrarAlertaClave(event);
