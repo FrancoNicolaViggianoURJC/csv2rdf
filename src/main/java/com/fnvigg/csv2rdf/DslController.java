@@ -50,6 +50,9 @@ public class DslController implements Initializable {
     private Scene scene;
     private Parent root;
     private String idProyecto;
+    private List<Pair<String,String>> clases;   // [IdArchivo, NombreArchivo]
+    private List<Pair<String,List<Pair<String, String>>>> atributos = new LinkedList<>(); // [Clase, ListaAtributos[nombreAtributo, valorAtributo]]
+    private Map<String, List<Pair<String, String>>> atributosPorClase = new HashMap<>();
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         idProyecto = AtributosSesion.getIdProyecto();
@@ -64,21 +67,27 @@ public class DslController implements Initializable {
         choices.add("xsd:boolean");
         choices.add("xsd:decimal");
 
+        //Init Estructuras de datos
+        this.clases = AtributosSesion.getClasesStatic();
+        this.atributos = AtributosSesion.getAtributosStatic();
+        for(Pair<String,List<Pair<String, String>>> claseAtributo : atributos){
+            atributosPorClase.put(claseAtributo.getKey().replace(".csv", ""), claseAtributo.getValue());
+        }
         //Init listview clases
         cargarClases();
 
         //Init de los mapas
-        int numeroClases = listviewClases.getItems().size();
-        for(int i = 0; i < numeroClases; i++){
-            enumerados.add(new HashMap<String, String>());
-        }
+        //int numeroClases = listviewClases.getItems().size();
+        //for(int i = 0; i < numeroClases; i++){
+        //    enumerados.add(new HashMap<String, String>());
+        //}
 
         //Botones panel 1
         btnEnumerado.setDisable(true);
         btnAtributoPrimario.setDisable(true);
 
         //Panel 2
-        cargarChoicebox();
+        //cargarChoicebox();
 
         //Actualizar la fase en el setting
         DatabaseH2.updateProyectosFase("PSM", idProyecto);
@@ -90,34 +99,38 @@ public class DslController implements Initializable {
      */
     private void cargarClases() {
 
-        //Las clases se obtienen a partir de los nombres de archivos
-
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
-        File ficheroDestino = new File( ruta);
+        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        //File ficheroDestino = new File( ruta);
 
         //Filtro para no obtener los archivos de configuracion
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File f, String name)
-            {
-                return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
-            }
-
-        };
-
-        File[] ficheros = ficheroDestino.listFiles(filter);
-        ArrayList<String> nombres = new ArrayList<>();
-
-        if(ficheros != null) {
-            for (File f : ficheros) {
-                nombres.add(f.getName());
-            }
+        //FilenameFilter filter = new FilenameFilter() {
+        //    public boolean accept(File f, String name)
+        //    {
+        //        return (name.endsWith(".csv") && !name.startsWith("nonRelevant_"));
+        //    }
+//
+        //};
+//
+        //File[] ficheros = ficheroDestino.listFiles(filter);
+        //ArrayList<String> nombres = new ArrayList<>();
+//
+        //if(ficheros != null) {
+        //    for (File f : ficheros) {
+        //        nombres.add(f.getName());
+        //    }
+        //}
+        ArrayList<String> claseList = new ArrayList<>();
+        for(Pair<String,String> clase : clases){
+            claseList.add(clase.getValue().replace(".csv", ""));    //Se crea la lista con solo los nombres de la clase
         }
-        ObservableList oll = FXCollections.observableArrayList(nombres);
+        ObservableList oll = FXCollections.observableArrayList(claseList);
         listviewClases.setItems(oll);
     }
 
     public void listviewClasesAction(MouseEvent mouseEvent) {
         try {
+            //Cargar solo los atributos relativos a esa clase
+            //Diccionario clase -> listaAtributos
             actualizarListViewAtributos();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -129,48 +142,55 @@ public class DslController implements Initializable {
         if(index != -1){
             String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
             if(!clase.isBlank()){
-                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
-                //Campos del archivo csv (atributos)
-                ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
-
-                //Acceso al archivo de atributos correspondiente
-                String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv",".txt");
-                File atributosFile = new File(rutaAtr);
-                if(atributosFile.exists() && !atributosFile.isDirectory()) {
-                    FileReader fr = new FileReader(atributosFile);
-                    BufferedReader br = new BufferedReader(fr);
-
-                    //Lectura archivo atributos
-                    String linea = br.readLine();
-                    String[] tokens = {};
-                    if (linea != null) {
-                        //formato: nombreAtr;tipoAtr,nombreAtr;tipoAtr,...
-                        tokens = linea.split(",");
-                    }
-                    List<String> tipos = Arrays.asList(tokens);
-
-                    //Si hay un tipo distinto de "_" guardado en la posicion, indica que el atributo tiene un tipo
-                    for (int i = 0; i < campos.size(); i++) {
-                        String tipo = tipos.get(i);
-                        if (!tipo.equals("_")) {
-                            String nombre = campos.get(i);
-                            campos.set(i, nombre + ";" + tipo);
-                        }
-                    }
-                    fr.close();
-                    br.close();
+                List<Pair<String, String>> atributos = atributosPorClase.get(clase.replace(".csv", ""));
+                List<String> nombresAtributos = new ArrayList<>();
+                for(Pair<String, String> atributo : atributos){
+                    nombresAtributos.add(atributo.getKey() + " : " + atributo.getValue());
                 }
-                ObservableList oll = FXCollections.observableArrayList(campos);
+
+                ObservableList oll = FXCollections.observableArrayList(nombresAtributos);
                 listviewAtributos.setItems(oll);
+               //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + clase;
+               ////Campos del archivo csv (atributos)
+               //ArrayList<String> campos = proyectos.obtenerCamposList(ruta);
 
-                //Actualizacion label
-                String key = clase.replaceAll(".csv", "");
-                String field = keyFlds.get(key);
-                if(field != null){
-                    atributoPrimarioLabel.setText("Atributo Primario: " + field);
-                }else{
-                    atributoPrimarioLabel.setText("Atributo Primario: ");
-                }
+               ////Acceso al archivo de atributos correspondiente
+               //String rutaAtr = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/f_atributos" + clase.replaceAll(".csv",".txt");
+               //File atributosFile = new File(rutaAtr);
+               //if(atributosFile.exists() && !atributosFile.isDirectory()) {
+               //    FileReader fr = new FileReader(atributosFile);
+               //    BufferedReader br = new BufferedReader(fr);
+
+               //    //Lectura archivo atributos
+               //    String linea = br.readLine();
+               //    String[] tokens = {};
+               //    if (linea != null) {
+               //        //formato: nombreAtr;tipoAtr,nombreAtr;tipoAtr,...
+               //        tokens = linea.split(",");
+               //    }
+               //    List<String> tipos = Arrays.asList(tokens);
+
+               //    //Si hay un tipo distinto de "_" guardado en la posicion, indica que el atributo tiene un tipo
+               //    for (int i = 0; i < campos.size(); i++) {
+               //        String tipo = tipos.get(i);
+               //        if (!tipo.equals("_")) {
+               //            String nombre = campos.get(i);
+               //            campos.set(i, nombre + ";" + tipo);
+               //        }
+               //    }
+               //    fr.close();
+               //    br.close();
+               //}
+               //ObservableList oll = FXCollections.observableArrayList(campos);
+               //listviewAtributos.setItems(oll);
+
+               //Actualizacion label
+               String field = DatabaseH2.getAtributoPrimario(clase);
+               if(field != null && !field.isBlank()){
+                   atributoPrimarioLabel.setText("Atributo Primario: " + field);
+               }else{
+                   atributoPrimarioLabel.setText("Atributo Primario: ");
+               }
 
             }
 
@@ -182,13 +202,13 @@ public class DslController implements Initializable {
         //En funcion de eso, habilitar un boton u otro
 
         String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
-        String[] tokens = atributo.split(";");
-        // nombreAtributo ; tipoAtributo
+        String[] tokens = atributo.split(":"); // atributo = nombreAtributo ; tipoAtributo
+
         //String nombreAtributo = tokens[0];
         String tipoAtributo = tokens[1];
 
         if(tipoAtributo.equals("alt")){
-            //Tipo atributo, disable key
+            //Tipo atributo, disable keyAttribute
             btnAtributoPrimario.setDisable(true);
             btnEnumerado.setDisable(false);
         }else{
@@ -199,18 +219,32 @@ public class DslController implements Initializable {
     }
 
     public void btnAtributoPrimarioAction(ActionEvent event) {
-
-        //Obtenemos valores de las clases para formar el par
-        String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
-        clase = clase.replaceAll(".csv", "");
-        String atributo = (String)listviewAtributos.getSelectionModel().getSelectedItem();
-        String[] tokens = atributo.split(";");
+        //Update la tabla Archivo con el nuevo atributo primario
+        //Obtener primero el idAtributo seleccionado
+        String clase = listviewClases.getSelectionModel().getSelectedItem()+".csv";
+        String idArchivo = DatabaseH2.getIdArchivo_nombre(clase);
+        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String[] tokens = atributo.split(":"); // atributo = nombreAtributo ; tipoAtributo
         String nombreAtributo = tokens[0];
 
-        //Metemos el par clave-valor [clase - atributo]
-        keyFlds.put(clase, nombreAtributo);
+        String idAtributo = DatabaseH2.getIdAtributo(idArchivo, nombreAtributo);
+        if(! idAtributo.isBlank()){
+            //Update tabla archivo
+            DatabaseH2.updateAtributoPrimario(idAtributo, idArchivo);
+        }
 
         atributoPrimarioLabel.setText("Atributo Primario: "+nombreAtributo);
+        //Obtenemos valores de las clases para formar el par
+        //String clase = (String)listviewClases.getSelectionModel().getSelectedItem();
+        //clase = clase.replaceAll(".csv", "");
+        //String atributo = (String)listviewAtributos.getSelectionModel().getSelectedItem();
+        //String[] tokens = atributo.split(";");
+        //String nombreAtributo = tokens[0];
+//
+        ////Metemos el par clave-valor [clase - atributo]
+        //keyFlds.put(clase, nombreAtributo);
+//
+        //atributoPrimarioLabel.setText("Atributo Primario: "+nombreAtributo);
 
     }
 

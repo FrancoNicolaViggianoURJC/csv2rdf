@@ -33,8 +33,20 @@ public class OntologyGenerator {
     private List<Pair<String,List<Pair<String, String>>>> atributos = new LinkedList<>(); // [Clase, ListaAtributos[nombreAtributo, valorAtributo]]
 
     /*------------------------------------------------------------
-                                Metodos
+                                Getters
      ------------------------------------------------------------*/
+
+    public List<Pair<String, String>> getClases() {
+        return clases;
+    }
+
+    public List<Pair<String, List<Pair<String, String>>>> getAtributos() {
+        return atributos;
+    }
+
+    /*------------------------------------------------------------
+                                    Metodos
+         ------------------------------------------------------------*/
     public OntologyGenerator(String publisher, String descripcion, String description) throws IOException {
         //Genera un archivo ontology.txt a partir de los datos introducidos en el proyecto.
 
@@ -199,19 +211,20 @@ public class OntologyGenerator {
 
         //For each clase en la bbdd, crear una clase
         this.clases = DatabaseH2.getPsmArchivos(idProyecto);    // (idArchivo, NombreArchivo)
-
+        AtributosSesion.setClasesStatic(this.clases);
         for(Pair<String,String> par : this.clases){
 
 
             String clase = par.getValue().replace(".csv", "");
             String idClase = par.getKey();
             LinkedList<Pair<String,String>> atributos = DatabaseH2.getOntAtributos(idClase);
+
             this.atributos.add(new Pair(clase, atributos));  //Para posteriormente imprimir los atributos agrupados por clases
             bw.write("<owl:Class rdf:about=\"http://www.example.com/"+nombreProyecto+"#"+clase+"\">\n" +
                     "\t\t<rdfs:label xml:lang=\"en\">"+clase+"</rdfs:label>\n" +
                     "    </owl:Class>\n");
         }
-
+        AtributosSesion.setAtributosStatic(this.atributos);
         //br.close();
         //fr.close();
         bw.close();

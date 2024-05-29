@@ -100,6 +100,7 @@ public class DatabaseH2 {
                     + "idProyecto INT NOT NULL,"
                     + "rutaArchivo VARCHAR(255) PRIMARY KEY,"
                     + "nombreArchivo VARCHAR(255) UNIQUE,"
+                    + "idAtributoPrimario INT UNIQUE,"
                     + "idArchivo INT AUTO_INCREMENT UNIQUE)";
             statement.executeUpdate(createTableSQL);
 
@@ -752,5 +753,79 @@ public class DatabaseH2 {
         }
         //return false;
         return atributos;
+    }
+
+    public static String getIdAtributo(String idArchivo, String nombreAtributo) {
+        String sql = "SELECT idAtributo FROM Atributo WHERE idArchivo = '"+idArchivo+"' AND nombre = '"+nombreAtributo+ "';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    return resultSet.getString("idAtributo");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return "";
+    }
+
+    public static boolean updateAtributoPrimario(String idAtributo, String idArchivo) {
+        String sql = "UPDATE Archivo SET atributoPrimario = '"+idAtributo+"' WHERE idArchivo = '"+idArchivo+"'";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Ejecutar la sentencia SQL de inserción
+            int filasInsertadas = statement.executeUpdate();
+            if(filasInsertadas>0)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String getAtributoPrimario(String clase) {
+        String sql = "SELECT idAtributoPrimario FROM Archivo WHERE nombreArchivo = '"+clase+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    String idAtt = resultSet.getString("idAtributoPrimario");
+                    return auxFunction(idAtt);  //obtener el nombre a partir del ID
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return "";
+    }
+
+    private static String auxFunction(String idAtt) {
+        String sql = "SELECT nombre FROM Atributo WHERE idAtributo = '"+idAtt+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    return resultSet.getString("nombre");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //return false;
+        return "";
     }
 }
