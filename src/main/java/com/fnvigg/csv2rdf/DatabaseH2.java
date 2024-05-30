@@ -4,9 +4,8 @@ import org.javatuples.Triplet;
 
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
 public class DatabaseH2 {
 
     private static String urlBBDD;
@@ -885,15 +884,60 @@ public class DatabaseH2 {
                 // Resultados
                 while (resultSet.next()) {
                     // Leer los valores de la fila necesarios
-                    String idArchivo = resultSet.getString("nombreArchivo");
+                    String nombreArchivo = resultSet.getString("nombreArchivo");
                     String nombre = resultSet.getString("nombre");
                     String valor = resultSet.getString("valor");
-                    resultados.add(new Triplet<String, String, String>(idArchivo, nombre, valor));
+                    resultados.add(new Triplet<>(nombreArchivo, nombre, valor));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return resultados;
+    }
+
+    public static Map<String, String> getDslPks(String idProyecto) {
+        Map<String, String> primaryKeys = new HashMap<>();
+        List<Pair<String,String>> resultados = new ArrayList<>();
+        String sql = "SELECT nombreArchivo, idAtributoPrimario "
+                + "FROM Archivo "
+                + "WHERE idProyecto = '"+idProyecto+"'";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    String nombreArchivo = resultSet.getString("nombreArchivo");
+                    String idAtributoPrimario = resultSet.getString("idAtributoPrimario");
+                    resultados.add(new Pair<String,String>(nombreArchivo, idAtributoPrimario));
+
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for(int i=0; i<resultados.size(); i++){
+            Pair<String,String> resultado = resultados.get(i);
+            String nombreArchivo = resultado.getKey();
+            String idAtributoPrimario = resultado.getValue();
+            sql = "SELECT nombre FROM Atributo WHERE idAtributo = '"+idAtributoPrimario+"'";
+            try (Connection connection = getConnection();
+                 PreparedStatement statement = connection.prepareStatement(sql)) {
+                //Obtener la consulta
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    // Resultados
+                    while (resultSet.next()) {
+                        String nombre = resultSet.getString("nombre");
+                        primaryKeys.put(nombreArchivo, nombre);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return primaryKeys;
     }
 }

@@ -287,11 +287,22 @@ public class DslController implements Initializable {
         //Comprobar que todos los keyfields fueron introducidos
         if(atributosPrimariosPorClase.size() == listviewClases.getItems().size()){
             //Obtener todas las clases y las rutas a sus ficheros fuente
-            List<Pair<String, String>> clases_rutas = DatabaseH2.getDslClases(idProyecto);
 
-            //Obtener todos los atributos y asociarlos con sus clases, asi como con su tipo de datos
-            List<Triplet<String,String,String>> atributos_clases = DatabaseH2.getDslAtributos(idProyecto);  //debugear esta consulta
-            //DslGenerator()
+            //FILE STATEMENTS. One for each Pair
+            List<Pair<String, String>> clases_rutas = DatabaseH2.getDslClases(idProyecto);  // (Clase, Ruta)
+
+            //SUBJECT STATEMENTS. Gather class and its primary att
+            Map<String, String> clases_pk = DatabaseH2.getDslPks(idProyecto); // (Clase, PK)
+
+            //PREDICATE-OBJECTS
+            //Obtener todos los atributos, junto con la clase que pertenecen y el valor que tienen (atributo, clase, valor)
+            List<Triplet<String, String, String>> atributos_clases = DatabaseH2.getDslAtributos(idProyecto);
+
+            //TODO
+            //Que pasa con los alt,bag,seq???
+
+
+            DslGenerator dslGen = new DslGenerator(idProyecto, clases_rutas, clases_pk, atributos_clases, enumeradosPorClase);
             //try {
             //    //Añadir las rutas de los datos, si las hubiera, a clasesUML
             //    añadirRutas();
