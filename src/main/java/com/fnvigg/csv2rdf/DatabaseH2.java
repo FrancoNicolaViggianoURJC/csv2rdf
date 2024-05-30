@@ -1,5 +1,6 @@
 package com.fnvigg.csv2rdf;
 import javafx.util.Pair;
+import org.javatuples.Triplet;
 
 import java.io.File;
 import java.sql.*;
@@ -846,5 +847,53 @@ public class DatabaseH2 {
             e.printStackTrace();
         }
         //return false;
+    }
+
+    public static List<Pair<String,String>> getDslClases(String idProyecto) {
+        List<Pair<String,String>> resultados = new ArrayList<>();
+        String sql = "SELECT nombreArchivo, rutaArchivo FROM Archivo WHERE idProyecto = '"+idProyecto+"';";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    String nombreArchivo = resultSet.getString("nombreArchivo");
+                    String rutaArchivo = resultSet.getString("rutaArchivo");
+                    resultados.add(new Pair<String,String>(nombreArchivo, rutaArchivo));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resultados;
+    }
+
+    public static List<Triplet<String, String, String>> getDslAtributos(String idProyecto) {
+        List<Triplet<String, String, String>> resultados = new ArrayList<>();
+        //String sql = "SELECT nombre, valor, idArchivo FROM Atributo WHERE idProyecto = '"+idProyecto+"';";
+        String sql = "SELECT Archivo.nombreArchivo, Atributo.nombre, Atributo.valor "
+                + "FROM Atributo "
+                + "JOIN Archivo ON Atributo.idArchivo = Archivo.idArchivo "
+                + "WHERE Atributo.idProyecto = '"+idProyecto+"';";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            //Obtener la consulta
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Resultados
+                while (resultSet.next()) {
+                    // Leer los valores de la fila necesarios
+                    String idArchivo = resultSet.getString("nombreArchivo");
+                    String nombre = resultSet.getString("nombre");
+                    String valor = resultSet.getString("valor");
+                    resultados.add(new Triplet<String, String, String>(idArchivo, nombre, valor));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resultados;
     }
 }

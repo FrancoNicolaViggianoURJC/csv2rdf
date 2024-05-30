@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.*;
 import org.javatuples.Quartet;
+import org.javatuples.Triplet;
 
 public class DslController implements Initializable {
 
@@ -285,7 +286,12 @@ public class DslController implements Initializable {
     public void generarDSL(ActionEvent event) {
         //Comprobar que todos los keyfields fueron introducidos
         if(atributosPrimariosPorClase.size() == listviewClases.getItems().size()){
-//
+            //Obtener todas las clases y las rutas a sus ficheros fuente
+            List<Pair<String, String>> clases_rutas = DatabaseH2.getDslClases(idProyecto);
+
+            //Obtener todos los atributos y asociarlos con sus clases, asi como con su tipo de datos
+            List<Triplet<String,String,String>> atributos_clases = DatabaseH2.getDslAtributos(idProyecto);  //debugear esta consulta
+            //DslGenerator()
             //try {
             //    //Añadir las rutas de los datos, si las hubiera, a clasesUML
             //    añadirRutas();
