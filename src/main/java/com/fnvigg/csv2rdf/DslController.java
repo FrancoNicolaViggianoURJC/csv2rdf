@@ -56,6 +56,7 @@ public class DslController implements Initializable {
     private Map<String, List<Pair<String, String>>> atributosPorClase = new HashMap<>();
     private Map<String, String> atributosPrimariosPorClase = new HashMap<>();
     private Map<String, String> enumeradosPorClase = new HashMap<>();
+    private List<Pair<String,String>> rutasAux = new ArrayList<>();
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         idProyecto = AtributosSesion.getIdProyecto();
@@ -88,7 +89,7 @@ public class DslController implements Initializable {
         btnAtributoPrimario.setDisable(true);
 
         //Panel 2
-        //cargarChoicebox();
+        cargarChoicebox();
 
         //Actualizar la fase en el setting
         DatabaseH2.updateProyectosFase("PSM", idProyecto);
@@ -303,7 +304,7 @@ public class DslController implements Initializable {
 
 
             try {
-                DslGenerator dslGen = new DslGenerator(idProyecto, clases_rutas, clases_pk, atributos_clases, enumeradosPorClase);
+                DslGenerator dslGen = new DslGenerator(idProyecto, clases_rutas, clases_pk, atributos_clases, enumeradosPorClase, rutas, rutasAux);
                 //limpiarCarpeta();
                 ejecutarJar();
                 abrirDirectorio();
@@ -582,10 +583,14 @@ public class DslController implements Initializable {
     List<Quartet<String, String, ArrayList<String>, ArrayList<String>>> rutas = new ArrayList<>();
 
     private void cargarChoicebox() {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
-        File clasesUML = new File(ruta);
-        ArrayList<String> clases = proyectos.obtenerClases(clasesUML);
-        ObservableList oll = FXCollections.observableArrayList(clases);
+        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        //File clasesUML = new File(ruta);
+        //ArrayList<String> clases = proyectos.obtenerClases(clasesUML);
+        ArrayList<String> claseList = new ArrayList<>();
+        for(Pair<String,String> clase : clases){
+            claseList.add(clase.getValue().replace(".csv", ""));
+        }
+        ObservableList oll = FXCollections.observableArrayList(claseList);
         classChoice.setItems(oll);
     }
 
@@ -623,7 +628,7 @@ public class DslController implements Initializable {
 
             //Mostrar campos de ese archivo
             String nombreArchivo = archivos.get(indexArchivo);
-            String rutaArchivo = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + nombreArchivo;
+            String rutaArchivo = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/" + nombreArchivo;
             ArrayList<String> campos = proyectos.obtenerCamposList(rutaArchivo);
             ObservableList oll = FXCollections.observableArrayList(campos);
             listviewAtributoClave.setItems(oll);
@@ -662,6 +667,7 @@ public class DslController implements Initializable {
             Quartet<String, String, ArrayList<String>, ArrayList<String>> ruta = new Quartet<>(clase, nombreRuta, archivos, atributos);
             //Se añade a la lista de rutas
             rutas.add(ruta);
+
             actualizarlistViewRutas();
         }
     }
@@ -675,7 +681,7 @@ public class DslController implements Initializable {
 
             //Funcion para abrir el explorador de archivos
             File ficheroSeleccionado = fileChooser.showOpenDialog(stage);
-            String archivoRuta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/nonRelevant_" + ficheroSeleccionado.getName();
+            String archivoRuta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/nonRelevant_" + ficheroSeleccionado.getName();
             File ficheroDestino = new File(archivoRuta);
             if(!ficheroSeleccionado.getName().endsWith(".csv")){
             //Mostrar warning
@@ -691,7 +697,7 @@ public class DslController implements Initializable {
                 ruta.setAt2(ficheros);
                 //Actualizamos la lista de rutas general
                 rutas.set(index, ruta);
-
+                rutasAux.add(new Pair("nonRelevant_"+ficheroSeleccionado.getName(),archivoRuta));
                 //Actualizar listview de archivos
                 ObservableList<String> oll = FXCollections.observableArrayList(ficheros);
                 listviewArchivosRelevantes.setItems(oll);

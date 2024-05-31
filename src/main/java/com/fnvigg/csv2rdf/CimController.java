@@ -275,7 +275,7 @@ public class CimController implements Initializable {
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
         //Creamos el fichero de destino
-        String ruta = System.getProperty("user.dir")+ "src/main/resources/Proyectos/" + proyecto + "/esquema.png";
+        String ruta = System.getProperty("user.dir")+ "src/main/resources/Proyectos/" + idProyecto + "/esquema.png";
         File ficheroDestino = new File( ruta );
 
         if(ficheroSeleccionado != null && !ficheroSeleccionado.getName().endsWith(".png") && !ficheroSeleccionado.getName().endsWith(".PNG") ){

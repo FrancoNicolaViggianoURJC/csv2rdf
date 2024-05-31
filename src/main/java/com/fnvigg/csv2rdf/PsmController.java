@@ -241,7 +241,7 @@ public class PsmController implements Initializable {
         File ficheroSeleccionado = fc.showOpenDialog(stage);
 
         if(ficheroSeleccionado.exists() && !ficheroSeleccionado.isDirectory()) {
-            if (ficheroSeleccionado.getName().endsWith(".png")) {
+            if (ficheroSeleccionado.getName().endsWith(".png") || ficheroSeleccionado.getName().endsWith(".PNG")) {
                 proyectos.guardarEsquemaOnt(ficheroSeleccionado, nombreProyecto);
 
                 String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/esquemaOnt.png";
@@ -513,11 +513,12 @@ public class PsmController implements Initializable {
     }
 
     private boolean comprobarAtributos() throws IOException {
-        if(numAtributos>= contador){
-            return true;
-        }else {
-            return false;
-        }
+        return true;
+        //if(numAtributos>= contador){
+        //    return true;
+        //}else {
+        //    return false;
+        //}
         /*
         //Iterar sobre los archivos de atributos y buscar "_", si hay alguno, devolver false
         String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";

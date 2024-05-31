@@ -20,7 +20,7 @@ public class DatabaseH2 {
 
         getConnection();
         //Quitar esto una vez probada la bbdd
-        freshDB();
+        //freshDB();
         createTables();
     }
 

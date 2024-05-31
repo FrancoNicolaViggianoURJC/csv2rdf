@@ -1,6 +1,7 @@
 package com.fnvigg.csv2rdf;
 
 import javafx.util.Pair;
+import org.javatuples.Quartet;
 import org.javatuples.Triplet;
 
 import java.io.*;
@@ -16,8 +17,12 @@ public class DslGenerator {
     private List<Pair<String, String>> clasesRutas;
     private Map<String, String> clasesPk;
     private List<Triplet<String, String, String>> atributosClases;
-    private List<String> clases;
 
+    // clase, nombreRuta , Archivos[], Atributos[]
+    // Para el archivo[0], su atributo relevante es el atributos[0]
+    private List<Quartet<String, String, ArrayList<String>, ArrayList<String>>> rutas;
+    private List<String> clases;
+    private List<Pair<String,String>> rutasAux;
     //public DslGenerator(List<String> clases) {
     //    //Lanzar los metodos para escribir el codigo DSL
     //    this.clases = clases;
@@ -34,12 +39,16 @@ public class DslGenerator {
 
     public DslGenerator(String idProyecto, List<Pair<String, String>> clasesRutas,
                         Map<String, String> clasesPk, List<Triplet<String, String,
-                        String>> atributosClases, Map<String, String> enumeradosPorClase) {
+                        String>> atributosClases, Map<String, String> enumeradosPorClase,
+                        List<Quartet<String, String, ArrayList<String>, ArrayList<String>>> rutas,
+                        List<Pair<String,String>> rutasAux) {
         this.clasesRutas = clasesRutas;
         this.clasesPk = clasesPk;
         this.atributosClases = atributosClases;
         this.idProyecto = idProyecto;
         this.clases = new ArrayList<>();
+        this.rutas = rutas;
+        this.rutasAux = rutasAux;
         this.enumeradosPorClase = enumeradosPorClase;
         limpiarDSL();
         try {
@@ -48,13 +57,55 @@ public class DslGenerator {
             for(String clase : this.clases){
                 crearSubjects(clase);
                 crearPredicateObjects(clase);
+                crearRutas(clase);
             }
             System.out.println("DSL Code generated");
+            System.out.println("To visualize rdf graph: https://issemantic.net/rdf-visualizer");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private void crearRutas(String clase) throws IOException {
+        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        File dslCode = new File(rutaDSL);
+
+        FileWriter fw = new FileWriter(dslCode, true);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        //RUTA POR CLASE
+        for(Quartet<String, String, ArrayList<String>, ArrayList<String>> paths : rutas){
+            String claseFormatted = clase.replace(".csv", "");
+            String claseAux = paths.getValue0();
+            if(claseFormatted.equals(claseAux)){
+                String nombreAtrFinal = paths.getValue1();
+                ArrayList<String> archivos = paths.getValue2();
+                ArrayList<String> intermedios = paths.getValue3();
+                StringBuilder cadena = new StringBuilder();
+                String ultimoArchivo = "";
+                for(int i = 0; i <= archivos.size()-1; i++){
+                    String archivo = archivos.get(i);
+                    String atributoIntermedio = intermedios.get(i);
+
+                    if(i== archivos.size()-1){
+                        //Ultimo archivo de la ruta
+                        cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+"),");
+                        ultimoArchivo = archivo.replace(".csv", "");
+                    }else{
+                        cadena.append("#" + archivo.replace(".csv", "") + "."+atributoIntermedio+",");
+                    }
+                }
+                cadena.append(nombreProyecto+":#"+ultimoArchivo+"."+nombreAtrFinal+"))");
+
+                bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtrFinal+"),OBJECT" +
+                        "(QUERY(MATCH("+cadena+")\n");
+            }
+
+        }
+
+        bw.close();
+        fw.close();
+    }
 
 
     private void crearClases() throws IOException {
@@ -73,6 +124,14 @@ public class DslGenerator {
             }
         }
 
+        if(rutasAux.size() != 0){
+            for(Pair<String, String> claseRuta : rutasAux) {
+                String clase = claseRuta.getKey();
+                //clases.add(clase);
+                String ruta = claseRuta.getValue();
+                bw.write("FILE(#"+clase.replace(".csv", "")+" , " +ruta+")\n");
+            }
+        }
         bw.close();
         fw.close();
        // for(String clase : clases){

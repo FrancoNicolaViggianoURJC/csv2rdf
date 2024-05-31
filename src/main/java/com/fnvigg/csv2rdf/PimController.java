@@ -145,7 +145,7 @@ public class PimController implements Initializable {
         File ficheroSeleccionado = fileChooser.showOpenDialog(stage);
 
         if(ficheroSeleccionado != null) {
-            if (ficheroSeleccionado.getName().endsWith(".png")) {
+            if (ficheroSeleccionado.getName().endsWith(".png") || ficheroSeleccionado.getName().endsWith(".PNG")) {
                 proyectos.guardarMDO(ficheroSeleccionado, idProyecto);
 
                 String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
