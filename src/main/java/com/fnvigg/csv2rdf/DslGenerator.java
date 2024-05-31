@@ -49,6 +49,7 @@ public class DslGenerator {
                 crearSubjects(clase);
                 crearPredicateObjects(clase);
             }
+            System.out.println("DSL Code generated");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
