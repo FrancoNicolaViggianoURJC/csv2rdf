@@ -173,9 +173,9 @@ public class DslGenerator {
                     bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtt+"),OBJECT("+nombreProyecto+":#"+claseFormatted+"."+nombreAtt+"))\n");
                 } else if (valorAtt.equals("alt")) {
                     //Do something
-                    String key = clase+nombreAtt;
+                    String key = claseFormatted+nombreAtt;
                     String values = enumeradosPorClase.get(key);
-                    bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtt+"),OBJECT(#"+claseFormatted+"."+nombreAtt+values+"))");
+                    bw.write("PREDICATE-OBJECT(PREDICATE("+nombreProyecto+":"+nombreAtt+"),OBJECT(#"+claseFormatted+"."+nombreAtt+","+values+"\n");
                 } else if (valorAtt.equals("bag")) {
                     //Do something
 

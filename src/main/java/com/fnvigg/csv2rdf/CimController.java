@@ -278,7 +278,7 @@ public class CimController implements Initializable {
         String ruta = System.getProperty("user.dir")+ "src/main/resources/Proyectos/" + proyecto + "/esquema.png";
         File ficheroDestino = new File( ruta );
 
-        if(ficheroSeleccionado != null && !ficheroSeleccionado.getName().endsWith(".png")){
+        if(ficheroSeleccionado != null && !ficheroSeleccionado.getName().endsWith(".png") && !ficheroSeleccionado.getName().endsWith(".PNG") ){
             //Mostrar warning
             mostrarAlertaTipoImagen(event);
         }else {

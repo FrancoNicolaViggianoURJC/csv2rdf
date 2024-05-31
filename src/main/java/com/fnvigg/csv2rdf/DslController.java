@@ -299,22 +299,17 @@ public class DslController implements Initializable {
             List<Triplet<String, String, String>> atributos_clases = DatabaseH2.getDslAtributos(idProyecto);
 
             //TODO
-            //Que pasa con los alt,bag,seq???
+            //bag,seq
 
 
-            DslGenerator dslGen = new DslGenerator(idProyecto, clases_rutas, clases_pk, atributos_clases, enumeradosPorClase);
-            //try {
-            //    //Añadir las rutas de los datos, si las hubiera, a clasesUML
-            //    añadirRutas();
-            //    List<String> clasesFormateadas = preprocesarDatos();
-            //    DslGenerator dslGen = new DslGenerator(clasesFormateadas);
-            //    //limpiarCarpeta();
-            //    ejecutarJar();
-            //    abrirDirectorio();
-            //} catch (IOException e) {
-            //    throw new RuntimeException(e);
-            //}
-//
+            try {
+                DslGenerator dslGen = new DslGenerator(idProyecto, clases_rutas, clases_pk, atributos_clases, enumeradosPorClase);
+                //limpiarCarpeta();
+                ejecutarJar();
+                abrirDirectorio();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }else{
             //mostrar alerta
             mostrarAlertaClave(event);
@@ -323,7 +318,7 @@ public class DslController implements Initializable {
     }
 
     private void abrirDirectorio() throws IOException {
-        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
         File rdf = new File(directorio);
         Desktop.getDesktop().open(rdf);
     }
@@ -332,20 +327,20 @@ public class DslController implements Initializable {
     private void ejecutarJar() throws IOException {
         //direccion donde está el motor, y la direccion temporal donde ejecutarlo en el proyecto
         String rutaJar = System.getProperty("user.dir") + "/src/main/resources/DSLengine2RDF.jar";
-        String rutaJarDest = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLengine2RDF.jar";
+        String rutaJarDest = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLengine2RDF.jar";
         File jar = new File(rutaJar);
         File jarDest = new File(rutaJarDest);
         crearCopias(jar, jarDest); //copia del motor
 
         //ruta donde se encuentra el codigo DSL, asi como archivos de salida/error de la ejecucion
-        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
-        String rutaOut = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/out.txt";
-        String rutaLog = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/log.txt";
+        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String rutaOut = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/out.txt";
+        String rutaLog = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/log.txt";
         File log = new File(rutaLog);
         File out = new File(rutaOut);
 
         //Configurar el env del jar
-        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
         File dirFile = new File(directorio);
 
         //Ejecucion del jar
