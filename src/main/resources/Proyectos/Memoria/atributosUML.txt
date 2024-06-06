@@ -1,1 +1,0 @@
-regionCode;xsd:integer;region,name;xsd:string;region,countryCode;xsd:string;region,area;xsd:float;region,latitude;xsd:float;region,longitude;xsd:float;region,

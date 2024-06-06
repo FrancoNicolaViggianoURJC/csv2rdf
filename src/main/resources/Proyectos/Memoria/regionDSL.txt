@@ -1,8 +1,0 @@
-SUBJECT(#region.regionCode,Memoria:region)
-PREDICATE-OBJECT(PREDICATE(Memoria:regionCode),OBJECT(Memoria:#region.regionCode))
-PREDICATE-OBJECT(PREDICATE(Memoria:name),OBJECT(Memoria:#region.name))
-PREDICATE-OBJECT(PREDICATE(Memoria:countryCode),OBJECT(Memoria:#region.countryCode))
-PREDICATE-OBJECT(PREDICATE(Memoria:area),OBJECT(Memoria:#region.area))
-PREDICATE-OBJECT(PREDICATE(Memoria:latitude),OBJECT(Memoria:#region.latitude))
-PREDICATE-OBJECT(PREDICATE(Memoria:longitude),OBJECT(Memoria:#region.longitude))
-PREDICATE-OBJECT(PREDICATE(Memoria:population),OBJECT(QUERY(MATCH(#nonRelevant_region.regionCode,#nonRelevant_region_population.regionCode),Memoria:#nonRelevant_region_population.population)))

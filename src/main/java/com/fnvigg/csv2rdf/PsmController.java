@@ -344,8 +344,11 @@ public class PsmController implements Initializable {
 
     }
     public void añadirTipoBasico(ActionEvent event) {
-        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
-
+        String atributo_aux = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo = "";
+        if(atributo_aux.contains(";")){
+            atributo = atributo_aux.split(";")[0].trim();
+        }
         //Obtencion tipo via dialog
         String tipo = mostrarInputBasico();
 
@@ -355,10 +358,17 @@ public class PsmController implements Initializable {
             //actualizarArchivoAtributos(clase, index, tipo);
             String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
             String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
-            DatabaseH2.updateAtributo(atributo, tipo, idArchivo);
             List<String> lista = listviewAtributos.getItems();
-            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-            lista.set(index, atributo + " ; " + tipo);
+            if(!atributo.equals("")){
+                DatabaseH2.updateAtributo(atributo, tipo, idArchivo);
+                int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+                lista.set(index, atributo + " ; " + tipo);
+            }else{
+                DatabaseH2.updateAtributo(atributo_aux, tipo, idArchivo);
+                int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+                lista.set(index, atributo_aux + " ; " + tipo);
+            }
+
             ObservableList oll = FXCollections.observableArrayList(lista);
             listviewAtributos.setItems(oll);
 

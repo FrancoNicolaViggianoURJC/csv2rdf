@@ -26,7 +26,10 @@
                         <Font name="Inter Regular" size="27.0" />
                     </font>
                 </Label>
-                <Label layoutX="26.0" layoutY="272.0" prefHeight="68.0" prefWidth="252.0" text="CSV@RDF Helptool es una aplicación de &#10;escritorio diseñada para brindar apoyo a los&#10;usuarios del proceso metodológico CSV@RDF." textFill="WHITE" />
+                <Label layoutX="14.0" layoutY="272.0" prefHeight="68.0" prefWidth="275.0" text="CSV@RDF Helptool es una aplicación de &#10;escritorio diseñada para brindar apoyo a los&#10;usuarios del proceso metodológico CSV@RDF." textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font size="13.0" />
+               </font></Label>
             </children>
         </AnchorPane>
         <AnchorPane prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: white;">
@@ -37,11 +40,23 @@
                     </font>
                 </Label>
                 <TextField layoutX="3.0" layoutY="24.0" opacity="0.0" promptText="Listener" text="Listener" />
-                <TextField fx:id="userFld" layoutX="75.0" layoutY="166.0" promptText="Usuario" />
-                <Button fx:id="loginBtn" layoutX="124.0" layoutY="256.0" mnemonicParsing="false" onAction="#loginBtnButtonClick" text="Login" />
-                <Button fx:id="newUserBtn" layoutX="101.0" layoutY="342.0" mnemonicParsing="false" onAction="#newBtnButtonClick" text="Nuevo usuario" />
+                <TextField fx:id="userFld" layoutX="66.0" layoutY="178.0" promptText="Usuario">
+               <font>
+                  <Font size="13.0" />
+               </font></TextField>
+                <Button fx:id="loginBtn" layoutX="125.0" layoutY="261.0" mnemonicParsing="false" onAction="#loginBtnButtonClick" text="Login">
+               <font>
+                  <Font size="13.0" />
+               </font></Button>
+                <Button fx:id="newUserBtn" layoutX="96.0" layoutY="342.0" mnemonicParsing="false" onAction="#newBtnButtonClick" text="Nuevo usuario">
+               <font>
+                  <Font size="13.0" />
+               </font></Button>
                 <Separator layoutY="313.0" prefHeight="1.0" prefWidth="304.0" />
-                <PasswordField fx:id="passFld" layoutX="75.0" layoutY="205.0" promptText="Contraseña" />
+                <PasswordField fx:id="passFld" layoutX="66.0" layoutY="217.0" promptText="Contraseña">
+               <font>
+                  <Font size="13.0" />
+               </font></PasswordField>
                 <Label fx:id="errLbl" layoutX="65.0" layoutY="288.0" text="El usuario/contraseña no existe" textFill="RED" visible="false" />
             </children>
         </AnchorPane>

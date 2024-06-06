@@ -44,7 +44,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="14.0" layoutY="23.0" text="Para cargar el esquema ontológico en el sistema, pulse el siguiente botón:" />
+                        <Label layoutX="14.0" layoutY="23.0" text="Para cargar la imagen del esquema ontológico, seleccione el archivo:" />
                         <Button layoutX="417.0" layoutY="19.0" mnemonicParsing="false" onAction="#btnCargarEsquemaAction" prefHeight="25.0" prefWidth="108.0" text="Cargar esquema" />
                         <ImageView fx:id="imageEsquema" fitHeight="340.0" fitWidth="566.0" layoutX="16.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true" />
                      </children></AnchorPane>

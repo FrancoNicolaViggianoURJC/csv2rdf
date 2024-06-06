@@ -1,1 +1,0 @@
-countryCode;xsd:integer;country,name;xsd:integer;country,continent;xsd:integer;country,capital;xsd:integer;country,area;xsd:integer;country,latitude;xsd:integer;country,longitude;xsd:integer;country,

@@ -16,6 +16,10 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -137,16 +141,33 @@ public class ProyectosController implements Initializable {
     public void onClickBorrarProyecto(ActionEvent event) {
         if(mostrarAlerta(event)) {
             String nombreProyecto = (String) listProyects.getSelectionModel().getSelectedItem();
+            String idProyecto = DatabaseH2.getProyectosID(nombreProyecto);
             Boolean exito = DatabaseH2.deleteProyecto(nombreProyecto);
             if(exito){
-                actualizarLista();
-                lblDatos.setVisible(false);
-                lblOntologico.setVisible(false);
+                //Borrar tambien el directorio del proyecto
+                String path = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
+                File directorio = new File(path);
+                if(directorio.exists()){
+                    borrarDirectorio(directorio);
+                    actualizarLista();
+                    lblDatos.setVisible(false);
+                    lblOntologico.setVisible(false);
+                }
 
             }else{
                 mostrarAlertaBorrado(event);
             }
         }
+    }
+
+    private boolean borrarDirectorio(File directorio) {
+        File[] allContents = directorio.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                borrarDirectorio(file);
+            }
+        }
+        return directorio.delete();
     }
 
     public void onClickRegistrarProyecto(ActionEvent event) {
