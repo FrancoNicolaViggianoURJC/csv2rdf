@@ -48,10 +48,10 @@ public class PimController implements Initializable {
         btnSiguienteFase.setDisable(true);
 
         //Cargar el MDO si lo hubiera
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
+        String ruta = "./Proyectos/" + idProyecto + "/MDO.png";
         File f = new File(ruta);
         if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
+            Image img = new Image(f.getAbsolutePath());
             imageMDO.setImage(img);
             btnSiguienteFase.setDisable(false);
         }
@@ -71,7 +71,7 @@ public class PimController implements Initializable {
     // 1 Panel
     public void btnVolverAction(ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource("faseCim.fxml"));
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/faseCim.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);
@@ -83,54 +83,47 @@ public class PimController implements Initializable {
 
     // 2 Panel
     public void btnClasesAction(ActionEvent event) {
-        String texto = "- Las clases y sus nombres se obtendrán de los contenedores representados en el esquema gráfico.";
-        String ruta = System.getProperty("user.dir");
-        Image img = new Image(ruta + "/src/main/resources/clases.png");
+        String texto = " - Las clases y sus nombres se obtendrán de los contenedores representados en el esquema gráfico.";
 
+        Image img = new Image(HelloApplication.class.getResource("/clases.png").toString());
         lblTexto.setText(texto);
         imageAyuda.setImage(img);
     }
 
     public void btnAsociacionesAction(ActionEvent event) {
-        String texto = "- Las asociaciones entre clases se derivarán de las relaciones entre contenedores representados en\n" +
-                "   el esquema gráfico y la información recolectada en los requerimientos de los datos.\n" +
-                "- Cualquier relación en el esquema gráfico implicará la inclusión de un atributo en la clase referenciada\n" +
-                "   cuyo tipo de dato será el nombre de la clase referenciada en el modelo de dominio objetivo.";
-        String ruta = System.getProperty("user.dir");
-        Image img = new Image(ruta + "/src/main/resources/asociaciones.png");
+        String texto = " - Las asociaciones entre clases se derivarán de las relaciones entre contenedores representados en el esquema gráfico y la información recolectada en \n" +
+                "   los requerimientos de los datos.\n" +
+                " - Cualquier relación en el esquema gráfico implicará la inclusión de un atributo en la clase referenciada cuyo tipo de dato será el nombre de la clase \n" +
+                "   referenciada en el modelo de dominio objetivo.";
 
+        Image img = new Image(HelloApplication.class.getResource("/asociaciones.png").toString());
         lblTexto.setText(texto);
         imageAyuda.setImage(img);
     }
 
     public void btnAtributosAction(ActionEvent event) {
-        String texto = "- Los atributos de las clases se obtendrán a partir del análisis de los valores en su dominio de datos.\n" +
-                "    Los atributos de una clase pueden ser definidos usando datatypes básicos como string, char, integer, float, boolean or date.";
-        String ruta = System.getProperty("user.dir");
-        Image img = new Image(ruta + "/src/main/resources/atributos.png");
+        String texto = " - Los atributos de las clases se obtendrán a partir del análisis de los valores en su dominio de datos.\n" +
+                " - Los atributos de una clase pueden ser definidos usando datatypes básicos como string, char, integer, float, boolean or date.";
 
+        Image img = new Image(HelloApplication.class.getResource("/atributos.png").toString());
         lblTexto.setText(texto);
         imageAyuda.setImage(img);
     }
 
     public void btnEnumeradosAction(ActionEvent event) {
-        String texto = "- Los atributos con un valor numérico usado para representar valores (1- ocio, 2- trabajo, 3-otros) se\n" +
-                "   definirán usando el tipo enum. Los valores tendrán que ser anotados en el esquema por medio de\n" +
-                "   comentarios.";
-        String ruta = System.getProperty("user.dir");
-        Image img = new Image(ruta + "/src/main/resources/enumerados.png");
+        String texto = " - Los atributos con un valor numérico usado para representar valores (1- ocio, 2- trabajo, 3-otros) se definirán usando el tipo enum.\n" +
+                " - Los valores tendrán que ser anotados en el esquema por medio de comentarios.";
 
+        Image img = new Image(HelloApplication.class.getResource("/enumerados.png").toString());
         lblTexto.setText(texto);
         imageAyuda.setImage(img);
     }
     public void btnRutasAction(ActionEvent event) {
-        String texto = "- Se van a definir también rutas para aquellos atributos que sean de interés, pero que su contenedor\n" +
-                "   no sea de interés. Estas rutas se definen por comentarios de la siguiente manera: el atributo de inte-\n" +
-                "   rés, en la misma caja, un atributo clave que se refiera a otro contenedor que será conectado por una\n" +
-                "   linea";
-        String ruta = System.getProperty("user.dir");
-        Image img = new Image(ruta + "/src/main/resources/ruta.png");
+        String texto = " - Se van a definir también rutas para aquellos atributos que sean de interés, pero que su contenedor no sea de interés.\n" +
+                " - Estas rutas se definen por comentarios de la siguiente manera: el atributo de interés, en la misma caja, un atributo clave que se refiera a otro\n" +
+                "   contenedor que será conectado por una linea";
 
+        Image img = new Image(HelloApplication.class.getResource("/ruta.png").toString());
         lblTexto.setText(texto);
         imageAyuda.setImage(img);
     }
@@ -146,10 +139,13 @@ public class PimController implements Initializable {
 
         if(ficheroSeleccionado != null) {
             if (ficheroSeleccionado.getName().endsWith(".png") || ficheroSeleccionado.getName().endsWith(".PNG")) {
+
                 proyectos.guardarMDO(ficheroSeleccionado, idProyecto);
 
-                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
-                Image img = new Image(ruta);
+                String ruta = "./Proyectos/" + idProyecto + "/MDO.PNG";
+                File f = new File(ruta);
+                System.out.println(ruta);
+                Image img = new Image(f.getAbsolutePath());
 
                 DatabaseH2.insertPimMDO(ruta, idProyecto);
 
@@ -164,7 +160,7 @@ public class PimController implements Initializable {
 
     public void btnSiguienteFaseAction(ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource("fasePsm.fxml"));
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/fasePsm.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);

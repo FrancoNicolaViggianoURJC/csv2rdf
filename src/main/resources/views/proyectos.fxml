@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.ProyectosController">
+   <children>
+      <TitledPane animated="false" collapsible="false" prefHeight="400.0" prefWidth="600.0" text="Proyectos">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <ListView fx:id="listProyects" layoutX="24.0" layoutY="36.0" onMouseClicked="#onClickDatosProyecto" prefHeight="250.0" prefWidth="261.0" />
+                  <Button fx:id="loadBtn" layoutX="75.0" layoutY="306.0" mnemonicParsing="false" onAction="#onClickCargarProyecto" text="Cargar">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Button>
+                  <Button fx:id="deleteBtn" layoutX="179.0" layoutY="306.0" mnemonicParsing="false" onAction="#onClickBorrarProyecto" prefHeight="27.0" prefWidth="56.0" text="Borrar">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Button>
+                  <Button fx:id="registerNewBtn" layoutX="402.0" layoutY="236.0" mnemonicParsing="false" onAction="#onClickRegistrarProyecto" text="Registrar">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Button>
+                  <Separator layoutX="296.0" layoutY="-31.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="4.0" />
+                  <Label layoutX="103.0" layoutY="13.0" text="Lista de proyectos">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+                  <Label layoutX="403.0" layoutY="14.0" text="Nuevo proyecto" />
+                  <TextField fx:id="dataProyectFld" layoutX="433.0" layoutY="61.0" prefHeight="25.0" prefWidth="138.0" />
+                  <Label fx:id="dataLbl" layoutX="306.0" layoutY="65.0" text="Ingeniero de Datos">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+                  <Label fx:id="ontologicalLbl" layoutX="306.0" layoutY="127.0" text="Ingeniero Ontológico">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+                  <TextField fx:id="ontologicProyectFld" layoutX="433.0" layoutY="123.0" prefHeight="25.0" prefWidth="138.0" />
+                  <Label fx:id="nameLbl" layoutX="306.0" layoutY="189.0" text="Nombre de proyecto">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+                  <TextField fx:id="nameProyectFld" layoutX="433.0" layoutY="185.0" prefHeight="25.0" prefWidth="138.0" />
+                  <Label layoutX="408.0" layoutY="293.0" text="Label" visible="false" />
+                  <Separator layoutX="296.0" layoutY="275.0" prefHeight="0.0" prefWidth="309.0" />
+                  <Label fx:id="dataLbl1" layoutX="306.0" layoutY="311.0" text="Ingeniero de Datos">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+                  <Label fx:id="ontologicalLbl1" layoutX="306.0" layoutY="341.0" text="Ingeniero Ontológico">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+                  <Label fx:id="lblDatos" layoutX="437.0" layoutY="308.0" prefHeight="24.0" prefWidth="139.0" text="Label" visible="false" />
+                  <Label fx:id="lblOntologico" layoutX="437.0" layoutY="339.0" prefHeight="24.0" prefWidth="139.0" text="Label" visible="false" />
+                  <Label layoutX="382.0" layoutY="284.0" text="Proyecto seleccionado">
+                     <font>
+                        <Font size="13.0" />
+                     </font></Label>
+               </children></AnchorPane>
+        </content>
+      </TitledPane>
+   </children>
+</AnchorPane>

@@ -138,7 +138,8 @@ public class PsmController implements Initializable {
     }
     public void btnFaseAnteriorAction(ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource("fasePim.fxml"));
+
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/fasePim.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);
@@ -157,14 +158,10 @@ public class PsmController implements Initializable {
         //Cargamos el texto y la imagen correspondiente
         String frase = "Una clase UML se transformará en una clase OWL.";
         labelAyudaOnt.setText(frase);
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/clasesOnt.png";
 
-        //Comprobamos la existencia de la imagen
-        File f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageAyudasOnt.setImage(img);
-        }
+        Image img = new Image(HelloApplication.class.getResource("/clasesOnt.png").toString());
+        imageAyudasOnt.setImage(img);
+
 
     }
 
@@ -174,16 +171,9 @@ public class PsmController implements Initializable {
                 "transformado en un OWL Datatype Property cuyo dominio será la correspondiente clase OWL y cuyo\n" +
                 "rango será la clase RDFS Datatype asociada con el tipo de datos básico.";
         labelAyudaOnt.setText(frase);
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/atributosOnt.png";
 
-        //Comprobamos la existencia de la imagen
-        File f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageAyudasOnt.setImage(img);
-        }else{
-            System.out.println("");
-        }
+        Image img = new Image(HelloApplication.class.getResource("/atributosOnt.png").toString());
+        imageAyudasOnt.setImage(img);
     }
 
     public void btnAtributosPropiosAction(ActionEvent event) {
@@ -192,14 +182,9 @@ public class PsmController implements Initializable {
                 "Property cuyo dominio será la correspondiente clase OWL y cuyo rango será la clase OWL a la que se\n" +
                 "refiere.";
         labelAyudaOnt.setText(frase);
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/AtributosPropiosOnt.png";
 
-        //Comprobamos la existencia de la imagen
-        File f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageAyudasOnt.setImage(img);
-        }
+        Image img = new Image(HelloApplication.class.getResource("/AtributosPropiosOnt.png").toString());
+        imageAyudasOnt.setImage(img);
     }
 
     public void btnEnumeradosAction(ActionEvent event) {
@@ -207,14 +192,9 @@ public class PsmController implements Initializable {
         String frase = "Un atributo UML definido por un tipo enumerado sera transformado en una OWL Object Property cuyo\n" +
                 "dominio será la correspondiente clase OWL y cuyo rango será la clase RDF Alt.";
         labelAyudaOnt.setText(frase);
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/enumeradosOnt.png";
 
-        //Comprobamos la existencia de la imagen
-        File f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageAyudasOnt.setImage(img);
-        }
+        Image img = new Image(HelloApplication.class.getResource("/enumeradosOnt.png").toString());
+        imageAyudasOnt.setImage(img);
     }
 
     public void btnColeccionesAction(ActionEvent event) {
@@ -222,14 +202,9 @@ public class PsmController implements Initializable {
         String frase = "Un atributo UML definido por un tipo colección sera transformado en una OWL Object Property cuyo\n" +
                 "dominio será la correspondiente clase OWL y cuyo rango será la clase RDF Bag.";
         labelAyudaOnt.setText(frase);
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/coleccionesOnt.png";
 
-        //Comprobamos la existencia de la imagen
-        File f = new File(ruta);
-        if(f.exists() && !f.isDirectory()){
-            Image img = new Image(ruta);
-            imageAyudasOnt.setImage(img);
-        }
+        Image img = new Image(HelloApplication.class.getResource("/coleccionesOnt.png").toString());
+        imageAyudasOnt.setImage(img);
     }
 
     /*----------------------------------------------------------------------------
@@ -242,10 +217,11 @@ public class PsmController implements Initializable {
 
         if(ficheroSeleccionado.exists() && !ficheroSeleccionado.isDirectory()) {
             if (ficheroSeleccionado.getName().endsWith(".png") || ficheroSeleccionado.getName().endsWith(".PNG")) {
-                proyectos.guardarEsquemaOnt(ficheroSeleccionado, nombreProyecto);
+                proyectos.guardarEsquemaOnt(ficheroSeleccionado, idProyecto);
 
-                String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/esquemaOnt.png";
-                Image img = new Image(ruta);
+                String ruta = "./Proyectos/" + idProyecto + "/esquemaOnt.png";
+                File f = new File(ruta);
+                Image img = new Image(f.getAbsolutePath());
 
                 //Carga en la bbdd
                 DatabaseH2.insertPsmEsquemaOntologico(ruta, idProyecto);
@@ -377,7 +353,11 @@ public class PsmController implements Initializable {
     }
 
     public void añadirTipoClase(ActionEvent event) {
-        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo_aux = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo = "";
+        if(atributo_aux.contains(";")){
+            atributo = atributo_aux.split(";")[0].trim();
+        }
         //int index = listviewAtributos.getSelectionModel().getSelectedIndex();
 
         //Obtencion tipo via dialog
@@ -389,11 +369,17 @@ public class PsmController implements Initializable {
             //actualizarArchivoAtributos(clase, index, tipo);
             String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
             String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
-            DatabaseH2.updateAtributo(atributo, tipo, idArchivo);
-
             List<String> lista = listviewAtributos.getItems();
-            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-            lista.set(index, atributo + " ; " + tipo);
+            if(!atributo.equals("")){
+                DatabaseH2.updateAtributo(atributo, tipo, idArchivo);
+                int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+                lista.set(index, atributo + " ; " + tipo);
+            }else{
+                DatabaseH2.updateAtributo(atributo_aux, tipo, idArchivo);
+                int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+                lista.set(index, atributo_aux + " ; " + tipo);
+            }
+
             ObservableList oll = FXCollections.observableArrayList(lista);
             listviewAtributos.setItems(oll);
             numAtributos += 1;
@@ -402,14 +388,26 @@ public class PsmController implements Initializable {
     }
 
     public void añadirEnumerado(ActionEvent event){
-        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo_aux = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo = "";
+        if(atributo_aux.contains(";")){
+            atributo = atributo_aux.split(";")[0].trim();
+        }
+
         //int index = listviewAtributos.getSelectionModel().getSelectedIndex();
         String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
         String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
-        DatabaseH2.updateAtributo(atributo, "alt",idArchivo);
+
         List<String> lista = listviewAtributos.getItems();
-        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-        lista.set(index, atributo + " ; alt");
+        if(!atributo.equals("")){
+            DatabaseH2.updateAtributo(atributo, "alt", idArchivo);
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo + " ; " + "alt");
+        }else{
+            DatabaseH2.updateAtributo(atributo_aux, "alt", idArchivo);
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo_aux + " ; " + "alt");
+        }
         ObservableList oll = FXCollections.observableArrayList(lista);
         listviewAtributos.setItems(oll);
         numAtributos += 1;
@@ -417,28 +415,50 @@ public class PsmController implements Initializable {
 
 
     public void añadirColeccion(ActionEvent event) {
-        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo_aux = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo = "";
+        if(atributo_aux.contains(";")){
+            atributo = atributo_aux.split(";")[0].trim();
+        }
         //int index = listviewAtributos.getSelectionModel().getSelectedIndex();
         //actualizarArchivoAtributos(clase, index, "bag");
         String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
         String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
-        DatabaseH2.updateAtributo(atributo, "bag", idArchivo);
         List<String> lista = listviewAtributos.getItems();
-        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-        lista.set(index, atributo + " ; bag");
+        if(!atributo.equals("")){
+            DatabaseH2.updateAtributo(atributo, "bag", idArchivo);
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo + " ; " + "bag");
+        }else{
+            DatabaseH2.updateAtributo(atributo_aux, "bag", idArchivo);
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo_aux + " ; " + "bag");
+        }
         ObservableList oll = FXCollections.observableArrayList(lista);
         listviewAtributos.setItems(oll);
         numAtributos += 1;
     }
 
     public void añadirColeccionOrd(ActionEvent event) {
-        String atributo = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo_aux = (String) listviewAtributos.getSelectionModel().getSelectedItem();
+        String atributo = "";
+        if(atributo_aux.contains(";")){
+            atributo = atributo_aux.split(";")[0].trim();
+        }
+
+
         String archivo = (String) listviewClases.getSelectionModel().getSelectedItem();
         String idArchivo = DatabaseH2.getIdArchivo_nombre(archivo);
-        DatabaseH2.updateAtributo(atributo, "seq", idArchivo);
         List<String> lista = listviewAtributos.getItems();
-        int index = listviewAtributos.getSelectionModel().getSelectedIndex();
-        lista.set(index, atributo + " ; seq");
+        if(!atributo.equals("")){
+            DatabaseH2.updateAtributo(atributo, "seq", idArchivo);
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo + " ; " + "seq");
+        }else{
+            DatabaseH2.updateAtributo(atributo_aux, "seq", idArchivo);
+            int index = listviewAtributos.getSelectionModel().getSelectedIndex();
+            lista.set(index, atributo_aux + " ; " + "seq");
+        }
         ObservableList oll = FXCollections.observableArrayList(lista);
         listviewAtributos.setItems(oll);
         numAtributos += 1;
@@ -650,7 +670,7 @@ public class PsmController implements Initializable {
     }
     public void transicionarPantalla(ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource("faseDsl.fxml"));
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/faseDsl.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);

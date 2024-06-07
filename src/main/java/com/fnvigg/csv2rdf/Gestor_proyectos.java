@@ -262,7 +262,7 @@ public class Gestor_proyectos {
     public void addRequerimiento(String requerimiento, String idProyecto) throws IOException {
         //Obtener ruta
         String ruta = System.getProperty("user.dir");
-        File f = new File(ruta + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos.txt");
+        File f = new File("./Proyectos/" + idProyecto + "/requerimientos.txt");
         //Abrirlo en modo append
         FileWriter fw = new FileWriter(f, true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -274,8 +274,8 @@ public class Gestor_proyectos {
 
     public void borrarRequerimiento(int indice, String idProyecto) throws IOException {
         //Comprobar si existe el archivo
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos.txt";
-        String rutaAux = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos_a.txt";
+        String ruta = "./Proyectos/" + idProyecto + "/requerimientos.txt";
+        String rutaAux = "./Proyectos/" + idProyecto + "/requerimientos_a.txt";
         File f = new File(ruta);
         File f_aux = new File(rutaAux);
         //Comprobar si existe
@@ -314,7 +314,7 @@ public class Gestor_proyectos {
     }
 
     public ArrayList obtenerRequerimientos(String idProyecto) throws IOException {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/requerimientos.txt";
+        String ruta = "./Proyectos/" + idProyecto + "/requerimientos.txt";
         File f = new File(ruta);
         ArrayList<String> lista = new ArrayList<>();
         //Comprobar si existe
@@ -335,9 +335,9 @@ public class Gestor_proyectos {
     }
 
     public void guardarMDO(File ficheroSeleccionado, String idProyecto) {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/MDO.png";
+        String ruta = "./Proyectos/" + idProyecto + "/MDO.png";
         File ficheroDestino = new File(ruta);
-
+        System.out.println(ruta);
         //Crear las copias de archivos para no trabajar sobre los originales
         FileChannel sourceChannel = null;
         FileChannel destChannel = null;
@@ -352,8 +352,8 @@ public class Gestor_proyectos {
         }
     }
 
-    public void guardarEsquemaOnt(File ficheroSeleccionado, String nombreProyecto) {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/esquemaOnt.png";
+    public void guardarEsquemaOnt(File ficheroSeleccionado, String idProyecto) {
+        String ruta = "./Proyectos/" + idProyecto + "/esquemaOnt.png";
         File ficheroDestino = new File(ruta);
 
         //Crear las copias de archivos para no trabajar sobre los originales

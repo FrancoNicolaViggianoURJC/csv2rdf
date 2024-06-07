@@ -20,11 +20,13 @@ public class HelloApplication extends Application {
         }
 
         //Crear el gestor de escenas, e indicarle la vista que queremos cargar
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        System.out.println(getClass());
+        System.out.println(this.getClass().getResource("/views/hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/views/hello-view.fxml"));
         //Dimensiones de la ventana
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setResizable(false);
-        stage.getIcons().add(new Image("/rdf graph.png"));
+        String url = HelloApplication.class.getResource("/rdfGraph.png").getPath();
         stage.setTitle("CSV@RDF Helptool");
         //Activar la escena
         stage.setScene(scene);

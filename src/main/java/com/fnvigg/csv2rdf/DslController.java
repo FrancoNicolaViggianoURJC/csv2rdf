@@ -319,7 +319,7 @@ public class DslController implements Initializable {
     }
 
     private void abrirDirectorio() throws IOException {
-        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
+        String directorio = "./Proyectos/" + idProyecto + "/";
         File rdf = new File(directorio);
         Desktop.getDesktop().open(rdf);
     }
@@ -327,25 +327,42 @@ public class DslController implements Initializable {
 
     private void ejecutarJar() throws IOException {
         //direccion donde está el motor, y la direccion temporal donde ejecutarlo en el proyecto
-        String rutaJar = System.getProperty("user.dir") + "/src/main/resources/DSLengine2RDF.jar";
-        String rutaJarDest = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLengine2RDF.jar";
-        File jar = new File(rutaJar);
-        File jarDest = new File(rutaJarDest);
-        crearCopias(jar, jarDest); //copia del motor
+
+        InputStream inputStream = HelloApplication.class.getResourceAsStream("/DSLengine2RDF.jar");
+        File tempFile = File.createTempFile("DSLengine2RDF", ".jar");
+        tempFile.deleteOnExit(); // Eliminar el archivo al salir
+
+        // Copiar el contenido del InputStream al archivo temporal
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+        //String rutaJar = HelloApplication.class.getResource("/DSLengine2RDF.jar");
+        //String rutaJarDest = "./Proyectos/" + idProyecto + "/DSLengine2RDF.jar";
+        //File jar = new File(HelloApplication.class.getResource("/DSLengine2RDF.jar").getPath().replace("jar:file:\\ ", ""));
+       // File jarDest = new File(rutaJarDest);
+        //System.out.println(jar);
+        //System.out.println(jar.getAbsolutePath());
+
+        //System.out.println(jarDest.getAbsolutePath());
+        //crearCopias(jar, jarDest); //copia del motor
 
         //ruta donde se encuentra el codigo DSL, asi como archivos de salida/error de la ejecucion
-        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
-        String rutaOut = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/out.txt";
-        String rutaLog = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/log.txt";
+        String rutaDSL = "./Proyectos/" + idProyecto + "/DSLCode.txt";
+        String rutaOut = "./Proyectos/" + idProyecto + "/out.txt";
+        String rutaLog = "./Proyectos/" + idProyecto + "/log.txt";
         File log = new File(rutaLog);
         File out = new File(rutaOut);
 
         //Configurar el env del jar
-        String directorio = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
+        String directorio = "./Proyectos/" + idProyecto + "/";
         File dirFile = new File(directorio);
 
         //Ejecucion del jar
-        ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar" , rutaJarDest , rutaDSL);
+        ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar" , tempFile.getAbsolutePath() , rutaDSL);
         processBuilder.directory(dirFile);
         processBuilder.redirectError(log);
         processBuilder.redirectOutput(out);
@@ -356,7 +373,7 @@ public class DslController implements Initializable {
     }
 
     private void añadirRutas() throws IOException {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
+        String ruta = "./Proyectos/" + nombreProyecto + "/clasesUML.txt";
         File clasesUML = new File(ruta);
         FileWriter fw = new FileWriter(clasesUML, true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -373,7 +390,7 @@ public class DslController implements Initializable {
     }
 
     private void limpiarCarpeta() {
-        String rutaClase = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/";
+        String rutaClase = "./Proyectos/" + nombreProyecto + "/";
         File directorio = new File( rutaClase);
 
         //Filtro para no obtener los archivos de configuracion
@@ -410,7 +427,7 @@ public class DslController implements Initializable {
         //Generar por cada clase el archivo DSL correspondiente
         for(String nombreClase : clasesFormateadas){
             //Archivo de la clase especifica
-            String rutaClase = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + nombreClase + "DSL.txt";
+            String rutaClase = "./Proyectos/" + nombreProyecto + "/" + nombreClase + "DSL.txt";
             File claseFile = new File(rutaClase);
             if(claseFile.exists()){
                 claseFile.delete();
@@ -425,7 +442,7 @@ public class DslController implements Initializable {
             //DATATYPES & OBJECTS
 
             // I/O
-            String rutaAtributos = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/atributosUML.txt";
+            String rutaAtributos = "./Proyectos/" + nombreProyecto + "/atributosUML.txt";
             File atributosUML = new File(rutaAtributos);
             FileReader fr = new FileReader(atributosUML);
             BufferedReader br = new BufferedReader(fr);
@@ -628,7 +645,7 @@ public class DslController implements Initializable {
 
             //Mostrar campos de ese archivo
             String nombreArchivo = archivos.get(indexArchivo);
-            String rutaArchivo = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/" + nombreArchivo;
+            String rutaArchivo = "./Proyectos/" + idProyecto + "/" + nombreArchivo;
             ArrayList<String> campos = proyectos.obtenerCamposList(rutaArchivo);
             ObservableList oll = FXCollections.observableArrayList(campos);
             listviewAtributoClave.setItems(oll);
@@ -681,7 +698,7 @@ public class DslController implements Initializable {
 
             //Funcion para abrir el explorador de archivos
             File ficheroSeleccionado = fileChooser.showOpenDialog(stage);
-            String archivoRuta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/nonRelevant_" + ficheroSeleccionado.getName();
+            String archivoRuta = "./Proyectos/" + idProyecto + "/nonRelevant_" + ficheroSeleccionado.getName();
             File ficheroDestino = new File(archivoRuta);
             if(!ficheroSeleccionado.getName().endsWith(".csv")){
             //Mostrar warning
@@ -711,6 +728,7 @@ public class DslController implements Initializable {
 
     private void crearCopias(File ficheroSeleccionado, File ficheroDestino) {
         //Crear las copias de archivos para no trabajar sobre los originales
+
         FileChannel sourceChannel = null;
         FileChannel destChannel = null;
         try {
@@ -788,7 +806,7 @@ public class DslController implements Initializable {
 
     public void faseAnteriorAction(ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource("fasePsm.fxml"));
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/fasePsm.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);

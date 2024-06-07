@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.CimController">
+   <children>
+      <Accordion fx:id="accordion" prefHeight="700.0" prefWidth="1200.0">
+        <panes>
+          <TitledPane fx:id="panel1" animated="false" text="Identificación archivos de interés">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="285.0" layoutY="50.0" prefHeight="69.0" prefWidth="629.0" text="El primer paso es identificar los archivos relevantes. Para ello, es necesario analizar los archivos de &#10;interés, indicando los campos que sean útiles para el proyecto." textAlignment="CENTER">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Button fx:id="btnIndicarArchivos" layoutX="141.0" layoutY="532.0" mnemonicParsing="false" onAction="#btnIndicarArchivosAction" prefHeight="30.0" prefWidth="120.0" text="Indicar archivos">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <ListView fx:id="listViewCampos" layoutX="723.0" layoutY="145.0" prefHeight="354.0" prefWidth="304.0" />
+                        <Label layoutX="225.0" layoutY="118.0" text="Archivos identificados">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <ListView fx:id="listViewArchivos" layoutX="141.0" layoutY="145.0" onMouseClicked="#archivoIndicado" prefHeight="354.0" prefWidth="304.0" />
+                        <Label layoutX="818.0" layoutY="118.0" text="Campos de interés">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Button fx:id="btnQuitarArchivo" layoutX="328.0" layoutY="532.0" mnemonicParsing="false" onAction="#btnQuitarArchivoAction" prefHeight="30.0" prefWidth="117.0" text="Quitar archivos">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Button fx:id="btnQuitarCampo" layoutX="824.0" layoutY="532.0" mnemonicParsing="false" onAction="#btnQuitarCampoAction" text="Quitar campo">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                     </children></AnchorPane>
+            </content>
+               <font>
+                  <Font size="14.0" />
+               </font>
+          </TitledPane>
+          <TitledPane animated="false" text="Esquema gráfico">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="179.0" layoutY="43.0" prefHeight="77.0" prefWidth="841.0" text="El esquema gráfico representa la distribución de los archivos fuentes, sus campos y las relaciones entre distintos ficheros. &#10;La función de este elemento es describir a un buen nivel de detalle el dominio de los datos, para servir  de referencia en futuras fases." textAlignment="CENTER">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <ImageView fx:id="imageEsquema" fitHeight="365.0" fitWidth="986.0" layoutX="111.0" layoutY="130.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../esquemaDefault.png" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="btnCargarEsquema" layoutX="570.0" layoutY="545.0" mnemonicParsing="false" onAction="#btnCargarEsquemaAction" text="Cargar">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                     </children></AnchorPane>
+            </content>
+               <font>
+                  <Font size="14.0" />
+               </font>
+          </TitledPane>
+          <TitledPane animated="false" text="Requerimientos de los datos">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="251.0" layoutY="71.0" prefHeight="72.0" prefWidth="633.0" text="A través del análisis del dominio de los datos y el esquema gráfico, se elaboran los requerimientos de&#10;datos por medio de descripciones de los mismos. Estas descripciones deben ser lo suficientemente&#10;comprensibles para obtener requerimientos coherentes, correctos y completos." textAlignment="CENTER">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <ImageView fx:id="imageHelp" fitHeight="71.0" fitWidth="87.0" layoutX="922.0" layoutY="154.0" onMouseClicked="#imageHelpAction" opacity="0.81" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../ayuda.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </ImageView>
+                        <ListView fx:id="listviewRequerimientos" layoutX="251.0" layoutY="154.0" prefHeight="328.0" prefWidth="636.0" />
+                        <TextField fx:id="inputFieldRequerimientos" layoutX="251.0" layoutY="506.0" prefHeight="25.0" prefWidth="636.0" />
+                        <Button fx:id="btnEliminarRequerimiento" layoutX="928.0" layoutY="452.0" mnemonicParsing="false" onAction="#btnEliminarRequerimientoAction" text="Eliminar">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Button fx:id="btnAñadirRequerimiento" layoutX="928.0" layoutY="505.0" mnemonicParsing="false" onAction="#btnAñadirRequerimientoAction" prefWidth="68.0" text="Añadir">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Button fx:id="btnSiguienteFase" layoutX="1062.0" layoutY="554.0" mnemonicParsing="false" onAction="#btnSiguienteFaseAction" text="Siguiente fase">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                     </children></AnchorPane>
+            </content>
+               <font>
+                  <Font size="14.0" />
+               </font>
+          </TitledPane>
+        </panes>
+      </Accordion>
+   </children>
+</AnchorPane>

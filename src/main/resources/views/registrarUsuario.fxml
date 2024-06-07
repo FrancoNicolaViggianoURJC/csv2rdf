@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<TitledPane animated="false" collapsible="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" text="Registro de usuario" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.RegistrarUsuarioController">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="userFld" layoutX="204.0" layoutY="89.0" prefHeight="25.0" prefWidth="214.0" />
+            <Label layoutX="137.0" layoutY="93.0" text="Usuario:">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <Label layoutX="115.0" layoutY="123.0" text="Contraseña:">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <Label layoutX="69.0" layoutY="153.0" text="Repetir contraseña:">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <Label layoutX="163.0" layoutY="183.0" text="Rol:">
+               <font>
+                  <Font size="14.0" />
+               </font></Label>
+            <ChoiceBox fx:id="rolCheckBox" layoutX="204.0" layoutY="179.0" prefHeight="25.0" prefWidth="213.0" />
+            <Button fx:id="registrarBtn" layoutX="256.0" layoutY="225.0" mnemonicParsing="false" onAction="#onClickRegistrarBtn" text="Registrarse">
+               <font>
+                  <Font size="14.0" />
+               </font></Button>
+            <Button fx:id="volverBtn" layoutX="31.0" layoutY="316.0" mnemonicParsing="false" onAction="#onClickVolverBtn" text="Volver">
+               <font>
+                  <Font size="14.0" />
+               </font></Button>
+            <Label fx:id="errContraseñas" layoutX="240.0" layoutY="268.0" text="Las contraseñas no coinciden" textFill="RED" visible="false" />
+            <PasswordField fx:id="passFld1" layoutX="204.0" layoutY="119.0" prefHeight="25.0" prefWidth="214.0" />
+            <PasswordField fx:id="passFld2" layoutX="204.0" layoutY="149.0" prefHeight="25.0" prefWidth="214.0" />
+         </children></AnchorPane>
+  </content>
+   <font>
+      <Font size="14.0" />
+   </font>
+</TitledPane>

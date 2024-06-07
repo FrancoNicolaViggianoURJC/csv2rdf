@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fnvigg.csv2rdf.PimController">
+   <children>
+      <Accordion fx:id="accordion" prefHeight="700.0" prefWidth="1200.0">
+        <panes>
+          <TitledPane animated="false" prefHeight="700.0" prefWidth="1200.0" text="Introducción">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="273.0" layoutY="68.0" text="En esta fase, se va a realizar una serie de transformaciones sobre el esquema gráfico de forma que se obt-&#10;enga el modelo de dominio objetivo. Este modelo será un diagrama UML de clases, con atributos y los&#10;tipos de datos identificados. ">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <ImageView fitHeight="406.0" fitWidth="764.0" layoutX="217.0" layoutY="150.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../ayuda_pim.png" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="btnVolver" layoutX="14.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnVolverAction" text="Volver">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                     </children></AnchorPane>
+            </content>
+               <font>
+                  <Font size="14.0" />
+               </font>
+          </TitledPane>
+          <TitledPane animated="false" prefHeight="700.0" prefWidth="1200.0" text="Set de reglas">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="14.0" text="A continuación se presenta el set de reglas:">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Button fx:id="btnClases" layoutX="81.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnClasesAction" prefHeight="25.0" prefWidth="110.0" text="Clases">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Button fx:id="btnAsociaciones" layoutX="308.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnAsociacionesAction" prefWidth="110.0" text="Asociaciones">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Button fx:id="btnAtributos" layoutX="535.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnAtributosAction" prefHeight="25.0" prefWidth="110.0" text="Atributos">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Button fx:id="btnRutas" layoutX="989.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnRutasAction" prefHeight="25.0" prefWidth="110.0" text="Rutas">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <Label fx:id="lblTexto" layoutX="75.0" layoutY="94.0" prefHeight="81.0" prefWidth="1023.0" text=" - Las clases y sus nombres se obtendrán de los contenedores representados en el esquema gráfico.">
+                           <font>
+                              <Font size="13.0" />
+                           </font></Label>
+                        <ImageView fx:id="imageAyuda" fitHeight="392.0" fitWidth="842.0" layoutX="172.0" layoutY="177.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../clases.png" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="btnEnumerados" layoutX="762.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnEnumeradosAction" prefHeight="30.0" prefWidth="110.0" text="Enumerados">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                     </children></AnchorPane>
+            </content>
+               <font>
+                  <Font size="14.0" />
+               </font>
+          </TitledPane>
+          <TitledPane animated="false" prefHeight="700.0" prefWidth="1200.0" text="Modelo de dominio objetivo">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="24.0" layoutY="15.0" prefHeight="25.0" prefWidth="449.0" text="Para incorporar la imagen del MDO, pulse el botón y cargue el archivo.">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Label>
+                        <Button fx:id="btnCargarImagen" layoutX="534.0" layoutY="12.0" mnemonicParsing="false" onAction="#btnCargarImagenAction" text="Cargar imagen">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                        <ImageView fx:id="imageMDO" fitHeight="458.0" fitWidth="1027.0" layoutX="86.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true" />
+                        <Button fx:id="btnSiguienteFase" layoutX="1061.0" layoutY="550.0" mnemonicParsing="false" onAction="#btnSiguienteFaseAction" text="Siguiente fase">
+                           <font>
+                              <Font size="14.0" />
+                           </font></Button>
+                     </children></AnchorPane>
+            </content>
+               <font>
+                  <Font size="14.0" />
+               </font>
+          </TitledPane>
+        </panes>
+      </Accordion>
+   </children>
+</AnchorPane>

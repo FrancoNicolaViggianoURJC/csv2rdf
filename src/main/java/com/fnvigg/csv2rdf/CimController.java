@@ -59,7 +59,7 @@ public class CimController implements Initializable {
         //--------------- Panel 2 --------------------------------
 
         //Creamos el fichero de destino
-        File f = new File(System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/esquema.png");
+        File f = new File("./Proyectos/" + idProyecto + "/esquema.png");
         if(f.exists() && !f.isDirectory()) {
             Image img = new Image(f.getAbsolutePath());
             imageEsquema.setImage(img);
@@ -171,7 +171,7 @@ public class CimController implements Initializable {
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
         //Creamos el fichero de destino
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/" + ficheroSeleccionado.getName();
+        String ruta = "./Proyectos/" + idProyecto + "/" + ficheroSeleccionado.getName();
         File ficheroDestino = new File(ruta);
 
         if(!ficheroSeleccionado.getName().endsWith(".csv")){
@@ -275,7 +275,7 @@ public class CimController implements Initializable {
         //Obtenemos el nombre de proyecto
         String proyecto = AtributosSesion.getNombreProyecto();
         //Creamos el fichero de destino
-        String ruta = System.getProperty("user.dir")+ "/src/main/resources/Proyectos/" + idProyecto + "/esquema.png";
+        String ruta = "./Proyectos/" + idProyecto + "/esquema.png";
         File ficheroDestino = new File( ruta );
 
         if(ficheroSeleccionado != null && !ficheroSeleccionado.getName().endsWith(".png") && !ficheroSeleccionado.getName().endsWith(".PNG") ){
@@ -347,7 +347,8 @@ public class CimController implements Initializable {
 
     public void btnSiguienteFaseAction(ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource("fasePim.fxml"));
+            System.out.println(HelloApplication.class.getResource("/views/fasePim.fxml").getPath());
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/fasePim.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);

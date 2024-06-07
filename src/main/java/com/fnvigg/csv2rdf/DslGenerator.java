@@ -67,7 +67,7 @@ public class DslGenerator {
     }
 
     private void crearRutas(String clase) throws IOException {
-        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String rutaDSL = "./Proyectos/" + idProyecto + "/DSLCode.txt";
         File dslCode = new File(rutaDSL);
 
         FileWriter fw = new FileWriter(dslCode, true);
@@ -110,7 +110,7 @@ public class DslGenerator {
 
     private void crearClases() throws IOException {
 
-        String path = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String path = "./Proyectos/" + idProyecto + "/DSLCode.txt";
         File dslCode = new File(path);
         FileWriter fw = new FileWriter(dslCode, true);
         BufferedWriter bw = new BufferedWriter(fw);
@@ -161,7 +161,7 @@ public class DslGenerator {
 
 
     private void limpiarDSL() {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String ruta = "./Proyectos/" + idProyecto + "/DSLCode.txt";
         File dslCode = new File(ruta);
         if(dslCode.exists() && !dslCode.isDirectory()){
             dslCode.delete();
@@ -203,7 +203,7 @@ public class DslGenerator {
     }
 
     private void crearPrefixes() throws IOException {
-        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String rutaDSL = "./Proyectos/" + idProyecto + "/DSLCode.txt";
         File dslCode = new File(rutaDSL);
 
         FileWriter fw = new FileWriter(dslCode, true);
@@ -216,7 +216,7 @@ public class DslGenerator {
     }
 
     private void crearPredicateObjects(String clase) throws IOException {
-        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String rutaDSL = "./Proyectos/" + idProyecto + "/DSLCode.txt";
         File dslCode = new File(rutaDSL);
 
         FileWriter fw = new FileWriter(dslCode, true);
@@ -256,7 +256,7 @@ public class DslGenerator {
     }
 
     private void crearSubjects(String clase) throws IOException {
-        String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/DSLCode.txt";
+        String rutaDSL = "./Proyectos/" + idProyecto + "/DSLCode.txt";
         File dslCode = new File(rutaDSL);
 
         FileWriter fw = new FileWriter(dslCode, true);

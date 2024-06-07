@@ -72,7 +72,7 @@ public class OntologyGenerator {
     }
 
     private void limpiarArchivo() {
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
+        String output = "./Proyectos/"+idProyecto+"/ontology.txt";
         File archivo = new File(output);
 
         if(archivo.exists() && !archivo.isDirectory()){
@@ -86,7 +86,7 @@ public class OntologyGenerator {
         /*
                     File writers
          */
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
+        String output = "./Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
@@ -194,7 +194,7 @@ public class OntologyGenerator {
         //FileReader fr = new FileReader(input);
         //BufferedReader br = new BufferedReader(fr);
 
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
+        String output = "./Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
@@ -245,7 +245,7 @@ public class OntologyGenerator {
         //}
 
         try{
-            String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
+            String output = "./Proyectos/"+idProyecto+"/ontology.txt";
 
             File archivo = new File(output);
             FileWriter fw = new FileWriter(archivo, true);
@@ -395,7 +395,7 @@ public class OntologyGenerator {
 
     private void escribirDatatypes(LinkedList<String> datatypes) throws IOException {
 
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
+        String output = "./Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);
@@ -466,7 +466,7 @@ public class OntologyGenerator {
     }
 
     private void escribirObjects(LinkedList<String> objects) throws IOException {
-        String output = System.getProperty("user.dir") + "/src/main/resources/Proyectos/"+idProyecto+"/ontology.txt";
+        String output = "./Proyectos/"+idProyecto+"/ontology.txt";
 
         File archivo = new File(output);
         FileWriter fw = new FileWriter(archivo, true);

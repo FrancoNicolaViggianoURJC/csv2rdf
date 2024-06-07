@@ -15,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -84,6 +85,14 @@ public class ProyectosController implements Initializable {
     }
 
     @FXML
+    private boolean mostrarAlertaArchivos(ActionEvent event){
+        Alert alertaNombre = new Alert(Alert.AlertType.INFORMATION);
+        alertaNombre.setTitle("Atencion");
+        alertaNombre.setContentText("Ha ocurrido un error con el sistema de archivos");
+        Optional<ButtonType> resultado = alertaNombre.showAndWait();
+        return false;
+    }
+    @FXML
     private boolean mostrarAlertaCampos(ActionEvent event){
         Alert alertaNombre = new Alert(Alert.AlertType.INFORMATION);
         alertaNombre.setTitle("Atencion");
@@ -128,7 +137,7 @@ public class ProyectosController implements Initializable {
 
     private void cargarEscena(String s, ActionEvent event) {
         try {
-            root = FXMLLoader.load(getClass().getResource(s));
+            root = FXMLLoader.load(HelloApplication.class.getResource("/views/"+s));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
             stage.setScene(scene);
@@ -153,6 +162,7 @@ public class ProyectosController implements Initializable {
                     lblDatos.setVisible(false);
                     lblOntologico.setVisible(false);
                 }
+                actualizarLista();
 
             }else{
                 mostrarAlertaBorrado(event);
@@ -172,33 +182,48 @@ public class ProyectosController implements Initializable {
 
     public void onClickRegistrarProyecto(ActionEvent event) {
         //Obtencion de los campos
-        String nombreProyecto = nameProyectFld.getText();
-        String nombreOntologico = ontologicProyectFld.getText();
-        String nombreDato = dataProyectFld.getText();
-        //Comprobacion que ninguno esté vacio
-        if(nombreProyecto.equals("") || nombreDato.equals("") || nombreOntologico.equals("")){
-            mostrarAlertaCampos(event);
+
+        //Crear el directorio donde se guardarán los proyectos
+        Boolean bool = false;
+
+        File f = new File("./Proyectos");
+        if(!f.exists()){
+            bool = f.mkdir();
         }else{
-            boolean insertado = DatabaseH2.insertProyecto(nombreDato, nombreOntologico, nombreProyecto);
-            String idProyecto = DatabaseH2.getProyectosID(nombreProyecto);
-            if(insertado){
-                //Se crea el proyecto
-                crearDirectorio(idProyecto);
-                actualizarLista();
-                initCampos();
-            }else{
-                //No se crea el proyecto
-                mostrarAlertaNombre(event);
-            }
+            bool = true;
         }
+
+        if(bool){
+            String nombreProyecto = nameProyectFld.getText();
+            String nombreOntologico = ontologicProyectFld.getText();
+            String nombreDato = dataProyectFld.getText();
+            //Comprobacion que ninguno esté vacio
+            if(nombreProyecto.equals("") || nombreDato.equals("") || nombreOntologico.equals("")){
+                mostrarAlertaCampos(event);
+            }else{
+                boolean insertado = DatabaseH2.insertProyecto(nombreDato, nombreOntologico, nombreProyecto);
+                String idProyecto = DatabaseH2.getProyectosID(nombreProyecto);
+                if(insertado){
+                    //Se crea el proyecto
+                    crearDirectorio(idProyecto);
+                    actualizarLista();
+                    initCampos();
+                }else{
+                    //No se crea el proyecto
+                    mostrarAlertaNombre(event);
+                }
+            }
+        }else{
+            mostrarAlertaArchivos(event);
+        }
+
 
     }
 
     private void crearDirectorio(String id) {
-        String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + id;
-        File directorio = new File(ruta);
-        if (!directorio.exists()){
-            directorio.mkdirs();
+        File f = new File("./Proyectos/"+id);
+        if (!f.exists()){
+            f.mkdirs();
         }
     }
 

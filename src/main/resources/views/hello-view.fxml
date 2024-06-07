@@ -13,7 +13,7 @@
                 <Line layoutX="300.0" startY="407.0" stroke="LIGHTGRAY" strokeWidth="5.0" />
                 <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="52.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../logo.png" />
+                        <Image url="@../logo.png" />
                     </image>
                 </ImageView>
                 <Label layoutX="97.0" layoutY="199.0" text="Helptool" textFill="WHITE">
