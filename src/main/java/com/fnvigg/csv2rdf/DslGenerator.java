@@ -23,19 +23,6 @@ public class DslGenerator {
     private List<Quartet<String, String, ArrayList<String>, ArrayList<String>>> rutas;
     private List<String> clases;
     private List<Pair<String,String>> rutasAux;
-    //public DslGenerator(List<String> clases) {
-    //    //Lanzar los metodos para escribir el codigo DSL
-    //    this.clases = clases;
-//
-    //    limpiarDSL();
-    //    try {
-    //        crearFiles();
-    //        crearPrefixes();
-    //        crearClases();
-    //    } catch (IOException e) {
-    //        throw new RuntimeException(e);
-    //    }
-    //}
 
     public DslGenerator(String idProyecto, List<Pair<String, String>> clasesRutas,
                         Map<String, String> clasesPk, List<Triplet<String, String,
@@ -120,7 +107,8 @@ public class DslGenerator {
                 String clase = claseRuta.getKey();
                 clases.add(clase);
                 String ruta = claseRuta.getValue();
-                bw.write("FILE(#"+clase.replace(".csv", "")+" , " +ruta+")\n");
+                File f_Aux = new File(ruta);
+                bw.write("FILE(#"+clase.replace(".csv", "")+" , " +f_Aux.getAbsolutePath()+")\n");
             }
         }
 
@@ -129,34 +117,13 @@ public class DslGenerator {
                 String clase = claseRuta.getKey();
                 //clases.add(clase);
                 String ruta = claseRuta.getValue();
-                bw.write("FILE(#"+clase.replace(".csv", "")+" , " +ruta+")\n");
+                File f_Aux = new File(ruta);
+                bw.write("FILE(#"+clase.replace(".csv", "")+" , " +f_Aux.getAbsolutePath()+")\n");
             }
         }
         bw.close();
         fw.close();
-       // for(String clase : clases){
-       //     String nombreClase = clase.replaceAll(".csv","");
-       //     String rutaClase = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/" + nombreClase + "DSL.txt";
-       //     File claseFile = new File(rutaClase);
-       //     FileReader fr = new FileReader(claseFile);
-       //     BufferedReader br = new BufferedReader(fr);
-//
-       //     String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
-       //     File dslCode = new File(ruta);
-       //     FileWriter fw = new FileWriter(dslCode, true);
-       //     BufferedWriter bw = new BufferedWriter(fw);
-//
-       //     String linea = br.readLine();
-       //     while(linea != null){
-       //         bw.write(linea+"\n");
-       //         linea = br.readLine();
-       //     }
-//
-       //     bw.close();
-       //     fw.close();
-       //     br.close();
-       //     fr.close();
-       // }
+
     }
 
 
@@ -166,40 +133,6 @@ public class DslGenerator {
         if(dslCode.exists() && !dslCode.isDirectory()){
             dslCode.delete();
         }
-    }
-
-    private void crearFiles() throws IOException {
-
-
-        //iterar el archivo clasesUML
-        //A las clases escritas solo hay que añadirles el .csv para el source
-        //String ruta = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/clasesUML.txt";
-        //File clasesUML = new File(ruta);
-        //String rutaDSL = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + nombreProyecto + "/DSLCode.txt";
-        //File dslCode = new File(rutaDSL);
-        //if(clasesUML.exists() && !clasesUML.isDirectory()){
-        //    FileReader fr = new FileReader(clasesUML);
-        //    BufferedReader br = new BufferedReader(fr);
-        //    FileWriter fw = new FileWriter(dslCode, true);
-        //    BufferedWriter bw = new BufferedWriter(fw);
-//
-        //    String linea = br.readLine();
-//
-        //    if(linea != null){
-        //        String[] tokens = linea.split(",");
-        //        for(String clase : tokens){
-        //            bw.write("FILE(#"+clase+", "+clase+".csv)\n");
-        //        }
-        //    }
-//
-        //    bw.close();
-        //    fw.close();
-        //    br.close();
-        //    fr.close();
-        //}else{
-        //    System.out.println("Error al leer clasesUML");
-        //}
-        //System.out.println("clases escritas");
     }
 
     private void crearPrefixes() throws IOException {

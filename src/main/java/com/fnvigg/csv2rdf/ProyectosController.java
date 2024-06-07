@@ -154,7 +154,7 @@ public class ProyectosController implements Initializable {
             Boolean exito = DatabaseH2.deleteProyecto(nombreProyecto);
             if(exito){
                 //Borrar tambien el directorio del proyecto
-                String path = System.getProperty("user.dir") + "/src/main/resources/Proyectos/" + idProyecto + "/";
+                String path = "./Proyectos/" + idProyecto + "/";
                 File directorio = new File(path);
                 if(directorio.exists()){
                     borrarDirectorio(directorio);

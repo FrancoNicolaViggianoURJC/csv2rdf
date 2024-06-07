@@ -330,7 +330,7 @@ public class DslController implements Initializable {
 
         InputStream inputStream = HelloApplication.class.getResourceAsStream("/DSLengine2RDF.jar");
         File tempFile = File.createTempFile("DSLengine2RDF", ".jar");
-        tempFile.deleteOnExit(); // Eliminar el archivo al salir
+        //tempFile.deleteOnExit(); // Eliminar el archivo al salir
 
         // Copiar el contenido del InputStream al archivo temporal
         try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
@@ -356,13 +356,16 @@ public class DslController implements Initializable {
         String rutaLog = "./Proyectos/" + idProyecto + "/log.txt";
         File log = new File(rutaLog);
         File out = new File(rutaOut);
+        File dslFile = new File(rutaDSL);
+        System.out.println("RUTA DSL:");
+        System.out.println(dslFile.getAbsolutePath());
 
         //Configurar el env del jar
         String directorio = "./Proyectos/" + idProyecto + "/";
         File dirFile = new File(directorio);
 
         //Ejecucion del jar
-        ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar" , tempFile.getAbsolutePath() , rutaDSL);
+        ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar" , tempFile.getAbsolutePath() , dslFile.getAbsolutePath());
         processBuilder.directory(dirFile);
         processBuilder.redirectError(log);
         processBuilder.redirectOutput(out);
