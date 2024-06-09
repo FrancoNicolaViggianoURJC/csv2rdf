@@ -13,6 +13,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -42,6 +44,7 @@ public class DslController implements Initializable {
     public Label atributoClaveLbl;
     public ChoiceBox classChoice;
     public Label clasePerteneceLbl;
+    public ImageView imgViewAyuda;
     private String nombreProyecto;
     private Gestor_proyectos proyectos = new Gestor_proyectos();
     private Map<String, String> keyFlds;
@@ -90,7 +93,10 @@ public class DslController implements Initializable {
 
         //Panel 2
         cargarChoicebox();
-
+        //String path = HelloApplication.class.getResource("/ayuda.png").getPath();
+        //File file = new File(path);
+        Image img = new Image(HelloApplication.class.getResource("/ayuda.png").toString());
+        imgViewAyuda.setImage(img);
         //Actualizar la fase en el setting
         DatabaseH2.updateProyectosFase("PSM", idProyecto);
     }
@@ -595,11 +601,26 @@ public class DslController implements Initializable {
         Optional<ButtonType> resultado = alerta.showAndWait();
         return false;
     }
+
+
     /*
     ----------------------- PANEL RUTAS ---------------------------------------
      */
     // nombreRuta , Archivos[], Atributos[]
     // Para el archivo[0], su atributo relevante es el atributos[0]
+
+    @FXML
+    private boolean mostrarAyudaVisualRuta() {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle("Rutas de archivos");
+        ImageView imgview = new ImageView(new Image(HelloApplication.class.getResource("/ayuda_visual_rutas.png").toString()));
+        alerta.setGraphic(imgview);
+        alerta.setTitle("Ayuda visual rutas");
+        alerta.setHeaderText(" ");
+        Optional<ButtonType> resultado = alerta.showAndWait();
+        return false;
+    }
+
     List<Quartet<String, String, ArrayList<String>, ArrayList<String>>> rutas = new ArrayList<>();
 
     private void cargarChoicebox() {
@@ -817,5 +838,9 @@ public class DslController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void onClickMostrarAyudaPath(MouseEvent mouseEvent) {
+        mostrarAyudaVisualRuta();
     }
 }

@@ -50,7 +50,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="179.0" layoutY="43.0" prefHeight="77.0" prefWidth="841.0" text="El esquema gráfico representa la distribución de los archivos fuentes, sus campos y las relaciones entre distintos ficheros. &#10;La función de este elemento es describir a un buen nivel de detalle el dominio de los datos, para servir  de referencia en futuras fases." textAlignment="CENTER">
+                        <Label layoutX="179.0" layoutY="43.0" prefHeight="77.0" prefWidth="841.0" text="El esquema gráfico representa la distribución de los archivos fuentes, sus campos y las relaciones entre distintos ficheros. &#10;La función de este elemento es describir a un buen nivel de detalle el dominio de los datos, para servir de referencia en futuras fases." textAlignment="CENTER">
                            <font>
                               <Font size="14.0" />
                            </font></Label>
